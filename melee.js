@@ -1,4 +1,415 @@
+/**
+ * melee.js
+ * Manages Chainmail melee attacks
+ */
+
+
+/**
+ * Set to true when listening for API triggered melee dice roll
+ * Then immediately set false again so we don't capture any
+ * other rolls.
+ * @type {boolean}
+ * @private
+ */
+var _isMeleeAttacking = false;
+
+/**
+ * Set to listen for counter attacks
+ * @type {boolean}
+ * @private
+ */
+var _isMeleeDefending = false;
+
+/**
+ * Gets set to the last selected object after a melee attack
+ * @type {object}
+ * @private
+ */
+var _selectedObj;
+
+/**
+ * Gets set to the last targeted object after a melee attack
+ * @type {object}
+ * @private
+ */
+var _targetObj;
+
+
+/**
+ * On Chat Listener
+ */
 on("chat:message", function(msg) {
+    //meleeMorale(msg);
+    try {
+        meleeAttack(msg);
+        meleeDiceListener(msg);
+    }
+    catch(err) {
+        if (typeof err === "string") {
+            log("String error caught: " + err);
+        }
+        else if (typeof err === "object" && typeof err.chatMsg !== "undefined") {
+            log(err);
+            sendChat(msg.who, err.chatMsg);
+        }
+        else if (typeof err === "undefined") {
+            log("Threw an undefined exception: Probably forgot to use 'new'.");
+        }
+        else {
+            log("Unknown error type: " + err);
+        }
+    }
+});
+
+function postCasualties(msg, unitObj)
+{
+    // check for dead unit before heavy loss
+
+    // apply casualties
+    // resolve melee morale
+    // end of melee
+    sendChat(msg.who, "Done");
+}
+
+function heavyLossMoraleCheck(msg, unitObj) {
+    var typeAttribute = "Unit Type";
+    var unitType = getAttributeWithError(unitObj, typeAttribute);
+    var casualties = getTokenBarValue(unitObj, 3);
+    var maxTroops = getTokenBarValue(unitObj, 1, "max");
+    var targetLoss;
+    var targetSave;
+    if (unitType === "Light Foot"
+        || unitType === "Peasant"
+        || unitType === "Levies"
+        || unitType === "Light Horse"
+        ) {
+        targetLoss = 1/4;
+        targetSave = 8;
+    }
+    else if (unitType === "Heavy Foot"
+        || unittype === "Medium Horse"
+    ) {
+        targetLoss = 1/3;
+        targetSave = 7;
+    }
+    else if (unitType === "Armored Foot") {
+        targetLoss = 1/3;
+        targetSave = 6;
+    }
+    else if (unitType === "Heavy Horse") {
+        targetLoss = 1/2;
+        targetSave = 6;
+    }
+    else if (unitType === "Knight") {
+        targetLoss = 1/2;
+        targetSave = 4;
+    }
+    else {
+        var chatMsg = "Failed to recognize unit type for heavy loss morale check: "
+            + unitType;
+        var logMsg = "";
+        throw new roll20Exception(logMsg, chatMsg);
+    }
+
+    var threshold = Math.ceil(targetLoss * maxTroops);
+    if (casualties <= threshold) { return; }
+
+    sendChat(msg.who, "/r (2d6>" + targetSave + ") save vs. massive casualties");
+
+}
+
+/**
+ * Listens for the dice rolled during a melee attack.
+ *
+ * Listening for dice this way, rather than using the sendChat callback, allows us to
+ * show the dice rolls that we act on.
+ *
+ *  {
+ *      "type":"V",
+ *      "rolls":[{
+ *          "type":"R",
+ *          "dice":20,
+ *          "sides":6,
+ *          "mods":{
+ *              "success":{
+ *                  "comp":">=",
+ *                  "point":6
+ *              }
+ *          },
+ *          "results":[
+ *              {"v":2},
+ *              {"v":2},
+ *              {"v":1},
+ *              {"v":4},
+ *              {"v":1},
+ *              {"v":5},
+ *              {"v":2},
+ *              {"v":2},
+ *              {"v":3},
+ *              {"v":4},
+ *              {"v":5},
+ *              {"v":3},
+ *              {"v":5},
+ *              {"v":5},
+ *              {"v":3},
+ *              {"v":3},
+ *              {"v":2},
+ *              {"v":2},
+ *              {"v":6},
+ *              {"v":6}
+ *          ]
+ *      }],
+ *      "resultType":"success",
+ *      "total":2
+ *  }
+ *
+ * @param msg
+ */
+function meleeDiceListener(msg) {
+    var rollData;
+    var kills;
+    var priorCasualties;
+    var totalCasualties;
+    var barnum = 3;
+    var casualtiesBarValue = "bar"+ barnum + "_value";
+    var selectedName;
+    var targetName;
+
+    if (msg.type === "rollresult" && _isMeleeAttacking === true) {
+        _isMeleeAttacking = false;
+        selectedName = getPropertyValue(_selectedObj, "name");
+        targetName = getPropertyValue(_targetObj, "name");
+        rollData = JSON.parse(msg.content);
+        kills = rollData.total;
+
+        // add casualties to defender
+        priorCasualties = getTokenBarValue(_targetObj, barnum);
+        totalCasualties = (priorCasualties*1) + (kills*1);
+        _targetObj.set(casualtiesBarValue, totalCasualties);
+
+        // announce casualties
+        sendChat(msg.who, selectedName + " attacks " + targetName + " and kills "
+            + kills + " troops.");
+        heavyLossMoraleCheck(msg, _targetObj);
+    }
+    else if (msg.type === "rollresult" && _isMeleeDefending === true) {
+        _isMeleeDefending = false;
+        selectedName = getPropertyValue(_selectedObj, "name");
+        targetName = getPropertyValue(_targetObj, "name");
+        rollData = JSON.parse(msg.content);
+        kills = rollData.total;
+
+        // add casualties to defender
+        priorCasualties = getTokenBarValue(_selectedObj, barnum);
+        totalCasualties = (priorCasualties*1) + (kills*1);
+        _selectedObj.set(casualtiesBarValue, totalCasualties);
+
+        // announce casualties
+        sendChat(msg.who, targetName + " counterattacks " + selectedName + " and kills "
+            + kills + " troops.");
+
+        heavyLossMoraleCheck(msg, _selectedObj);
+
+        postCasualties(msg);
+    }
+
+}
+
+function meleeAttack(msg) {
+    if (msg.type === "api" && msg.content.indexOf("!melee ") !== -1) {
+        var argStr = msg.content.replace("!melee ", "");
+        var argList = argStr.split(",");
+        var format = "!melee @{selected|token_id},@{target|token_id},?{Are there less than 20 Units per side|Yes|No}";
+        if (argList.length !== 3) {
+            var logMsg = "Not enough argumentsin !melee command: " + msg.content;
+            var chatMsg = "The !melee macro is set up incorrectly.";
+            throw new roll20Exception(logMsg, chatMsg);
+        }
+        var selectedId = argList[0];
+        var targetId = argList[1];
+        var isLowUnits = argList[2] === "Yes";
+        var tokenType = "graphic";
+        _selectedObj = getObjectWithReport(tokenType, selectedId);
+        _targetObj = getObjectWithReport(tokenType, targetId);
+        var selectedSheetId = getPropertyValue(_selectedObj, "represents");
+        var targetSheetId = getPropertyValue(_targetObj, "represents");
+        var typeAttribute = "Unit Type";
+        var selectedUnitType = getAttributeWithError(selectedSheetId, typeAttribute);
+        var targetUnitType = getAttributeWithError(targetSheetId, typeAttribute);
+
+        // TODO: these are affected by flanking
+        var attackDiceFactor = getAttackDiceFactor(selectedUnitType, targetUnitType);
+        var selectedTroops = getTokenBarValue(_selectedObj, 1);
+
+        /* TODO: All troops formed in close order with pole arms can only take frontal melee
+         * damage from like-armed troops.
+         */
+        var weaponAttribute = "Weapon";
+        var selectedWeapon = getAttributeWithError(selectedSheetId, weaponAttribute);
+        var pikeMod = (selectedWeapon === "Pike"
+            || selectedWeapon === "Halbard"
+            || selectedWeapon === "Pole"
+            ) ? 1 : 0;
+        var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
+
+        var targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
+
+        // start attack dice roll listener
+        _isMeleeAttacking = true;
+        sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber);
+
+        // counterattack:
+        // TODO: affected by flanking
+        attackDiceFactor = getAttackDiceFactor(targetUnitType, selectedUnitType);
+        var targetTroops = getTokenBarValue(_targetObj, 1);
+        // TODO: close order pole arms and frontal damage
+        var targetWeapon = getAttributeWithError(targetSheetId, weaponAttribute);
+        pikeMod = (targetWeapon === "Pike"
+            || targetWeapon === "Halbard"
+            || targetWeapon === "Pole"
+            ) ? 1 : 0;
+        numberOfDice = Math.ceil(targetTroops * attackDiceFactor) + pikeMod;
+        targetNumber = getAttackerTargetNumber(targetUnitType, selectedUnitType);
+        _isMeleeDefending = true;
+        sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber);
+    }
+}
+
+function getAttackerTargetNumber(selectedUnitType, targetUnitType) {
+
+    var logMsg = "";
+    var chatMsg = "Unrecognized target unit type: " + targetUnitType;
+
+    if (selectedUnitType === "Light Foot") {
+        if (targetUnitType === "Light Foot") { return 6; }
+        if (targetUnitType === "Heavy Foot") { return 6; }
+        if (targetUnitType === "Armored Foot") { return 6; }
+        if (targetUnitType === "Light Horse") { return 6; }
+        if (targetUnitType === "Medium Horse") { return 6; }
+        if (targetUnitType === "Heavy Horse") { return 6; }
+        throw new roll20Exception(logMsg, chatMsg);
+    }
+    else if (selectedUnitType === "Heavy Foot") {
+        if (targetUnitType === "Light Foot") { return 5; }
+        if (targetUnitType === "Heavy Foot") { return 6; }
+        if (targetUnitType === "Armored Foot") { return 6; }
+        if (targetUnitType === "Light Horse") { return 6; }
+        if (targetUnitType === "Medium Horse") { return 6; }
+        if (targetUnitType === "Heavy Horse") { return 6; }
+        throw new roll20Exception(logMsg, chatMsg);
+    }
+    else if (selectedUnitType === "Armored Foot") {
+        if (targetUnitType === "Light Foot") { return 4; }
+        if (targetUnitType === "Heavy Foot") { return 5; }
+        if (targetUnitType === "Armored Foot") { return 6; }
+        if (targetUnitType === "Light Horse") { return 6; }
+        if (targetUnitType === "Medium Horse") { return 6; }
+        if (targetUnitType === "Heavy Horse") { return 6; }
+        throw new roll20Exception(logMsg, chatMsg);
+    }
+    else if (selectedUnitType === "Light Horse") {
+        if (targetUnitType === "Light Foot") { return 5; }
+        if (targetUnitType === "Heavy Foot") { return 6; }
+        if (targetUnitType === "Armored Foot") { return 6; }
+        if (targetUnitType === "Light Horse") { return 6; }
+        if (targetUnitType === "Medium Horse") { return 6; }
+        if (targetUnitType === "Heavy Horse") { return 6; }
+        throw new roll20Exception(logMsg, chatMsg);
+    }
+    else if (selectedUnitType === "Medium Horse") {
+        if (targetUnitType === "Light Foot") { return 4; }
+        if (targetUnitType === "Heavy Foot") { return 5; }
+        if (targetUnitType === "Armored Foot") { return 6; }
+        if (targetUnitType === "Light Horse") { return 5; }
+        if (targetUnitType === "Medium Horse") { return 6; }
+        if (targetUnitType === "Heavy Horse") { return 6; }
+        throw new roll20Exception(logMsg, chatMsg);
+    }
+    else if (selectedUnitType === "Heavy Horse") {
+        if (targetUnitType === "Light Foot") { return 5; }
+        if (targetUnitType === "Heavy Foot") { return 5; }
+        if (targetUnitType === "Armored Foot") { return 5; }
+        if (targetUnitType === "Light Horse") { return 5; }
+        if (targetUnitType === "Medium Horse") { return 5; }
+        if (targetUnitType === "Heavy Horse") { return 6; }
+        throw new roll20Exception(logMsg, chatMsg);
+    }
+
+    chatMsg = "Unrecognized selected unit type: " + selectedUnitType;
+    throw new roll20Exception(logMsg, chatMsg);
+}
+
+/**
+ * Appendix A - Get the number of melee dice to fire against a defender
+ *
+ * @param selectedUnitType
+ * @param targetUnitType
+ */
+function getAttackDiceFactor(selectedUnitType, targetUnitType) {
+
+    var logMsg = "";
+    var chatMsg = "Unrecognized target unit type: " + targetUnitType;
+
+    if (selectedUnitType === "Light Foot") {
+        if (targetUnitType === "Light Foot") { return 1; }
+        if (targetUnitType === "Heavy Foot") { return 1/2; }
+        if (targetUnitType === "Armored Foot") { return 1/3; }
+        if (targetUnitType === "Light Horse") { return 1/2; }
+        if (targetUnitType === "Medium Horse") { return 1/3; }
+        if (targetUnitType === "Heavy Horse") { return 1/4; }
+        throw new roll20Exception(logMsg, chatMsg);
+    }
+    else if (selectedUnitType === "Heavy Foot") {
+        if (targetUnitType === "Light Foot") { return 1; }
+        if (targetUnitType === "Heavy Foot") { return 1; }
+        if (targetUnitType === "Armored Foot") { return 1/2; }
+        if (targetUnitType === "Light Horse") { return 1/2; }
+        if (targetUnitType === "Medium Horse") { return 1/3; }
+        if (targetUnitType === "Heavy Horse") { return 1/4; }
+        throw new roll20Exception(logMsg, chatMsg);
+    }
+    else if (selectedUnitType === "Armored Foot") {
+        if (targetUnitType === "Light Foot") { return 1; }
+        if (targetUnitType === "Heavy Foot") { return 1; }
+        if (targetUnitType === "Armored Foot") { return 1; }
+        if (targetUnitType === "Light Horse") { return 1; }
+        if (targetUnitType === "Medium Horse") { return 1/2; }
+        if (targetUnitType === "Heavy Horse") { return 1/3; }
+        throw new roll20Exception(logMsg, chatMsg);
+    }
+    else if (selectedUnitType === "Light Horse") {
+        if (targetUnitType === "Light Foot") { return 2; }
+        if (targetUnitType === "Heavy Foot") { return 2; }
+        if (targetUnitType === "Armored Foot") { return 1; }
+        if (targetUnitType === "Light Horse") { return 1; }
+        if (targetUnitType === "Medium Horse") { return 1/2; }
+        if (targetUnitType === "Heavy Horse") { return 1/3; }
+        throw new roll20Exception(logMsg, chatMsg);
+    }
+    else if (selectedUnitType === "Medium Horse") {
+        if (targetUnitType === "Light Foot") { return 2; }
+        if (targetUnitType === "Heavy Foot") { return 2; }
+        if (targetUnitType === "Armored Foot") { return 2; }
+        if (targetUnitType === "Light Horse") { return 1; }
+        if (targetUnitType === "Medium Horse") { return 1; }
+        if (targetUnitType === "Heavy Horse") { return 1/2; }
+        throw new roll20Exception(logMsg, chatMsg);
+    }
+    else if (selectedUnitType === "Heavy Horse") {
+        if (targetUnitType === "Light Foot") { return 4; }
+        if (targetUnitType === "Heavy Foot") { return 3; }
+        if (targetUnitType === "Armored Foot") { return 2; }
+        if (targetUnitType === "Light Horse") { return 2; }
+        if (targetUnitType === "Medium Horse") { return 1; }
+        if (targetUnitType === "Heavy Horse") { return 1; }
+        throw new roll20Exception(logMsg, chatMsg);
+    }
+
+    chatMsg = "Unrecognized selected unit type: " + selectedUnitType;
+    throw new roll20Exception(logMsg, chatMsg);
+}
+
+function meleeMorale(msg) {
     if(msg.type === "api" && msg.content.indexOf("!melee") !== -1) {
 
         var argStr = msg.content.replace("!melee ", "");
@@ -45,7 +456,7 @@ on("chat:message", function(msg) {
             }
         }
     }
-});
+}
 
 
 function getSelectedObjects(selectedArray) {
@@ -258,6 +669,7 @@ function getTokenBarMax(tokenObj, barNum) {
 
 /**
  * Gets the value of an object property with validation
+ *
  * @param obj
  * @param property
  * @returns {*}

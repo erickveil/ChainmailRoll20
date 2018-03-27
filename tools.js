@@ -43,7 +43,7 @@ function validateObjectType(targetObj, tokenType) {
 /**
  * Gets the value set to one of the three token bars
  *
- * @param tokenObj
+ * @param tokenId
  * @param barNum
  */
 function getTokenBarValue(tokenObj, barNum) {
@@ -92,7 +92,7 @@ function getAttributeWithError(characterId, attribute, valueType)
     if (typeof attVal === "undefined") {
         var logMsg = "Could not find attribute " + attribute
             + " value from character id " + characterId;
-        var chatMsg = "logMsg";
+        var chatMsg = "";
         throw new roll20Exception(logMsg, chatMsg);
     }
     return attVal;

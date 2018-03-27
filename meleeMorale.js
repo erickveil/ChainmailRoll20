@@ -252,3 +252,5 @@ function getSideWithFewerCasualties(selected, target) {
 function announceMoraleFactors(speaker, tokenName, tokenCasualties, tokenTroops) {
     sendChat(speaker, tokenName + " has lost " + tokenCasualties + " troops this round and has " + tokenTroops + " troops remaining.");
 }
+
+

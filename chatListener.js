@@ -45,16 +45,14 @@
  * Then immediately set false again so we don't capture any
  * other rolls.
  * @type {boolean}
- * @private
  */
-var _isMeleeAttacking = false;
+var isMeleeAttacking = false;
 
 /**
  * Set to listen for counter attacks
  * @type {boolean}
- * @private
  */
-var _isMeleeDefending = false;
+var isMeleeDefending = false;
 
 /* ========== MAIN ============ */
 
@@ -63,6 +61,7 @@ var _isMeleeDefending = false;
  */
 on("chat:message", function(msg) {
     try {
+        eventMassiveCasualtyRoll(msg);
         eventMeleeAttack(msg);
         eventMeleeDiceRolled(msg);
     }
@@ -106,40 +105,33 @@ function eventMeleeDiceRolled(msg) {
     var selectedName;
     var targetName;
 
-    if (msg.type === "rollresult" && _isMeleeAttacking === true) {
-        _isMeleeAttacking = false;
+    if (msg.type === "rollresult" && isMeleeAttacking === true) {
+        isMeleeAttacking = false;
         selectedName = getPropertyValue(_selectedObj, "name");
         targetName = getPropertyValue(_targetObj, "name");
         rollData = JSON.parse(msg.content);
-        kills = rollData.total;
+        kills = (rollData.total)*1;
 
-        // add casualties to defender
-        priorCasualties = getTokenBarValue(_targetObj, barnum);
-        totalCasualties = (priorCasualties*1) + (kills*1);
-        _targetObj.set(casualtiesBarValue, totalCasualties);
+        // set casualties to defender
+        _targetObj.set(casualtiesBarValue, kills);
 
         // announce casualties
         sendChat(msg.who, selectedName + " attacks " + targetName + " and kills "
             + kills + " troops.");
-        heavyLossMoraleCheck(msg, _targetObj);
     }
-    else if (msg.type === "rollresult" && _isMeleeDefending === true) {
-        _isMeleeDefending = false;
+    else if (msg.type === "rollresult" && isMeleeDefending === true) {
+        isMeleeDefending = false;
         selectedName = getPropertyValue(_selectedObj, "name");
         targetName = getPropertyValue(_targetObj, "name");
         rollData = JSON.parse(msg.content);
-        kills = rollData.total;
+        kills = (rollData.total)*1;
 
         // add casualties to defender
-        priorCasualties = getTokenBarValue(_selectedObj, barnum);
-        totalCasualties = (priorCasualties*1) + (kills*1);
-        _selectedObj.set(casualtiesBarValue, totalCasualties);
+        _selectedObj.set(casualtiesBarValue, kills);
 
         // announce casualties
         sendChat(msg.who, targetName + " counterattacks " + selectedName + " and kills "
             + kills + " troops.");
-
-        heavyLossMoraleCheck(msg, _selectedObj);
 
         // check for dead unit before heavy loss
 
@@ -149,4 +141,7 @@ function eventMeleeDiceRolled(msg) {
         sendChat(msg.who, "Done");
     }
 
+
 }
+
+

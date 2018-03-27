@@ -59,17 +59,10 @@ function eventMeleeAttack(msg) {
 
         // start attack dice roll listener
 
-        /*
-        var selectedName = getPropertyValue(_selectedObj, "name");
-        var targetName = getPropertyValue(_targetObj, "name");
-        */
+        // global reference
+        isMeleeAttacking = true;
 
-        _isMeleeAttacking = true;
         sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber);
-            /*
-        sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber
-            + " **" + selectedName + " attacks " + targetName + "**");
-            */
 
         // counterattack:
         // TODO: affected by flanking
@@ -83,12 +76,11 @@ function eventMeleeAttack(msg) {
             ) ? 1 : 0;
         numberOfDice = Math.ceil(targetTroops * attackDiceFactor) + pikeMod;
         targetNumber = getAttackerTargetNumber(targetUnitType, selectedUnitType);
-        _isMeleeDefending = true;
+
+        // global reference
+        isMeleeDefending = true;
+
         sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber);
-            /*
-        sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber
-            + " **" + targetName + " counter attacks " +  selectedName);
-            */
     }
 }
 

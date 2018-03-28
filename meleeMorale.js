@@ -38,8 +38,6 @@ function meleeMorale(msg) {
         try {
             var selectedObjs = validate2ItemsInList(msg.selected);
 
-            // TODO: note and resolve heavy loss casualties
-
             resolveMeleeMorale(msg.who, selectedObjs, isLowUnits);
         }
         catch(err) {
@@ -212,8 +210,6 @@ function resolveMeleeMorale(sender, selectedObjList, isLowUnits) {
         sendChat(sender, "**" + names[loser] + "** surrenders. Remove unit from play.");
         token[loser].set("status_" + icon_surrender, true);
     }
-
-    // TODO: auto clear casualties
 }
 
 

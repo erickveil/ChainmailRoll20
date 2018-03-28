@@ -52,6 +52,7 @@ function eventMeleeDiceRolled(msg) {
     var casualtiesBarValue = "bar"+ barnum + "_value";
     var selectedName;
     var targetName;
+    var survived;
 
 
     if (msg.type === "rollresult"
@@ -68,7 +69,8 @@ function eventMeleeDiceRolled(msg) {
         sendChat(msg.who, selectedName + " attacks " + targetName + " and kills "
             + kills + " troops.");
 
-        heavyLossMoraleCheck(msg, targetObj);
+        survived = calculateTroopLoss(msg, targetObj);
+        if (survived) { heavyLossMoraleCheck(msg, targetObj); }
     }
     else if (msg.type === "rollresult"
         && isMyMeleeRollResult(rollData, targetObj)) {
@@ -85,7 +87,8 @@ function eventMeleeDiceRolled(msg) {
             + kills + " troops.");
 
         // check for dead unit before heavy loss
-        heavyLossMoraleCheck(msg, selectedObj);
+        survived = calculateTroopLoss(msg, selectedObj);
+        if (survived) { heavyLossMoraleCheck(msg, selectedObj); }
 
         // apply casualties
         // resolve melee morale

@@ -12,6 +12,7 @@ var selectedObj;
 
 /**
  * Gets set to the last targeted object after a melee attack
+ * TODO: do not run attack if either side has less than 1 troop.
  * @type {object}
  */
 var targetObj;
@@ -211,6 +212,40 @@ function getAttackDiceFactor(selectedUnitType, targetUnitType) {
 
     chatMsg = "Unrecognized selected unit type: " + selectedUnitType;
     throw new roll20Exception(logMsg, chatMsg);
+}
+
+/**
+ * To be called after casualties are applied.
+ * @param msg
+ * @param selectedObj
+ * @return boolean true if the target unit survives, false if all men are killed
+ */
+function calculateTroopLoss(msg, selectedObj) {
+    var casualties = getTokenBarValue(selectedObj, 3);
+    var troops = getTokenBarValue(selectedObj, 1);
+    var newValue = troops*1 - casualties*1;
+    if (newValue < 0) { newValue = 0; }
+    log("casualties: " + casualties + ", troops: " + troops + ", newValue: " + newValue);
+    selectedObj.set("bar1_value", newValue);
+    if (newValue > 0) { return true; }
+    // unit slain
+    selectedObj.set("status_dead", true);
+    var result = [];
+    result[1] = " have been slaughtered!";
+    result[2] = " have been annihilated!";
+    result[3] = " have been erased!";
+    result[4] = " have been stomped!";
+    result[5] = " have gone to Valhalla!";
+    result[6] = " are no more!";
+    result[7] = " should have run!";
+    result[8] = " will haunt this field forever!";
+    result[9] = " have died with honor!";
+    result[10] = " will no longer be a problem!";
+    var i = randomInteger(10);
+    var unitName = getPropertyValue(selectedObj, "name");
+    sendChat(msg.who, unitName + result[i]);
+    return false;
+
 }
 
 

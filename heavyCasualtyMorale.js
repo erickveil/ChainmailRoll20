@@ -6,7 +6,6 @@
  * Morale check for when a side suffers heavy losses in a single
  * melee exchange.
  *
- * TODO: On melee call getMaxCasualties, and set to max value on token before setting casualties.
  * TODO: Set max casualties on missile attack also.
  * TODO: Subtract casualties from troops
  * TODO: See if missile attacks need any love.
@@ -22,38 +21,86 @@ var isRollingSave = false;
  * @param unitObj
  */
 function heavyLossMoraleCheck(msg, unitObj) {
+
+    var casualties = getTokenBarValue(unitObj, 3);
+    var threshold = getMaxCasualties(unitObj);
+    unitObj.set("bar3_max", threshold);
+    if (casualties <= threshold) { return; }
+
+    var unitName = getPropertyValue(unitObj, "name");
+    sendChat(msg.who, unitName + " has suffered massive casualties: "
+        + casualties + " out of a maxumum of " + threshold);
+
+    currentlySavingUnitObj = unitObj;
+    currentSaveTarget = getTargetSave(unitObj);
+
+    // Going with PRNG for now.
+    var rollResult = randomInteger(6) + randomInteger(6);
+    sendChat(msg.who, "Rolling 2d6 " + unitName
+        + " save vs. massive casualties DC " + currentSaveTarget);
+    resolveMassCasualtyCheck(msg, rollResult);
+}
+
+function getTargetSave(unitObj)
+{
     var typeAttribute = "Unit Type";
     var sheetId = getPropertyValue(unitObj, "represents");
     var unitType = getAttributeWithError(sheetId, typeAttribute);
-    var casualties = getTokenBarValue(unitObj, 3);
+    if (unitType === "Light Foot"
+        || unitType === "Peasant"
+        || unitType === "Levies"
+        || unitType === "Light Horse"
+    ) {
+        return 8;
+    }
+    else if (unitType === "Heavy Foot"
+        || unittype === "Medium Horse"
+    ) {
+        return 7;
+    }
+    else if (unitType === "Armored Foot") {
+        return 6;
+    }
+    else if (unitType === "Heavy Horse") {
+        return 6;
+    }
+    else if (unitType === "Knight") {
+        return 4;
+    }
+
+    var chatMsg = "Failed to recognize unit type for heavy loss morale check: "
+        + unitType;
+    var logMsg = "";
+    throw new roll20Exception(logMsg, chatMsg);
+}
+
+function getMaxCasualties(unitObj)
+{
+    var typeAttribute = "Unit Type";
+    var sheetId = getPropertyValue(unitObj, "represents");
+    var unitType = getAttributeWithError(sheetId, typeAttribute);
     var maxTroops = getTokenBarMax(unitObj, 1);
     var targetLoss;
-    var targetSave;
     if (unitType === "Light Foot"
         || unitType === "Peasant"
         || unitType === "Levies"
         || unitType === "Light Horse"
     ) {
         targetLoss = 1/4;
-        targetSave = 8;
     }
     else if (unitType === "Heavy Foot"
         || unittype === "Medium Horse"
     ) {
         targetLoss = 1/3;
-        targetSave = 7;
     }
     else if (unitType === "Armored Foot") {
         targetLoss = 1/3;
-        targetSave = 6;
     }
     else if (unitType === "Heavy Horse") {
         targetLoss = 1/2;
-        targetSave = 6;
     }
     else if (unitType === "Knight") {
         targetLoss = 1/2;
-        targetSave = 4;
     }
     else {
         var chatMsg = "Failed to recognize unit type for heavy loss morale check: "
@@ -62,21 +109,7 @@ function heavyLossMoraleCheck(msg, unitObj) {
         throw new roll20Exception(logMsg, chatMsg);
     }
 
-    var threshold = Math.ceil(targetLoss * maxTroops);
-    if (casualties <= threshold) { return; }
-
-    var unitName = getPropertyValue(unitObj, "name");
-    sendChat(msg.who, unitName + " has suffered massive casualties: "
-        + casualties + " out of a maxumum of " + threshold);
-
-    currentlySavingUnitObj = unitObj;
-    currentSaveTarget = targetSave;
-
-    // Going with PRNG for now.
-    var rollResult = randomInteger(6) + randomInteger(6);
-    sendChat(msg.who, "Rolling 2d6 " + unitName
-        + " save vs. massive casualties DC " + targetSave);
-    resolveMassCasualtyCheck(msg, rollResult);
+    return Math.ceil(targetLoss * maxTroops);
 }
 
 /**

@@ -225,7 +225,6 @@ function calculateTroopLoss(msg, selectedObj) {
     var troops = getTokenBarValue(selectedObj, 1);
     var newValue = troops*1 - casualties*1;
     if (newValue < 0) { newValue = 0; }
-    log("casualties: " + casualties + ", troops: " + troops + ", newValue: " + newValue);
     selectedObj.set("bar1_value", newValue);
     if (newValue > 0) { return true; }
     // unit slain

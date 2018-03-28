@@ -7,28 +7,6 @@
  *
  */
 
-/* ========== FLAGS ============
- * Global values for tracking if I should be listening to dice rolls.
- * Probably should be encapsulated in an object, but I seem to like
- * shooting myself in the foot later.
- */
-
-/**
- * Set to true when listening for API triggered melee dice roll
- * Then immediately set false again so we don't capture any
- * other rolls.
- * @type {boolean}
- */
-var isMeleeAttacking = false;
-
-/**
- * Set to listen for counter attacks
- * @type {boolean}
- */
-var isMeleeDefending = false;
-
-/* ========== MAIN ============ */
-
 /**
  * On Chat Listener
  */
@@ -74,23 +52,13 @@ function eventMeleeDiceRolled(msg) {
     var casualtiesBarValue = "bar"+ barnum + "_value";
     var selectedName;
     var targetName;
-    //if (msg.type === "rollresult" && isMeleeAttacking === true) {
 
-    if (msg.type === "rollresult") {
-        log("type: " + msg.type + ", dice: " + getRollResultDice(rollData)
-            + ", name: " + getRollResultText(rollData) + ", is selected: "
-        + isMyMeleeRollResult(rollData, selectedObj) + ", is target: "
-        + isMyMeleeRollResult(rollData, targetObj));
-    }
 
-    // TODO: always false, I think selectedObj is not set or accessible.
     if (msg.type === "rollresult"
         && isMyMeleeRollResult(rollData, selectedObj)) {
 
-        isMeleeAttacking = false;
         selectedName = getPropertyValue(selectedObj, "name");
         targetName = getPropertyValue(targetObj, "name");
-        log(rollData);
         kills = (rollData.total)*1;
 
         // set casualties to defender
@@ -102,11 +70,9 @@ function eventMeleeDiceRolled(msg) {
 
         heavyLossMoraleCheck(msg, targetObj);
     }
-    //else if (msg.type === "rollresult" && isMeleeDefending === true) {
     else if (msg.type === "rollresult"
         && isMyMeleeRollResult(rollData, targetObj)) {
 
-        isMeleeDefending = false;
         selectedName = getPropertyValue(selectedObj, "name");
         targetName = getPropertyValue(targetObj, "name");
         kills = (rollData.total)*1;
@@ -134,9 +100,6 @@ function isMyMeleeRollResult(rollData, unitObj) {
     var unitTroops = getTokenBarValue(unitObj, 1);
     var rollName = getRollResultText(rollData);
     var rollDice = getRollResultDice(rollData);
-    log("unitName: [" + unitName + "], rollName: [" + rollName
-    + "], unitTroops: [" + unitTroops*1 + "], rollDice: ["
-    + rollDice*1 + "]");
     return (unitName === rollName) && (unitTroops*1 === rollDice*1);
 }
 

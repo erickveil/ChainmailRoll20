@@ -57,9 +57,6 @@ function eventMeleeAttack(msg) {
 
         // start attack dice roll listener
 
-        // global reference
-        isMeleeAttacking = true;
-
         var selectedName = getPropertyValue(selectedObj, "name");
         sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
 
@@ -76,9 +73,6 @@ function eventMeleeAttack(msg) {
             ) ? 1 : 0;
         numberOfDice = Math.ceil(targetTroops * attackDiceFactor) + pikeMod;
         targetNumber = getAttackerTargetNumber(targetUnitType, selectedUnitType);
-
-        // global reference
-        isMeleeDefending = true;
 
         var targetName = getPropertyValue(targetObj, "name");
         sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + targetName);

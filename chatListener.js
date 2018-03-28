@@ -7,6 +7,9 @@
  *
  */
 
+var isSelectedDone = false;
+var isTargetDone = false;
+
 /**
  * On Chat Listener
  */
@@ -71,6 +74,12 @@ function eventMeleeDiceRolled(msg) {
 
         survived = calculateTroopLoss(msg, targetObj);
         if (survived) { heavyLossMoraleCheck(msg, targetObj); }
+        isSelectedDone = true;
+        if (isTargetDone) {
+            isSelectedDone = false;
+            isTargetDone = false;
+            checkMorale(msg);
+        }
     }
     else if (msg.type === "rollresult"
         && isMyMeleeRollResult(rollData, targetObj)) {
@@ -94,7 +103,23 @@ function eventMeleeDiceRolled(msg) {
         // resolve melee morale
         // end of melee
         sendChat(msg.who, "Done");
+        isTargetDone = true;
+        if (isSelectedDone) {
+            isSelectedDone = false;
+            isTargetDone = false;
+            checkMorale(msg);
+        }
     }
+}
+
+// TODO: Do not check morale if one side is dead, or has failed heavy loss morale
+function checkMorale(msg) {
+    var selectedObjList = [];
+    selectedObjList[0] = selectedObj;
+    selectedObjList[1] = targetObj;
+    var isLowUnits = false;
+
+    resolveMeleeMorale(msg.who, selectedObjList, isLowUnits);
 }
 
 function isMyMeleeRollResult(rollData, unitObj) {

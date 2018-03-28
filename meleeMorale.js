@@ -62,7 +62,7 @@ function meleeMorale(msg) {
  * calculated this every single melee.
  *
  * @param sender msg.who. Name of the speaker.
- * @param selectedObjList array of 2 token IDs involved in the battle.
+ * @param selectedObjList array of 2 token objects
  * @param isLowUnits "yes" if there are "less than 20 units per side, "no" if not.
  */
 function resolveMeleeMorale(sender, selectedObjList, isLowUnits) {
@@ -70,8 +70,8 @@ function resolveMeleeMorale(sender, selectedObjList, isLowUnits) {
     // get the actual tokens referred to in chat
     var token = [];
     var tokenType = "graphic";
-    token[0] = getObj(tokenType, selectedObjList[0]["_id"]);
-    token[1] = getObj(tokenType, selectedObjList[1]["_id"]);
+    token[0] = selectedObjList[0];
+    token[1] = selectedObjList[1];
 
     // validate objects are graphics
     validateObjectType(token[0], tokenType);
@@ -81,8 +81,6 @@ function resolveMeleeMorale(sender, selectedObjList, isLowUnits) {
     var names = [];
     names[0] = getPropertyValue(token[0], "name");
     names[1] = getPropertyValue(token[1], "name");
-    sendChat(sender, "**" +names[0] + "** and **" + names[1]
-        + "** are engaged in a melee battle!");
 
     // get bar values from tokens
     var casualties = [];

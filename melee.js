@@ -33,6 +33,7 @@ function eventMeleeAttack(msg) {
         var tokenType = "graphic";
         selectedObj = getObjectWithReport(tokenType, selectedId);
         targetObj = getObjectWithReport(tokenType, targetId);
+        clearLocalCasualties(selectedObj, targetObj);
         var selectedSheetId = getPropertyValue(selectedObj, "represents");
         var targetSheetId = getPropertyValue(targetObj, "represents");
         var typeAttribute = "Unit Type";
@@ -247,7 +248,16 @@ function calculateTroopLoss(msg, selectedObj) {
 
 }
 
-
+/**
+ * If we forget to clear the casualties, the combat doesn't work.
+ * @param selectedUnit
+ * @param targetUnit
+ */
+function clearLocalCasualties(selectedUnit, targetUnit)
+{
+    selectedUnit.set("bar3_value", 0);
+    targetUnit.set("bar3_value", 0);
+}
 
 
 

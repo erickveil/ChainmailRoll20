@@ -254,3 +254,4 @@ function announceMoraleFactors(speaker, tokenName, tokenCasualties, tokenTroops)
 }
 
 
+

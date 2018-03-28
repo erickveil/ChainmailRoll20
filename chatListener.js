@@ -55,10 +55,6 @@ function eventMeleeDiceRolled(msg) {
     var survived;
 
 
-    // TODO: If you don't clear casualties before an attack, the attacks fail to resolve after rolling
-    // TODO: Do sheets even need a casualty value? Is the bar enough?
-    // TODO: It looks like heavy casualty limit is calculated off of bar 1 value and not max
-
     if (msg.type === "rollresult"
         && isMyMeleeRollResult(rollData, selectedObj)) {
 

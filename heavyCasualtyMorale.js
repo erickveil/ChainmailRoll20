@@ -26,7 +26,7 @@ function heavyLossMoraleCheck(msg, unitObj) {
     var sheetId = getPropertyValue(unitObj, "represents");
     var unitType = getAttributeWithError(sheetId, typeAttribute);
     var casualties = getTokenBarValue(unitObj, 3);
-    var maxTroops = getTokenBarValue(unitObj, 1, "max");
+    var maxTroops = getTokenBarMax(unitObj, 1);
     var targetLoss;
     var targetSave;
     if (unitType === "Light Foot"

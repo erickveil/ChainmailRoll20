@@ -100,7 +100,7 @@ function resolveMeleeMorale(sender, selectedObjList, isLowUnits) {
 
     var icon_retreat = "tread";
     var icon_rout = "broken-heart";
-    var icon_surrender = "dead";
+    var icon_surrender = "skull";
 
     announceMoraleFactors(sender, names[0], casualties[0], troops[0]);
     announceMoraleFactors(sender, names[1], casualties[1], troops[1]);

@@ -1,0 +1,38 @@
+{
+    "type":"V",
+    "rolls":[
+        {
+            "type":"R",
+            "dice":40,
+            "sides":6,
+            "mods":{
+                "success":{
+                    "comp":">=",
+                    "point":6
+                }
+        },
+            "results":[
+                {"v":6},
+                {"v":5},
+                {"v":6},
+                {"v":4},
+                {"v":6},
+                {"v":2},
+                {"v":1}
+            ]
+        },
+        {
+        "type":"C",
+        "text":" Westbridge Light Foot"
+        }
+    ],
+    "resultType":"success",
+    "total":9,
+
+    "comments":
+      [
+        "json.rolls[1].text = roller name",
+        "json.rolls[0].dice = roller troops"
+      ]
+}
+

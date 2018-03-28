@@ -6,13 +6,9 @@
  * Morale check for when a side suffers heavy losses in a single
  * melee exchange.
  *
- * TODO: This will be its own button:
- * TODO: Isolate function to get max casualties
  * TODO: On melee call getMaxCasualties, and set to max value on token before setting casualties.
  * TODO: Set max casualties on missile attack also.
- * TODO: Provide listener hook function to read msg and get API command for running heavy loss morale check.
- * TODO: On melee and missile attacks, recommend when a unit has gone over its max casualties to chat.
- * TODO: On melee, recommend to check melee morale after it is complete.
+ * TODO: Subtract casualties from troops
  * TODO: See if missile attacks need any love.
  */
 
@@ -75,21 +71,22 @@ function heavyLossMoraleCheck(msg, unitObj) {
 
     currentlySavingUnitObj = unitObj;
     currentSaveTarget = targetSave;
-    isRollingSave = true;
-    sendChat(msg.who, "/r 2d6 " + unitName
-        + " save vs. massive casualties DC " + targetSave);
 
+    // Going with PRNG for now.
+    var rollResult = randomInteger(6) + randomInteger(6);
+    sendChat(msg.who, "Rolling 2d6 " + unitName
+        + " save vs. massive casualties DC " + targetSave);
+    resolveMassCasualtyCheck(msg, rollResult);
 }
 
-function eventMassiveCasualtyRoll(msg) {
-    if (msg.type === "rollresult" && isRollingSave === true) {
-        isRollingSave = false;
-
+/**
+ * Handles the result of a morale role for massive casualties.
+ *
+ * @param msg
+ * @param rollResult
+ */
+function resolveMassCasualtyCheck(msg, rollResult) {
         var unitName = getPropertyValue(currentlySavingUnitObj, "name");
-        var rollData = JSON.parse(msg.content);
-        log(rollData);
-        var rollResult = (rollData.total)*1;
-
         sendChat(msg.who, "Checking save: " + unitName + " rolled "
             + rollResult + " vs DC " + currentSaveTarget + ":");
         if (rollResult < currentSaveTarget) {
@@ -99,6 +96,20 @@ function eventMassiveCasualtyRoll(msg) {
             sendChat(msg.who, unitName
                 + " has passed their morale check for heavy losses!");
         }
+}
+
+/**
+ * Event for attempting to use actual rolls from chat (Unused currently)
+ * @param msg
+ */
+function eventMassiveCasualtyRoll(msg) {
+    if (msg.type === "rollresult" && isRollingSave === true) {
+        isRollingSave = false;
+        var rollData = JSON.parse(msg.content);
+        log(rollData);
+        var rollResult = (rollData.total)*1;
+
+        resolveMassCasualtyCheck(msg, rollResult);
     }
 }
 

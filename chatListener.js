@@ -5,33 +5,6 @@
  *
  * Listens for API commands to execute and dice rolls to act on
  *
- * For reference, here's what a roll looks like:
- *  {
- *      "type":"V",
- *      "rolls":[{
- *          "type":"R",
- *          "dice":20,
- *          "sides":6,
- *          "mods":{
- *              "success":{
- *                  "comp":">=",
- *                  "point":6
- *              }
- *          },
- *          "results":[
- *              {"v":2},
- *              {"v":2},
- *              {"v":1},
- *              ... and so on and so forth ...
- *              {"v":2},
- *              {"v":6},
- *              {"v":6}
- *          ]
- *      }],
- *      "resultType":"success",
- *      "total":2
- *  }
- *
  */
 
 /* ========== FLAGS ============
@@ -61,7 +34,6 @@ var isMeleeDefending = false;
  */
 on("chat:message", function(msg) {
     try {
-        eventMassiveCasualtyRoll(msg);
         eventMeleeAttack(msg);
         eventMeleeDiceRolled(msg);
     }
@@ -96,52 +68,87 @@ on("chat:message", function(msg) {
  * @param msg
  */
 function eventMeleeDiceRolled(msg) {
-    var rollData;
+    var rollData = (msg.type === "rollresult" ? JSON.parse(msg.content) : "");
     var kills;
-    var priorCasualties;
-    var totalCasualties;
     var barnum = 3;
     var casualtiesBarValue = "bar"+ barnum + "_value";
     var selectedName;
     var targetName;
+    //if (msg.type === "rollresult" && isMeleeAttacking === true) {
 
-    if (msg.type === "rollresult" && isMeleeAttacking === true) {
+    if (msg.type === "rollresult") {
+        log("type: " + msg.type + ", dice: " + getRollResultDice(rollData)
+            + ", name: " + getRollResultText(rollData) + ", is selected: "
+        + isMyMeleeRollResult(rollData, selectedObj) + ", is target: "
+        + isMyMeleeRollResult(rollData, targetObj));
+    }
+
+    // TODO: always false, I think selectedObj is not set or accessible.
+    if (msg.type === "rollresult"
+        && isMyMeleeRollResult(rollData, selectedObj)) {
+
         isMeleeAttacking = false;
-        selectedName = getPropertyValue(_selectedObj, "name");
-        targetName = getPropertyValue(_targetObj, "name");
-        rollData = JSON.parse(msg.content);
+        selectedName = getPropertyValue(selectedObj, "name");
+        targetName = getPropertyValue(targetObj, "name");
+        log(rollData);
         kills = (rollData.total)*1;
 
         // set casualties to defender
-        _targetObj.set(casualtiesBarValue, kills);
+        targetObj.set(casualtiesBarValue, kills);
 
         // announce casualties
         sendChat(msg.who, selectedName + " attacks " + targetName + " and kills "
             + kills + " troops.");
+
+        heavyLossMoraleCheck(msg, targetObj);
     }
-    else if (msg.type === "rollresult" && isMeleeDefending === true) {
+    //else if (msg.type === "rollresult" && isMeleeDefending === true) {
+    else if (msg.type === "rollresult"
+        && isMyMeleeRollResult(rollData, targetObj)) {
+
         isMeleeDefending = false;
-        selectedName = getPropertyValue(_selectedObj, "name");
-        targetName = getPropertyValue(_targetObj, "name");
-        rollData = JSON.parse(msg.content);
+        selectedName = getPropertyValue(selectedObj, "name");
+        targetName = getPropertyValue(targetObj, "name");
         kills = (rollData.total)*1;
 
         // add casualties to defender
-        _selectedObj.set(casualtiesBarValue, kills);
+        selectedObj.set(casualtiesBarValue, kills);
 
         // announce casualties
         sendChat(msg.who, targetName + " counterattacks " + selectedName + " and kills "
             + kills + " troops.");
 
         // check for dead unit before heavy loss
+        heavyLossMoraleCheck(msg, selectedObj);
 
         // apply casualties
         // resolve melee morale
         // end of melee
         sendChat(msg.who, "Done");
     }
+}
 
+function isMyMeleeRollResult(rollData, unitObj) {
 
+    var unitName = getPropertyValue(unitObj, "name");
+    var unitTroops = getTokenBarValue(unitObj, 1);
+    var rollName = getRollResultText(rollData);
+    var rollDice = getRollResultDice(rollData);
+    log("unitName: [" + unitName + "], rollName: [" + rollName
+    + "], unitTroops: [" + unitTroops*1 + "], rollDice: ["
+    + rollDice*1 + "]");
+    return (unitName === rollName) && (unitTroops*1 === rollDice*1);
+}
+
+function getRollResultText(rollData) {
+    var rollText = rollData.rolls[1].text.trim();
+    return rollText;
+}
+
+function getRollResultDice(rollData) {
+    var rollObj = rollData.rolls[0];
+    var rollDice = rollObj.dice;
+    return rollDice;
 }
 
 

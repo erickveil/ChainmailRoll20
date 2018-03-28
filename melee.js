@@ -7,16 +7,14 @@
 /**
  * Gets set to the last selected object after a melee attack
  * @type {object}
- * @private
  */
-var _selectedObj;
+var selectedObj;
 
 /**
  * Gets set to the last targeted object after a melee attack
  * @type {object}
- * @private
  */
-var _targetObj;
+var targetObj;
 
 function eventMeleeAttack(msg) {
     if (msg.type === "api" && msg.content.indexOf("!melee ") !== -1) {
@@ -32,17 +30,17 @@ function eventMeleeAttack(msg) {
         var targetId = argList[1];
         var isLowUnits = argList[2] === "Yes";
         var tokenType = "graphic";
-        _selectedObj = getObjectWithReport(tokenType, selectedId);
-        _targetObj = getObjectWithReport(tokenType, targetId);
-        var selectedSheetId = getPropertyValue(_selectedObj, "represents");
-        var targetSheetId = getPropertyValue(_targetObj, "represents");
+        selectedObj = getObjectWithReport(tokenType, selectedId);
+        targetObj = getObjectWithReport(tokenType, targetId);
+        var selectedSheetId = getPropertyValue(selectedObj, "represents");
+        var targetSheetId = getPropertyValue(targetObj, "represents");
         var typeAttribute = "Unit Type";
         var selectedUnitType = getAttributeWithError(selectedSheetId, typeAttribute);
         var targetUnitType = getAttributeWithError(targetSheetId, typeAttribute);
 
         // TODO: these are affected by flanking
         var attackDiceFactor = getAttackDiceFactor(selectedUnitType, targetUnitType);
-        var selectedTroops = getTokenBarValue(_selectedObj, 1);
+        var selectedTroops = getTokenBarValue(selectedObj, 1);
 
         /* TODO: All troops formed in close order with pole arms can only take frontal melee
          * damage from like-armed troops.
@@ -62,12 +60,14 @@ function eventMeleeAttack(msg) {
         // global reference
         isMeleeAttacking = true;
 
-        sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber);
+        var selectedName = getPropertyValue(selectedObj, "name");
+        sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
 
+        // =======================================================================
         // counterattack:
         // TODO: affected by flanking
         attackDiceFactor = getAttackDiceFactor(targetUnitType, selectedUnitType);
-        var targetTroops = getTokenBarValue(_targetObj, 1);
+        var targetTroops = getTokenBarValue(targetObj, 1);
         // TODO: close order pole arms and frontal damage
         var targetWeapon = getAttributeWithError(targetSheetId, weaponAttribute);
         pikeMod = (targetWeapon === "Pike"
@@ -80,7 +80,8 @@ function eventMeleeAttack(msg) {
         // global reference
         isMeleeDefending = true;
 
-        sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber);
+        var targetName = getPropertyValue(targetObj, "name");
+        sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + targetName);
     }
 }
 

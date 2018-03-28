@@ -91,8 +91,8 @@ function resolveMassCasualtyCheck(msg, rollResult) {
             + rollResult + " vs DC " + currentSaveTarget + ":");
         if (rollResult < currentSaveTarget) {
             sendChat(msg.who, unitName + " has surrendered!");
-            var icon_surrender = "skull";
-            currentlySavingUnitObj.set("status_" + icon_surrender);
+            var icon_surrender = "dead";
+            currentlySavingUnitObj.set("status_" + icon_surrender, true);
         }
         else {
             sendChat(msg.who, unitName

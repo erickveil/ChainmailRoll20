@@ -100,7 +100,7 @@ function resolveMeleeMorale(sender, selectedObjList, isLowUnits) {
 
     var icon_retreat = "tread";
     var icon_rout = "broken-heart";
-    var icon_surrender = "skull";
+    var icon_surrender = "dead";
 
     announceMoraleFactors(sender, names[0], casualties[0], troops[0]);
     announceMoraleFactors(sender, names[1], casualties[1], troops[1]);
@@ -202,15 +202,15 @@ function resolveMeleeMorale(sender, selectedObjList, isLowUnits) {
     }
     else if (scoreDiff >= 60 && scoreDiff <= 79) {
         sendChat(sender, "**" + names[loser] + "** retreat 1 move");
-        token[loser].set("status_" + icon_retreat, retreatRounds);
+        token[loser].set("status_" + icon_retreat, true, retreatRounds);
     }
     else if (scoreDiff >= 80 && scoreDiff <= 99) {
         sendChat(sender, "**" + names[loser] + "** rout 1 1/2 move");
-        token[loser].set("status_" + icon_rout, retreatRounds);
+        token[loser].set("status_" + icon_rout, true, retreatRounds);
     }
     else {
         sendChat(sender, "**" + names[loser] + "** surrenders. Remove unit from play.");
-        token[loser].set("status_" + icon_surrender);
+        token[loser].set("status_" + icon_surrender, true);
     }
 
     // TODO: auto clear casualties

@@ -12,7 +12,6 @@ var selectedObj;
 
 /**
  * Gets set to the last targeted object after a melee attack
- * TODO: do not run attack if either side has less than 1 troop.
  * @type {object}
  */
 var targetObj;
@@ -31,8 +30,20 @@ function eventMeleeAttack(msg) {
         var targetId = argList[1];
         var isLowUnits = argList[2] === "Yes";
         var tokenType = "graphic";
+
         selectedObj = getObjectWithReport(tokenType, selectedId);
         targetObj = getObjectWithReport(tokenType, targetId);
+        var selectedTroops = getTokenBarValue(selectedObj, 1);
+        var targetTroops = getTokenBarValue(targetObj, 1);
+        if (selectedTroops < 1) {
+            sendChat(msg.who, "Cannot attack with a defeated unit! Remove it from play.");
+            return;
+        }
+        if (targetTroops < 1) {
+            sendChat(msg.who, "This unit is already defeated. Remove it from play and attack another.");
+            return;
+        }
+
         clearLocalCasualties(selectedObj, targetObj);
         var selectedSheetId = getPropertyValue(selectedObj, "represents");
         var targetSheetId = getPropertyValue(targetObj, "represents");
@@ -42,7 +53,8 @@ function eventMeleeAttack(msg) {
 
         // TODO: these are affected by flanking
         var attackDiceFactor = getAttackDiceFactor(selectedUnitType, targetUnitType);
-        var selectedTroops = getTokenBarValue(selectedObj, 1);
+        var selectedName = getPropertyValue(selectedObj, "name");
+
 
         /* TODO: All troops formed in close order with pole arms can only take frontal melee
          * damage from like-armed troops.
@@ -59,14 +71,12 @@ function eventMeleeAttack(msg) {
 
         // start attack dice roll listener
 
-        var selectedName = getPropertyValue(selectedObj, "name");
         sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
 
         // =======================================================================
         // counterattack:
         // TODO: affected by flanking
         attackDiceFactor = getAttackDiceFactor(targetUnitType, selectedUnitType);
-        var targetTroops = getTokenBarValue(targetObj, 1);
         // TODO: close order pole arms and frontal damage
         var targetWeapon = getAttributeWithError(targetSheetId, weaponAttribute);
         pikeMod = (targetWeapon === "Pike"

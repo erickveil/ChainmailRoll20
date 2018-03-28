@@ -7,7 +7,6 @@
  * melee exchange.
  *
  * TODO: Set max casualties on missile attack also.
- * TODO: Subtract casualties from troops
  * TODO: See if missile attacks need any love.
  */
 

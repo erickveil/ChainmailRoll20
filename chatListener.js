@@ -15,6 +15,7 @@ var isTargetDone = false;
  */
 on("chat:message", function(msg) {
     try {
+        eventMissileAttack(msg);
         eventMeleeAttack(msg);
         eventMeleeDiceRolled(msg);
     }

@@ -20,6 +20,7 @@ on("chat:message", function(msg) {
         eventMeleeAttack(msg);
         eventFlankAttack(msg);
         eventRearAttack(msg);
+        eventPolarmAdvantageAttack(msg);
         eventMeleeDiceRolled(msg);
     }
     catch(err) {
@@ -55,8 +56,6 @@ on("chat:message", function(msg) {
 function eventMeleeDiceRolled(msg) {
     var rollData = (msg.type === "rollresult" ? JSON.parse(msg.content) : "");
     var kills;
-    var barnum = 3;
-    var casualtiesBarValue = "bar"+ barnum + "_value";
     var selectedName;
     var targetName;
     var survived;

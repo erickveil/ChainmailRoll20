@@ -23,7 +23,7 @@ function eventMeleeAttack(msg) {
     var argStr = msg.content.replace("!melee ", "");
     var argList = argStr.split(",");
     if (argList.length !== 2) {
-        var logMsg = "Not enough argumentsin !melee command: " + msg.content;
+        var logMsg = "Not enough arguments in !melee command: " + msg.content;
         var chatMsg = "The !melee macro is set up incorrectly.";
         throw new roll20Exception(logMsg, chatMsg);
     }
@@ -48,6 +48,38 @@ function eventMeleeAttack(msg) {
     frontalAttack(selectedTroops, targetTroops, msg);
 }
 
+function eventPolarmAdvantageAttack(msg) {
+    if (!(msg.type === "api" && msg.content.indexOf("!pole ") !== -1)) {
+        return;
+    }
+    var argStr = msg.content.replace("!pole ", "");
+    var argList = argStr.split(",");
+    if (argList.length !== 2) {
+        var logMsg = "Not enough arguments in !melee command: " + msg.content;
+        var chatMsg = "The !melee macro is set up incorrectly.";
+        throw new roll20Exception(logMsg, chatMsg);
+    }
+    var selectedId = argList[0];
+    var targetId = argList[1];
+    var tokenType = "graphic";
+
+    selectedObj = getObjectWithReport(tokenType, selectedId);
+    targetObj = getObjectWithReport(tokenType, targetId);
+    var selectedTroops = getTokenBarValue(selectedObj, 1);
+    var targetTroops = getTokenBarValue(targetObj, 1);
+    if (selectedTroops < 1) {
+        sendChat(msg.who, "Cannot attack with a defeated unit! Remove it from play.");
+        return;
+    }
+    if (targetTroops < 1) {
+        sendChat(msg.who, "This unit is already defeated. Remove it from play and attack another.");
+        return;
+    }
+
+    clearLocalCasualties(selectedObj, targetObj);
+    polearmAdvantageAttack(selectedTroops, msg);
+}
+
 function eventFlankAttack(msg) {
     if (!(msg.type === "api" && msg.content.indexOf("!flank ") !== -1)) {
         return;
@@ -55,7 +87,7 @@ function eventFlankAttack(msg) {
     var argStr = msg.content.replace("!flank ", "");
     var argList = argStr.split(",");
     if (argList.length !== 2) {
-        var logMsg = "Not enough argumentsin !melee command: " + msg.content;
+        var logMsg = "Not enough arguments in !melee command: " + msg.content;
         var chatMsg = "The !melee macro is set up incorrectly.";
         throw new roll20Exception(logMsg, chatMsg);
     }
@@ -87,7 +119,7 @@ function eventRearAttack(msg) {
     var argStr = msg.content.replace("!rear ", "");
     var argList = argStr.split(",");
     if (argList.length !== 2) {
-        var logMsg = "Not enough argumentsin !melee command: " + msg.content;
+        var logMsg = "Not enough arguments in !melee command: " + msg.content;
         var chatMsg = "The !melee macro is set up incorrectly.";
         throw new roll20Exception(logMsg, chatMsg);
     }
@@ -121,10 +153,6 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
     var targetUnitType = getAttributeWithError(targetSheetId, typeAttribute);
     var attackDiceFactor = getAttackDiceFactor(selectedUnitType, targetUnitType);
     var selectedName = getPropertyValue(selectedObj, "name");
-
-    /* TODO: All troops formed in close order with pole arms can only take frontal melee
-     * damage from like-armed troops.
-     */
     var weaponAttribute = "Weapon";
     var selectedWeapon = getAttributeWithError(selectedSheetId, weaponAttribute);
     var pikeMod = (selectedWeapon === "Pike"
@@ -136,6 +164,30 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
 
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
     counterAttack(targetUnitType, selectedUnitType, targetSheetId, weaponAttribute, targetTroops, msg);
+}
+
+/**
+ * All troops formed in close order with pole arms can ony take frontal melee damage from like-armed troops.
+ * @param selectedTroops
+ * @param msg
+ */
+function polearmAdvantageAttack(selectedTroops, msg) {
+
+    // though not rear, this triggers a morale check without a counter attack
+    isRearAttack = true;
+
+    var selectedSheetId = getPropertyValue(selectedObj, "represents");
+    var targetSheetId = getPropertyValue(targetObj, "represents");
+    var typeAttribute = "Unit Type";
+    var selectedUnitType = getAttributeWithError(selectedSheetId, typeAttribute);
+    var targetUnitType = getAttributeWithError(targetSheetId, typeAttribute);
+    var attackDiceFactor = getAttackDiceFactor(selectedUnitType, targetUnitType);
+    var selectedName = getPropertyValue(selectedObj, "name");
+    var pikeMod = 1;
+    var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
+    var targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
+
+    sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
 }
 
 function flankAttack(selectedTroops, targetTroops, msg) {

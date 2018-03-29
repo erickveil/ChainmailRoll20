@@ -20,15 +20,14 @@ function eventMeleeAttack(msg) {
     if (msg.type === "api" && msg.content.indexOf("!melee ") !== -1) {
         var argStr = msg.content.replace("!melee ", "");
         var argList = argStr.split(",");
-        var format = "!melee @{selected|token_id},@{target|token_id},?{Are there less than 20 Units per side|Yes|No}";
-        if (argList.length !== 3) {
+        var format = "!melee @{selected|token_id},@{target|token_id}";
+        if (argList.length !== 2) {
             var logMsg = "Not enough argumentsin !melee command: " + msg.content;
             var chatMsg = "The !melee macro is set up incorrectly.";
             throw new roll20Exception(logMsg, chatMsg);
         }
         var selectedId = argList[0];
         var targetId = argList[1];
-        var isLowUnits = argList[2] === "Yes";
         var tokenType = "graphic";
 
         selectedObj = getObjectWithReport(tokenType, selectedId);

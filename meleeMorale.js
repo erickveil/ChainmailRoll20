@@ -63,9 +63,8 @@ function meleeMorale(msg) {
  *
  * @param sender msg.who. Name of the speaker.
  * @param selectedObjList array of 2 token objects
- * @param isLowUnits "yes" if there are "less than 20 units per side, "no" if not.
  */
-function resolveMeleeMorale(sender, selectedObjList, isLowUnits) {
+function resolveMeleeMorale(sender, selectedObjList) {
 
     // get the actual tokens referred to in chat
     var token = [];
@@ -143,12 +142,25 @@ function resolveMeleeMorale(sender, selectedObjList, isLowUnits) {
 
     // get morale rating attribute from each character
     var moraleAttr = [];
-    moraleAttr[0] = getAttrByName(sheetId[0], "Morale Rating");
-    moraleAttr[1] = getAttrByName(sheetId[1], "Morale Rating");
+    moraleAttr[0] = getAttributeWithError(sheetId[0], "Morale Rating");
+    moraleAttr[1] = getAttributeWithError(sheetId[1], "Morale Rating");
 
     var survivalMorale = [];
-    survivalMorale[0] = troops[0] * moraleAttr[0];
-    survivalMorale[1] = troops[1] * moraleAttr[1];
+    // TODO: It is number of Figures on each side, not troops that gets multiplied
+    var armyName = [];
+    armyName[0] = getArmyName(sheetId[0]);
+    armyName[1] = getArmyName(sheetId[1]);
+    var armySheetId = [];
+    armySheetId[0] = getArmySheetId(armyName[0]);
+    armySheetId[1] = getArmySheetId(armyName[1]);
+    var armySize = [];
+    armySize[0] = getAttributeWithError(armySheetId[0], "Figures");
+    armySize[1] = getAttributeWithError(armySheetId[1], "Figures");
+    var isLowUnits = armySize[0] < 20 || armySize[1] < 20;
+
+    survivalMorale[0] = armySize[0] * moraleAttr[0];
+    survivalMorale[1] = armySize[1] * moraleAttr[1];
+
     score[0] += survivalMorale[0];
     score[1] += survivalMorale[1];
     sendChat(sender, names[0] + " has a morale rating of "

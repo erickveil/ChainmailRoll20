@@ -112,14 +112,21 @@ function eventMeleeDiceRolled(msg) {
     }
 }
 
-// TODO: Do not check morale if one side is dead, or has failed heavy loss morale
 function checkMorale(msg) {
     var selectedObjList = [];
     selectedObjList[0] = selectedObj;
     selectedObjList[1] = targetObj;
-    var isLowUnits = false;
+    if (isOneSideDefeated(selectedObjList)) { return; }
+    resolveMeleeMorale(msg.who, selectedObjList);
+}
 
-    resolveMeleeMorale(msg.who, selectedObjList, isLowUnits);
+function isOneSideDefeated(unitList) {
+    for (var i = 0; i < unitList.length; ++i) {
+        var troops = getTokenBarValue(unitList[i], 1);
+        var isDead = unitList[i].get("status_dead");
+        if (troops*1 < 1 || isDead) { return true; }
+    }
+    return false;
 }
 
 function isMyMeleeRollResult(rollData, unitObj) {

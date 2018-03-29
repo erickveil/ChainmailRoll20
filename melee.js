@@ -109,6 +109,7 @@ function eventRearAttack(msg) {
     }
 
     clearLocalCasualties(selectedObj, targetObj);
+    isRearAttack = true;
     rearAttack(selectedTroops, msg);
 }
 

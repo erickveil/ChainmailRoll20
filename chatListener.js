@@ -9,6 +9,7 @@
 
 var isSelectedDone = false;
 var isTargetDone = false;
+var isRearAttack = false;
 
 /**
  * On Chat Listener
@@ -76,9 +77,10 @@ function eventMeleeDiceRolled(msg) {
         survived = calculateTroopLoss(msg, targetObj);
         if (survived) { heavyLossMoraleCheck(msg, targetObj); }
         isSelectedDone = true;
-        if (isTargetDone) {
+        if (isTargetDone || isRearAttack) {
             isSelectedDone = false;
             isTargetDone = false;
+            isRearAttack = false;
             checkMorale(msg);
         }
     }
@@ -105,9 +107,10 @@ function eventMeleeDiceRolled(msg) {
         // end of melee
         sendChat(msg.who, "Done");
         isTargetDone = true;
-        if (isSelectedDone) {
+        if (isSelectedDone || isRearAttack) {
             isSelectedDone = false;
             isTargetDone = false;
+            isRearAttack = false;
             checkMorale(msg);
         }
     }

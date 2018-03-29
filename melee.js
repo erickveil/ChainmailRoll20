@@ -225,6 +225,17 @@ function getAttackDiceFactor(selectedUnitType, targetUnitType) {
 }
 
 /**
+ * Applies the casualties to the casualty bar
+ * @param token object Token to apply casualties to
+ * @param kills int Number to set the casualty bar to.
+ */
+function applyCasualties(token, kills) {
+    var barnum = 3;
+    var casualtiesBarValue = "bar"+ barnum + "_value";
+    token.set(casualtiesBarValue, kills);
+}
+
+/**
  * To be called after casualties are applied.
  * @param msg
  * @param selectedObj

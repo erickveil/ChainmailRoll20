@@ -17,7 +17,7 @@
 function getObjectWithReport(objType, objId) {
     var obj = getObj(objType, objId);
     if (typeof obj === "undefined") {
-        var logMsg = "Could not find object type " + objType + " with id " + objId;
+        var logMsg = "Object id " + objId;
         var chatMsg = "Could not find the " + objType + " object.";
         throw new roll20Exception(logMsg, chatMsg);
     }

@@ -1,6 +1,7 @@
 on("chat:message", function(msg) {
     if(msg.type === "api" && msg.content.indexOf("!missile") !== -1) {
 
+        // TODO: offload listeneing to the listener
         var argStr = msg.content.replace("!missile ", "");
         var argList = argStr.split(",");
 
@@ -13,15 +14,18 @@ on("chat:message", function(msg) {
 
         var selectedId = argList[0];
         var targetId = argList[1];
-        var archerType = "graphic";
-        var targetType = "character";
+        var tokenType = "graphic";
 
         try {
-            // defined in melee.js
-            var archerToken = getObjectWithReport(archerType, selectedId);
-            var targetSheet = getObjectWithReport(targetType, targetId);
+
+            var archerToken = getObjectWithReport(tokenType, selectedId);
+            var targetToken = getObjectWithReport(tokenType, targetId);
+            clearLocalCasualties(archerToken, targetToken);
+
             var archerTroops = getTokenBarValue(archerToken, 1);
-            var targetArmor = getAttributeWithError(targetId, "AC v Missile");
+            var targetSheetId = getPropertyValue(targetToken, "represents");
+            var targetUnitType = getAttributeWithError(targetSheetId, "Unit Type");
+            var targetArmor = getTargetMissileAC(targetUnitType);
 
             // split number of troops vs AC 0 and 1
             var firingUnits = [];
@@ -115,6 +119,9 @@ on("chat:message", function(msg) {
                 sendChat(msg.who, "Firing unit " + (i+1)
                     + " (" + firingUnits[i] + " troops)"
                     + " does " + unitDamage + " damage.");
+                applyCasualties(targetToken, unitDamage);
+                calculateTroopLoss(msg, targetToken);
+                heavyLossMoraleCheck(msg, targetToken);
                 damage += unitDamage;
             } // end loop thru firing units
             sendChat(msg.who, "**Total missile damage: " + damage + "**");
@@ -133,6 +140,23 @@ on("chat:message", function(msg) {
         }
     }
 });
+
+/**
+ * 0 = Unarmored
+ * 1 = 1/2 Armor or Shield
+ * 2 = Fully Armored
+ * @param unitType
+ */
+function getTargetMissileAC(unitType) {
+    if (unitType === "Light Foot"
+        || unitType === "Light Horse"
+        ) { return 1; }
+    if (unitType === "Heavy Foot"
+        || unitType === "Armored Foot"
+        || unitType === "Medium Horse"
+        || unitType === "Heavy Horse"
+        ) { return 2; }
+}
 
 
 

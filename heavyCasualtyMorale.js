@@ -6,8 +6,6 @@
  * Morale check for when a side suffers heavy losses in a single
  * melee exchange.
  *
- * TODO: Set max casualties on missile attack also.
- * TODO: See if missile attacks need any love.
  */
 
 var currentlySavingUnitObj;

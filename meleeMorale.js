@@ -146,7 +146,6 @@ function resolveMeleeMorale(sender, selectedObjList) {
     moraleAttr[1] = getAttributeWithError(sheetId[1], "Morale Rating");
 
     var survivalMorale = [];
-    // TODO: It is number of Figures on each side, not troops that gets multiplied
     var armyName = [];
     armyName[0] = getArmyName(sheetId[0]);
     armyName[1] = getArmyName(sheetId[1]);

@@ -64,9 +64,7 @@ function eventMeleeDiceRolled(msg) {
         selectedName = getPropertyValue(selectedObj, "name");
         targetName = getPropertyValue(targetObj, "name");
         kills = (rollData.total)*1;
-
-        // set casualties to defender
-        targetObj.set(casualtiesBarValue, kills);
+        applyCasualties(targetObj, kills);
 
         // announce casualties
         sendChat(msg.who, selectedName + " attacks " + targetName + " and kills "
@@ -89,7 +87,7 @@ function eventMeleeDiceRolled(msg) {
         kills = (rollData.total)*1;
 
         // add casualties to defender
-        selectedObj.set(casualtiesBarValue, kills);
+        applyCasualties(selectedObj, kills);
 
         // announce casualties
         sendChat(msg.who, targetName + " counterattacks " + selectedName + " and kills "

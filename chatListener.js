@@ -17,6 +17,8 @@ on("chat:message", function(msg) {
     try {
         eventMissileAttack(msg);
         eventMeleeAttack(msg);
+        eventFlankAttack(msg);
+        eventRearAttack(msg);
         eventMeleeDiceRolled(msg);
     }
     catch(err) {

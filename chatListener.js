@@ -17,6 +17,7 @@ var isRearAttack = false;
 on("chat:message", function(msg) {
     try {
         eventMissileAttack(msg);
+        eventIndirectMissileAttack(msg);
         eventMeleeAttack(msg);
         eventFlankAttack(msg);
         eventRearAttack(msg);

@@ -10,7 +10,7 @@
  * @param msg
  */
 function eventMissileAttack(msg) {
-    if (!(msg.type === "api" && msg.content.indexOf("!missile") !== -1)) {
+    if (!(msg.type === "api" && msg.content.indexOf("!missile ") !== -1)) {
        return;
     }
 
@@ -27,7 +27,28 @@ function eventMissileAttack(msg) {
     var selectedId = argList[0];
     var targetId = argList[1];
 
-    missileAttack(selectedId, targetId, msg);
+    missileAttack(selectedId, targetId, msg, false);
+}
+
+function eventIndirectMissileAttack(msg) {
+    if (!(msg.type === "api" && msg.content.indexOf("!indirect ") !== -1)) {
+       return;
+    }
+
+    var argStr = msg.content.replace("!indirect ", "");
+    var argList = argStr.split(",");
+
+    if (argList.length !== 2) {
+        var logMsg = "Missile attack command takes 1 selected archer argument and "
+            + "1 target argument.";
+        var chatMsg = "Missile attack macro set up incorrectly."
+        throw new roll20Exception(logMsg, chatMsg);
+    }
+
+    var selectedId = argList[0];
+    var targetId = argList[1];
+
+    missileAttack(selectedId, targetId, msg, true);
 }
 
 /**
@@ -35,8 +56,9 @@ function eventMissileAttack(msg) {
  * @param selectedId
  * @param targetId
  * @param msg
+ * @param isIndirect
  */
-function missileAttack(selectedId, targetId, msg) {
+function missileAttack(selectedId, targetId, msg, isIndirect) {
     var tokenType = "graphic";
     var archerToken = getObjectWithReport(tokenType, selectedId);
     var targetToken = getObjectWithReport(tokenType, targetId);
@@ -65,7 +87,12 @@ function missileAttack(selectedId, targetId, msg) {
 
     var damage = 0;
     for (var i = 0; i < firingUnits.length; ++i) {
-        damage += calcMissileDamage(firingUnits[i], msg, targetArmor, i+1, targetToken);
+        if (isIndirect) {
+            damage += calcIndirectMissileDamage(firingUnits[i], msg, targetArmor, i + 1, targetToken);
+        }
+        else {
+            damage += calcMissileDamage(firingUnits[i], msg, targetArmor, i + 1, targetToken);
+        }
     }
     sendChat(msg.who, "**Total missile damage: " + damage + "**");
 }
@@ -91,6 +118,28 @@ function calcMissileDamage(numTroops, msg, targetArmor, unitNum, targetToken) {
     }
     else {
         unitDamage = getFullArmorMissileDamage(numTroops, roll);
+    } // end armor 2
+    sendChat(msg.who, "Firing unit " + unitNum
+        + " (" + numTroops + " troops)"
+        + " does " + unitDamage + " damage.");
+    applyCasualties(targetToken, unitDamage);
+    calculateTroopLoss(msg, targetToken);
+    heavyLossMoraleCheck(msg, targetToken);
+    return unitDamage;
+}
+
+function calcIndirectMissileDamage(numTroops, msg, targetArmor, unitNum, targetToken) {
+    var roll = randomInteger(6);
+    sendChat(msg.who, "**Rolling 1d6: ``" + roll + "``");
+    var unitDamage = 0;
+    if (targetArmor === 0) {
+        unitDamage = getHalfArmorMissileDamage(numTroops, roll);
+    }
+    else if (targetArmor === 1) {
+        unitDamage = getFullArmorMissileDamage(numTroops, roll);
+    }
+    else {
+        unitDamage = 0;
     } // end armor 2
     sendChat(msg.who, "Firing unit " + unitNum
         + " (" + numTroops + " troops)"

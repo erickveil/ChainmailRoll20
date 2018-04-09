@@ -75,7 +75,9 @@ function eventMeleeDiceRolled(msg) {
             + kills + " troops.");
 
         survived = calculateTroopLoss(msg, targetObj);
+
         if (survived) { heavyLossMoraleCheck(msg, targetObj); }
+
         isSelectedDone = true;
         if (isTargetDone || isRearAttack) {
             isSelectedDone = false;
@@ -105,7 +107,6 @@ function eventMeleeDiceRolled(msg) {
         // apply casualties
         // resolve melee morale
         // end of melee
-        sendChat(msg.who, "Done");
         isTargetDone = true;
         if (isSelectedDone || isRearAttack) {
             isSelectedDone = false;

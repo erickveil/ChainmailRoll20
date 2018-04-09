@@ -22,7 +22,9 @@ function heavyLossMoraleCheck(msg, unitObj) {
     var casualties = getTokenBarValue(unitObj, 3);
     var threshold = getMaxCasualties(unitObj);
     unitObj.set("bar3_max", threshold);
-    if (casualties <= threshold) { return; }
+    if (casualties <= threshold) {
+        return;
+    }
 
     var unitName = getPropertyValue(unitObj, "name");
     sendChat(msg.who, unitName + " has suffered massive casualties: "
@@ -83,10 +85,11 @@ function getMaxCasualties(unitObj)
         || unitType === "Levies"
         || unitType === "Light Horse"
     ) {
+
         targetLoss = 1/4;
     }
     else if (unitType === "Heavy Foot"
-        || unittype === "Medium Horse"
+        || unitType === "Medium Horse"
     ) {
         targetLoss = 1/3;
     }

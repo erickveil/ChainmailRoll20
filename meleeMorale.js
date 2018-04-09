@@ -114,12 +114,12 @@ function resolveMeleeMorale(sender, selectedObjList) {
     // nobody gets this in a tie
     if (casualtyDiff !== 0) {
         var dieResult = randomInteger(6);
-        sendChat(sender, "**Rolling 1d6: ``" + dieResult + "``**");
+        sendChat(sender, "**Rolling Morale Check, 1d6: ``" + dieResult + "``**");
         var casualtyBonus = (dieResult * casualtyDiff);
         score[fewerCasualtiesSide] += casualtyBonus;
 
-        sendChat(sender, names[fewerCasualtiesSide] + " has suffered fewer casualties: +"
-            + casualtyBonus + " casualty bonus.");
+        //sendChat(sender, names[fewerCasualtiesSide] + " has suffered fewer casualties: +"
+        //    + casualtyBonus + " casualty bonus.");
     }
 
     // get side with more troops and award difference
@@ -130,8 +130,8 @@ function resolveMeleeMorale(sender, selectedObjList) {
 
     // nobody gets this in a tie
     if (troopsDiff !== 0) {
-        sendChat(sender, names[mostTroops] + " has the most troops: +"
-            + troopsDiff + " troop bonus.");
+        //sendChat(sender, names[mostTroops] + " has the most troops: +"
+        //    + troopsDiff + " troop bonus.");
         score[mostTroops] += troopsDiff;
     }
 
@@ -162,17 +162,17 @@ function resolveMeleeMorale(sender, selectedObjList) {
 
     score[0] += survivalMorale[0];
     score[1] += survivalMorale[1];
-    sendChat(sender, names[0] + " has a morale rating of "
-        + moraleAttr[0] + " and their survivor morale is " + survivalMorale[0]);
-    sendChat(sender, names[1] + " has a morale rating of "
-        + moraleAttr[1] + " and their survivor morale is " + survivalMorale[1]);
+    //sendChat(sender, names[0] + " has a morale rating of "
+    //    + moraleAttr[0] + " and their survivor morale is " + survivalMorale[0]);
+    //sendChat(sender, names[1] + " has a morale rating of "
+    //    + moraleAttr[1] + " and their survivor morale is " + survivalMorale[1]);
 
     var lowMultiplier = isLowUnits === true ? 2 : 1;
     score[0] *= lowMultiplier;
     score[1] *= lowMultiplier;
 
-    sendChat(sender, names[0] + " total morale score is **" + score[0] + "**");
-    sendChat(sender, names[1] + " total morale score is **" + score[1] + "**");
+    //sendChat(sender, names[0] + " total morale score is **" + score[0] + "**");
+    //sendChat(sender, names[1] + " total morale score is **" + score[1] + "**");
 
     // get looser
     var winner;
@@ -255,7 +255,7 @@ function getSideWithFewerCasualties(selected, target) {
  * @param tokenTroops
  */
 function announceMoraleFactors(speaker, tokenName, tokenCasualties, tokenTroops) {
-    sendChat(speaker, tokenName + " has lost " + tokenCasualties + " troops this round and has " + tokenTroops + " troops remaining.");
+    //sendChat(speaker, tokenName + " has lost " + tokenCasualties + " troops this round and has " + tokenTroops + " troops remaining.");
 }
 
 

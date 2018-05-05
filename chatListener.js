@@ -118,6 +118,7 @@ function eventMeleeDiceRolled(msg) {
 }
 
 function checkMorale(msg) {
+    log("checkMorale");
     var selectedObjList = [];
     selectedObjList[0] = selectedObj;
     selectedObjList[1] = targetObj;

@@ -16,6 +16,7 @@ var isRearAttack = false;
  */
 on("chat:message", function(msg) {
     try {
+        //log("------------");
         eventMissileAttack(msg);
         eventIndirectMissileAttack(msg);
         eventMeleeAttack(msg);
@@ -61,9 +62,14 @@ function eventMeleeDiceRolled(msg) {
     var targetName;
     var survived;
 
+    if (msg.type === "rollresult") {
+        //log("rollresult, selectedObj = " + selectedObj);
+        //log(msg.content);
+    }
 
     if (msg.type === "rollresult"
         && isMyMeleeRollResult(rollData, selectedObj)) {
+        //log("melee dice rolled: selected");
 
         selectedName = getPropertyValue(selectedObj, "name");
         targetName = getPropertyValue(targetObj, "name");
@@ -88,6 +94,7 @@ function eventMeleeDiceRolled(msg) {
     }
     else if (msg.type === "rollresult"
         && isMyMeleeRollResult(rollData, targetObj)) {
+        //log("melee dice rolled: target");
 
         selectedName = getPropertyValue(selectedObj, "name");
         targetName = getPropertyValue(targetObj, "name");
@@ -118,7 +125,7 @@ function eventMeleeDiceRolled(msg) {
 }
 
 function checkMorale(msg) {
-    log("checkMorale");
+    //log("checkMorale");
     var selectedObjList = [];
     selectedObjList[0] = selectedObj;
     selectedObjList[1] = targetObj;
@@ -145,7 +152,11 @@ function isMyMeleeRollResult(rollData, unitObj) {
     var troopsBeforeLoss = unitTroops*1 + casualties*1;
     var rollDice = getRollResultDice(rollData);
 
-    return (unitName === rollName) && (troopsBeforeLoss*1 === rollDice*1);
+    // Number of dice rolled does not correlate directly to the number of soldiers on a side.
+    //var results = (unitName === rollName) && (troopsBeforeLoss*1 === rollDice*1);
+    var results = (unitName === rollName);
+    //log("isMyMeleeRollResult: " + unitName + " vs " + rollName + " AND " + troopsBeforeLoss*1 + " vs " + rollDice*1 + " = " + results);
+    return results;
 }
 
 function getRollResultText(rollData) {
@@ -156,6 +167,7 @@ function getRollResultText(rollData) {
 function getRollResultDice(rollData) {
     var rollObj = rollData.rolls[0];
     var rollDice = rollObj.dice;
+    //log("getRollResultDice, size: " + rollData.rolls.length + " dice value: " + rollDice + " data: " + rollData);
     return rollDice;
 }
 

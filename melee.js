@@ -20,6 +20,7 @@ function eventMeleeAttack(msg) {
     if (!(msg.type === "api" && msg.content.indexOf("!melee ") !== -1)) {
         return;
     }
+    //log("melee attack");
     var argStr = msg.content.replace("!melee ", "");
     var argList = argStr.split(",");
     if (argList.length !== 2) {

@@ -24,6 +24,7 @@ on("chat:message", function(msg) {
         eventRearAttack(msg);
         eventPolarmAdvantageAttack(msg);
         eventMeleeDiceRolled(msg);
+        eventFearMoraleCheck(msg);
     }
     catch(err) {
         if (typeof err === "string") {
@@ -43,8 +44,6 @@ on("chat:message", function(msg) {
         }
     }
 });
-
-
 
 /**
  * Listens for the dice rolled during a melee attack.

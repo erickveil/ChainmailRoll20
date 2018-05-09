@@ -40,11 +40,39 @@ function heavyLossMoraleCheck(msg, unitObj) {
     resolveMassCasualtyCheck(msg, rollResult);
 }
 
+/**
+ * Used when the wizard gets too close.
+ * @param msg
+ */
+function eventFearMoraleCheck(msg) {
+
+    if (!(msg.type === "api" && msg.content.indexOf("!fearMorale ") !== -1)) {
+        return;
+    }
+
+    var argStr = msg.content.replace("!fearMorale ", "");
+    // only one arg, and it should be @selected
+    argList = argStr.split(",");
+    var unitName = argList[0];
+    var selectedId = argList[1];
+
+    var tokenType = "graphic";
+    var savingObj = getObjectWithReport(tokenType, selectedId);
+    currentlySavingUnitObj = savingObj;
+    currentSaveTarget = getTargetSave(savingObj);
+
+    var rollResult = randomInteger(6) + randomInteger(6);
+    sendChat(msg.who, "Rolling 2d6 " + unitName
+        + " save vs. fear DC " + currentSaveTarget);
+    resolveMassCasualtyCheck(msg, rollResult);
+}
+
 function getTargetSave(unitObj)
 {
     var typeAttribute = "Unit Type";
     var sheetId = getPropertyValue(unitObj, "represents");
     var unitType = getAttributeWithError(sheetId, typeAttribute);
+
     if (unitType === "Light Foot"
         || unitType === "Peasant"
         || unitType === "Levies"
@@ -119,18 +147,17 @@ function getMaxCasualties(unitObj)
  * @param rollResult
  */
 function resolveMassCasualtyCheck(msg, rollResult) {
-        var unitName = getPropertyValue(currentlySavingUnitObj, "name");
-        sendChat(msg.who, "Checking save: " + unitName + " rolled "
-            + rollResult + " vs DC " + currentSaveTarget + ":");
-        if (rollResult < currentSaveTarget) {
-            sendChat(msg.who, unitName + " has surrendered!");
-            var icon_surrender = "dead";
-            currentlySavingUnitObj.set("status_" + icon_surrender, true);
-        }
-        else {
-            sendChat(msg.who, unitName
-                + " has passed their morale check for heavy losses!");
-        }
+    var unitName = getPropertyValue(currentlySavingUnitObj, "name");
+    sendChat(msg.who, "Checking save: " + unitName + " rolled "
+        + rollResult + " vs DC " + currentSaveTarget + ":");
+    if (rollResult < currentSaveTarget) {
+        sendChat(msg.who, unitName + " has surrendered!");
+        var icon_surrender = "dead";
+        currentlySavingUnitObj.set("status_" + icon_surrender, true);
+    }
+    else {
+        sendChat(msg.who, unitName + " has passed their morale check!");
+    }
 }
 
 /**
@@ -147,4 +174,6 @@ function eventMassiveCasualtyRoll(msg) {
         resolveMassCasualtyCheck(msg, rollResult);
     }
 }
+
+
 

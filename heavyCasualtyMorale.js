@@ -27,16 +27,16 @@ function heavyLossMoraleCheck(msg, unitObj) {
     }
 
     var unitName = getPropertyValue(unitObj, "name");
-    sendChat(msg.who, unitName + " has suffered massive casualties: "
-        + casualties + " out of a maxumum of " + threshold);
+    sendChat(msg.who, css.morale + unitName + " has suffered massive casualties: "
+        + casualties + " out of a maxumum of " + threshold + css.spanEnd);
 
     currentlySavingUnitObj = unitObj;
     currentSaveTarget = getTargetSave(unitObj);
 
     // Going with PRNG for now.
     var rollResult = randomInteger(6) + randomInteger(6);
-    sendChat(msg.who, "Rolling 2d6 " + unitName
-        + " save vs. massive casualties DC " + currentSaveTarget);
+    sendChat(msg.who, css.morale + "Rolling 2d6 " + unitName
+        + " save vs. massive casualties DC " + currentSaveTarget + css.spanEnd);
     resolveMassCasualtyCheck(msg, rollResult);
 }
 
@@ -62,8 +62,8 @@ function eventFearMoraleCheck(msg) {
     currentSaveTarget = getTargetSave(savingObj);
 
     var rollResult = randomInteger(6) + randomInteger(6);
-    sendChat(msg.who, "Rolling 2d6 " + unitName
-        + " save vs. fear DC " + currentSaveTarget);
+    sendChat(msg.who, css.morale + "Rolling 2d6 " + unitName
+        + " save vs. fear DC " + currentSaveTarget + css.spanEnd);
     resolveMassCasualtyCheck(msg, rollResult);
 }
 
@@ -148,15 +148,15 @@ function getMaxCasualties(unitObj)
  */
 function resolveMassCasualtyCheck(msg, rollResult) {
     var unitName = getPropertyValue(currentlySavingUnitObj, "name");
-    sendChat(msg.who, "Checking save: " + unitName + " rolled "
-        + rollResult + " vs DC " + currentSaveTarget + ":");
+    sendChat(msg.who, css.morale + "Checking save: " + unitName + " rolled "
+        + rollResult + " vs DC " + currentSaveTarget + ":" + css.spanEnd);
     if (rollResult < currentSaveTarget) {
-        sendChat(msg.who, unitName + " has surrendered!");
+        sendChat(msg.who, css.morale + unitName + " has surrendered!" + css.spanEnd);
         var icon_surrender = "dead";
         currentlySavingUnitObj.set("status_" + icon_surrender, true);
     }
     else {
-        sendChat(msg.who, unitName + " has passed their morale check!");
+        sendChat(msg.who, css.morale + unitName + " has passed their morale check!" + css.spanEnd);
     }
 }
 

@@ -77,8 +77,8 @@ function missileAttack(selectedId, targetId, msg, isIndirect) {
         firingUnits[0] = archerTroops;
     }
     else if (archerTroops > 20) {
-        sendChat(msg.who, "There are more than 20 troops in "
-            + "this unit. Split unit before firing missile attacks.");
+        sendChat(msg.who, css.error + "There are more than 20 troops in "
+            + "this unit. Split unit before firing missile attacks." + css.spanEnd);
     }
     else {
         firingUnits[0] = Math.floor(archerTroops / 2);
@@ -94,7 +94,7 @@ function missileAttack(selectedId, targetId, msg, isIndirect) {
             damage += calcMissileDamage(firingUnits[i], msg, targetArmor, i + 1, targetToken);
         }
     }
-    sendChat(msg.who, "**Total missile damage: " + damage + "**");
+    sendChat(msg.who, css.missile + "**Total missile damage: " + damage + "**" + css.spanEnd);
 }
 
 /**
@@ -108,7 +108,7 @@ function missileAttack(selectedId, targetId, msg, isIndirect) {
  */
 function calcMissileDamage(numTroops, msg, targetArmor, unitNum, targetToken) {
     var roll = randomInteger(6);
-    sendChat(msg.who, "**Rolling 1d6: ``" + roll + "``");
+    sendChat(msg.who, css.missile + "**Rolling 1d6: ``" + roll + "``" + css.spanEnd);
     var unitDamage = 0;
     if (targetArmor === 0) {
         unitDamage = getNoArmorMissileDamage(numTroops, roll);
@@ -119,9 +119,9 @@ function calcMissileDamage(numTroops, msg, targetArmor, unitNum, targetToken) {
     else {
         unitDamage = getFullArmorMissileDamage(numTroops, roll);
     } // end armor 2
-    sendChat(msg.who, "Firing unit " + unitNum
+    sendChat(msg.who, css.missile + "Firing unit " + unitNum
         + " (" + numTroops + " troops)"
-        + " does " + unitDamage + " damage.");
+        + " does " + unitDamage + " damage." + css.spanEnd);
     applyCasualties(targetToken, unitDamage);
     calculateTroopLoss(msg, targetToken);
     heavyLossMoraleCheck(msg, targetToken);
@@ -130,7 +130,7 @@ function calcMissileDamage(numTroops, msg, targetArmor, unitNum, targetToken) {
 
 function calcIndirectMissileDamage(numTroops, msg, targetArmor, unitNum, targetToken) {
     var roll = randomInteger(6);
-    sendChat(msg.who, "**Rolling 1d6: ``" + roll + "``");
+    sendChat(msg.who, css.indirectMissile + "**Rolling 1d6: ``" + roll + "``" + css.spanEnd);
     var unitDamage = 0;
     if (targetArmor === 0) {
         unitDamage = getHalfArmorMissileDamage(numTroops, roll);
@@ -141,9 +141,9 @@ function calcIndirectMissileDamage(numTroops, msg, targetArmor, unitNum, targetT
     else {
         unitDamage = 0;
     } // end armor 2
-    sendChat(msg.who, "Firing unit " + unitNum
+    sendChat(msg.who, css.indirectMissile + "Firing unit " + unitNum
         + " (" + numTroops + " troops)"
-        + " does " + unitDamage + " damage.");
+        + " does " + unitDamage + " damage." + css.spanEnd);
     applyCasualties(targetToken, unitDamage);
     calculateTroopLoss(msg, targetToken);
     heavyLossMoraleCheck(msg, targetToken);

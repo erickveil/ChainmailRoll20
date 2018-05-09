@@ -25,7 +25,7 @@ function eventMeleeAttack(msg) {
     var argList = argStr.split(",");
     if (argList.length !== 2) {
         var logMsg = "Not enough arguments in !melee command: " + msg.content;
-        var chatMsg = "The !melee macro is set up incorrectly.";
+        var chatMsg = css.error + "The !melee macro is set up incorrectly." + css.spanEnd;
         throw new roll20Exception(logMsg, chatMsg);
     }
     var selectedId = argList[0];
@@ -37,7 +37,8 @@ function eventMeleeAttack(msg) {
     var selectedTroops = getTokenBarValue(selectedObj, 1);
     var targetTroops = getTokenBarValue(targetObj, 1);
     if (selectedTroops < 1) {
-        sendChat(msg.who, "Cannot attack with a defeated unit! Remove it from play.");
+        sendChat(msg.who, css.error + "Cannot attack with a defeated unit! Remove it from play."
+            + css.spanEnd);
         return;
     }
     if (targetTroops < 1) {
@@ -57,7 +58,7 @@ function eventPolarmAdvantageAttack(msg) {
     var argList = argStr.split(",");
     if (argList.length !== 2) {
         var logMsg = "Not enough arguments in !melee command: " + msg.content;
-        var chatMsg = "The !melee macro is set up incorrectly.";
+        var chatMsg = css.error + "The !melee macro is set up incorrectly." + css.spanEnd;
         throw new roll20Exception(logMsg, chatMsg);
     }
     var selectedId = argList[0];
@@ -69,11 +70,12 @@ function eventPolarmAdvantageAttack(msg) {
     var selectedTroops = getTokenBarValue(selectedObj, 1);
     var targetTroops = getTokenBarValue(targetObj, 1);
     if (selectedTroops < 1) {
-        sendChat(msg.who, "Cannot attack with a defeated unit! Remove it from play.");
+        sendChat(msg.who, css.error + "Cannot attack with a defeated unit! Remove it from play." + css.spanEnd);
         return;
     }
     if (targetTroops < 1) {
-        sendChat(msg.who, "This unit is already defeated. Remove it from play and attack another.");
+        sendChat(msg.who, css.error + "This unit is already defeated. Remove it from play and attack another."
+            + css.spanEnd);
         return;
     }
 
@@ -89,7 +91,7 @@ function eventFlankAttack(msg) {
     var argList = argStr.split(",");
     if (argList.length !== 2) {
         var logMsg = "Not enough arguments in !melee command: " + msg.content;
-        var chatMsg = "The !melee macro is set up incorrectly.";
+        var chatMsg = css.error + "The !melee macro is set up incorrectly." + css.spanEnd;
         throw new roll20Exception(logMsg, chatMsg);
     }
     var selectedId = argList[0];
@@ -101,11 +103,13 @@ function eventFlankAttack(msg) {
     var selectedTroops = getTokenBarValue(selectedObj, 1);
     var targetTroops = getTokenBarValue(targetObj, 1);
     if (selectedTroops < 1) {
-        sendChat(msg.who, "Cannot attack with a defeated unit! Remove it from play.");
+        sendChat(msg.who, css.error + "Cannot attack with a defeated unit! Remove it from play." + css.spanEnd);
+
         return;
     }
     if (targetTroops < 1) {
-        sendChat(msg.who, "This unit is already defeated. Remove it from play and attack another.");
+        sendChat(msg.who, css.error + "This unit is already defeated. Remove it from play and attack another."
+            + css.spanEnd);
         return;
     }
 
@@ -121,7 +125,7 @@ function eventRearAttack(msg) {
     var argList = argStr.split(",");
     if (argList.length !== 2) {
         var logMsg = "Not enough arguments in !melee command: " + msg.content;
-        var chatMsg = "The !melee macro is set up incorrectly.";
+        var chatMsg = css.error + "The !melee macro is set up incorrectly." + css.spanEnd;
         throw new roll20Exception(logMsg, chatMsg);
     }
     var selectedId = argList[0];
@@ -133,11 +137,12 @@ function eventRearAttack(msg) {
     var selectedTroops = getTokenBarValue(selectedObj, 1);
     var targetTroops = getTokenBarValue(targetObj, 1);
     if (selectedTroops < 1) {
-        sendChat(msg.who, "Cannot attack with a defeated unit! Remove it from play.");
+        sendChat(msg.who, css.error + "Cannot attack with a defeated unit! Remove it from play." + css.spanEnd);
         return;
     }
     if (targetTroops < 1) {
-        sendChat(msg.who, "This unit is already defeated. Remove it from play and attack another.");
+        sendChat(msg.who, css.error + "This unit is already defeated. Remove it from play and attack another."
+            + css.spanEnd);
         return;
     }
 
@@ -523,7 +528,7 @@ function calculateTroopLoss(msg, selectedObj) {
     result[10] = " will no longer be a problem!";
     var i = randomInteger(10);
     var unitName = getPropertyValue(selectedObj, "name");
-    sendChat(msg.who, unitName + result[i]);
+    sendChat(msg.who, css.meleeResult + unitName + result[i] + css.spanEnd);
     return false;
 
 }

@@ -34,7 +34,7 @@ on("chat:message", function(msg) {
             && typeof err.chatMsg !== "undefined"
             ) {
             log(err);
-            sendChat(msg.who, err.chatMsg);
+            sendChat(msg.who, css.error + err.chatMsg + css.spanEnd);
         }
         else if (typeof err === "undefined") {
             log("Threw an undefined exception: Probably forgot to use 'new'.");
@@ -76,8 +76,8 @@ function eventMeleeDiceRolled(msg) {
         applyCasualties(targetObj, kills);
 
         // announce casualties
-        sendChat(msg.who, selectedName + " attacks " + targetName + " and kills "
-            + kills + " troops.");
+        sendChat(msg.who, css.attack + selectedName + " attacks " + targetName + " and kills "
+            + kills + " troops." + css.spanEnd);
 
         survived = calculateTroopLoss(msg, targetObj);
 
@@ -103,8 +103,8 @@ function eventMeleeDiceRolled(msg) {
         applyCasualties(selectedObj, kills);
 
         // announce casualties
-        sendChat(msg.who, targetName + " counterattacks " + selectedName + " and kills "
-            + kills + " troops.");
+        sendChat(msg.who, css.counterAttack + targetName + " counterattacks " + selectedName + " and kills "
+            + kills + " troops." + css.spanEnd);
 
         // check for dead unit before heavy loss
         survived = calculateTroopLoss(msg, selectedObj);

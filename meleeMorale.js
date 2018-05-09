@@ -31,7 +31,8 @@ function meleeMorale(msg) {
         var tokenLink = "_defaulttoken";
         */
         if (typeof msg.selected === "undefined" || msg.selected.length !== 2) {
-            sendChat(msg.who, "You need to select 2 tokens before you check morale between them");
+            sendChat(msg.who, css.error + "You need to select 2 tokens before you check morale between them"
+                + css.spanEnd);
             return;
         }
 
@@ -46,7 +47,7 @@ function meleeMorale(msg) {
             }
             else if (typeof err === "object" && typeof err.chatMsg !== "undefined") {
                 log(err);
-                sendChat(msg.who, err.chatMsg);
+                sendChat(msg.who, css.error + err.chatMsg + css.spanEnd);
             }
             else {
                 log("Unknown error type: " + err);
@@ -114,7 +115,7 @@ function resolveMeleeMorale(sender, selectedObjList) {
     // nobody gets this in a tie
     if (casualtyDiff !== 0) {
         var dieResult = randomInteger(6);
-        sendChat(sender, "**Rolling Morale Check, 1d6: ``" + dieResult + "``**");
+        sendChat(sender, css.morale + "**Rolling Morale Check, 1d6: ``" + dieResult + "``**" + css.spanEnd);
         var casualtyBonus = (dieResult * casualtyDiff);
         score[fewerCasualtiesSide] += casualtyBonus;
 
@@ -186,10 +187,10 @@ function resolveMeleeMorale(sender, selectedObjList) {
         loser = 0;
     }
     else {
-        sendChat(sender, "**No winner this round.**");
+        sendChat(sender, css.morale + "**No winner this round.**" + css.spanEnd);
         return;
     }
-    sendChat(sender, "**" + names[winner] + "** is the winner!");
+    sendChat(sender, css.morale + "**" + names[winner] + "** is the winner!" + css.spanEnd);
 
     // get difference between scores
     var scoreDiff = Math.abs(score[0] - score[1]);
@@ -199,24 +200,24 @@ function resolveMeleeMorale(sender, selectedObjList) {
 
     // look up difference on table and report losing side and result.
     if (scoreDiff < 20) {
-        sendChat(sender, "**Melee continues.**");
+        sendChat(sender, css.morale + "**Melee continues.**" + css.spanEnd + css.spanEnd);
     }
     else if (scoreDiff >= 20 && scoreDiff <= 39) {
-        sendChat(sender, "**" + names[loser] + "** moves back 2 move, good order");
+        sendChat(sender, css.morale + "**" + names[loser] + "** moves back 2 move, good order" + css.spanEnd);
     }
     else if (scoreDiff >= 40 && scoreDiff <= 59) {
-        sendChat(sender, "**" + names[loser] + "** moves back 1 move, good order");
+        sendChat(sender, css.morale + "**" + names[loser] + "** moves back 1 move, good order" + css.spanEnd);
     }
     else if (scoreDiff >= 60 && scoreDiff <= 79) {
-        sendChat(sender, "**" + names[loser] + "** retreat 1 move");
+        sendChat(sender, css.morale + "**" + names[loser] + "** retreat 1 move" + css.spanEnd);
         token[loser].set("status_" + icon_retreat, true, retreatRounds);
     }
     else if (scoreDiff >= 80 && scoreDiff <= 99) {
-        sendChat(sender, "**" + names[loser] + "** rout 1 1/2 move");
+        sendChat(sender, css.morale + "**" + names[loser] + "** rout 1 1/2 move" + css.spanEnd);
         token[loser].set("status_" + icon_rout, true, retreatRounds);
     }
     else {
-        sendChat(sender, "**" + names[loser] + "** surrenders. Remove unit from play.");
+        sendChat(sender, css.morale + "**" + names[loser] + "** surrenders. Remove unit from play." + css.spanEnd);
         token[loser].set("status_" + icon_surrender, true);
     }
 }

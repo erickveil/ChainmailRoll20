@@ -27,7 +27,7 @@ function heavyLossMoraleCheck(msg, unitObj) {
     }
 
     var unitName = getPropertyValue(unitObj, "name");
-    sendChat(msg.who, css.morale + unitName + " has suffered massive casualties: "
+    sendChat(msg.who, css.morale + unitName + " has suffered **massive casualties**: "
         + casualties + " out of a maxumum of " + threshold + css.spanEnd);
 
     currentlySavingUnitObj = unitObj;
@@ -148,15 +148,24 @@ function getMaxCasualties(unitObj)
  */
 function resolveMassCasualtyCheck(msg, rollResult) {
     var unitName = getPropertyValue(currentlySavingUnitObj, "name");
-    sendChat(msg.who, css.morale + "Checking save: " + unitName + " rolled "
-        + rollResult + " vs DC " + currentSaveTarget + ":" + css.spanEnd);
+    sendChat(msg.who, css.morale
+        + "Checking save: **"
+        + unitName
+        + "** rolled "
+        + css.rollValue
+        + rollResult
+        + css.endValue
+        + " vs DC "
+        + currentSaveTarget
+        + ":"
+        + css.spanEnd);
     if (rollResult < currentSaveTarget) {
-        sendChat(msg.who, css.morale + unitName + " has surrendered!" + css.spanEnd);
+        sendChat(msg.who, css.morale + unitName + " has **surrendered!**" + css.spanEnd);
         var icon_surrender = "dead";
         currentlySavingUnitObj.set("status_" + icon_surrender, true);
     }
     else {
-        sendChat(msg.who, css.morale + unitName + " has passed their morale check!" + css.spanEnd);
+        sendChat(msg.who, css.morale + unitName + " has **passed** their morale check!" + css.spanEnd);
     }
 }
 

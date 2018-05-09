@@ -32,7 +32,7 @@ var css = {
     counterAttack: "<p style='"
         + "font-size:medium;"
         + "background-color:#aa5585;"
-        + "color:#a5c663;"
+        + "color:lightgrey;"
         + "padding:4px;"
         + "padding-left:6px;"
         + "margin:0px;"
@@ -40,7 +40,7 @@ var css = {
         + "' />",
     morale: "<p style='"
         + "font-size:medium;"
-        + "background-color:#3d1255;"
+        + "background-color:#343477;"
         + "color:#ffffaa;"
         + "padding:4px;"
         + "padding-left:6px;"
@@ -62,7 +62,31 @@ var css = {
         + "padding-left:6px;"
         + "margin:0px;"
         + "border-radius:12px;"
+        + "' />",
+    missileDamage: "<p style='"
+        + "font-size:medium;"
+        + "background-color:#440027;"
+        + "color:white;"
+        + "padding:4px;"
+        + "padding-left:6px;"
+        + "margin:0px;"
+        + "border-radius:12px;"
+        + "' />",
+    killValue: "<span style='"
+        + "font-size:medium;"
+        + "background-color:black;"
+        + "color:yellow;"
+        + "padding:3px;"
+        + "' />",
+    endValue: "</span>",
+    rollValue: "<span style='"
+        + "font-size:medium;"
+        + "background-color:white;"
+        + "color:black;"
+        + "padding:5px;"
+        + "border:thin solid black;"
         + "' />"
+
 };
 
 

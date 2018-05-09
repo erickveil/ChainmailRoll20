@@ -94,7 +94,12 @@ function missileAttack(selectedId, targetId, msg, isIndirect) {
             damage += calcMissileDamage(firingUnits[i], msg, targetArmor, i + 1, targetToken);
         }
     }
-    sendChat(msg.who, css.missile + "**Total missile damage: " + damage + "**" + css.spanEnd);
+    sendChat(msg.who, css.missileDamage
+        + "**Total missile damage: "
+        + css.killValue
+        + damage
+        + css.endValue
+        + "**" + css.spanEnd);
 }
 
 /**
@@ -108,7 +113,13 @@ function missileAttack(selectedId, targetId, msg, isIndirect) {
  */
 function calcMissileDamage(numTroops, msg, targetArmor, unitNum, targetToken) {
     var roll = randomInteger(6);
-    sendChat(msg.who, css.missile + "**Rolling 1d6: ``" + roll + "``" + css.spanEnd);
+    sendChat(msg.who, css.missile
+        + "Rolling 1d6: "
+        + css.rollValue
+        + roll
+        + css.endValue
+        + css.spanEnd);
+
     var unitDamage = 0;
     if (targetArmor === 0) {
         unitDamage = getNoArmorMissileDamage(numTroops, roll);
@@ -130,7 +141,12 @@ function calcMissileDamage(numTroops, msg, targetArmor, unitNum, targetToken) {
 
 function calcIndirectMissileDamage(numTroops, msg, targetArmor, unitNum, targetToken) {
     var roll = randomInteger(6);
-    sendChat(msg.who, css.indirectMissile + "**Rolling 1d6: ``" + roll + "``" + css.spanEnd);
+    sendChat(msg.who, css.indirectMissile
+        + "Rolling 1d6: "
+        + css.rollValue
+        + roll
+        + css.endValue
+        + css.spanEnd);
     var unitDamage = 0;
     if (targetArmor === 0) {
         unitDamage = getHalfArmorMissileDamage(numTroops, roll);

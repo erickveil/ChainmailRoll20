@@ -115,7 +115,14 @@ function resolveMeleeMorale(sender, selectedObjList) {
     // nobody gets this in a tie
     if (casualtyDiff !== 0) {
         var dieResult = randomInteger(6);
-        sendChat(sender, css.morale + "**Rolling Morale Check, 1d6: ``" + dieResult + "``**" + css.spanEnd);
+        sendChat(sender, css.morale
+            + "Rolling Morale Check, 1d6: "
+            + css.rollValue
+            + "**"
+            + dieResult
+            + "**"
+            + css.endValue
+            + css.spanEnd);
         var casualtyBonus = (dieResult * casualtyDiff);
         score[fewerCasualtiesSide] += casualtyBonus;
 

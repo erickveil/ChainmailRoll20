@@ -33,10 +33,26 @@ function heavyLossMoraleCheck(msg, unitObj) {
     currentlySavingUnitObj = unitObj;
     currentSaveTarget = getTargetSave(unitObj);
 
+    // Determine if inspiring figure is nearby
+    var isGetsBonus = isGetsLeadershipMoraleBonus(unitObj);
+    if (isGetsBonus) {
+        var leaderName = getLeaderName(unitObj);
+        sendChat(msg.who, css.morale
+            + unitName + " gets a **morale bonus** from " + leaderName
+            + css.spanEnd);
+    }
+
+    var moraleBonus = (isGetsBonus) ? 1 : 0;
+    var moraleStr = (isGetsBonus) ? "+1 " : "";
+
     // Going with PRNG for now.
-    var rollResult = randomInteger(6) + randomInteger(6);
-    sendChat(msg.who, css.morale + "Rolling 2d6 " + unitName
-        + " save vs. massive casualties DC " + currentSaveTarget + css.spanEnd);
+    var rollResult = randomInteger(6) + randomInteger(6) + moraleBonus;
+    sendChat(msg.who, css.morale
+        + "Rolling 2d6 "
+        + moraleStr
+        + unitName
+        + " save vs. massive casualties DC "
+        + currentSaveTarget + css.spanEnd);
     resolveMassCasualtyCheck(msg, rollResult);
 }
 
@@ -61,9 +77,27 @@ function eventFearMoraleCheck(msg) {
     currentlySavingUnitObj = savingObj;
     currentSaveTarget = getTargetSave(savingObj);
 
-    var rollResult = randomInteger(6) + randomInteger(6);
-    sendChat(msg.who, css.morale + "Rolling 2d6 " + unitName
-        + " save vs. fear DC " + currentSaveTarget + css.spanEnd);
+    // Determine if inspiring figure is nearby
+    var isGetsBonus = isGetsLeadershipMoraleBonus(savingObj);
+    if (isGetsBonus) {
+        var leaderName = getLeaderName(savingObj);
+        sendChat(msg.who, css.morale
+            + unitName + " gets a **morale bonus** from " + leaderName
+            + css.spanEnd);
+    }
+
+    var moraleBonus = (isGetsBonus) ? 1 : 0;
+    var moraleStr = (isGetsBonus) ? "+1 " : "";
+
+
+    var rollResult = randomInteger(6) + randomInteger(6) + moraleBonus;
+    sendChat(msg.who, css.morale
+        + "Rolling 2d6 "
+        + moraleStr
+        + unitName
+        + " save vs. fear DC "
+        + currentSaveTarget
+        + css.spanEnd);
     resolveMassCasualtyCheck(msg, rollResult);
 }
 

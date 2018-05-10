@@ -114,9 +114,24 @@ function resolveMeleeMorale(sender, selectedObjList) {
 
     // nobody gets this in a tie
     if (casualtyDiff !== 0) {
-        var dieResult = randomInteger(6);
+
+        // leadership bonus:
+        var isGetsBonus = isGetsLeadershipMoraleBonus(token[fewerCasualtiesSide]);
+        if (isGetsBonus) {
+            sendChat(sender, css.morale
+                + names[fewerCasualtiesSide]
+                + " gets a **morale bonus** from "
+                + getLeaderName(token[fewerCasualtiesSide])
+                + " added to their roll!" + css.spanEnd);
+        }
+        var moraleBonus = (isGetsBonus) ? 1 : 0;
+        var bonusStr = (isGetsBonus) ? "+1 " : "";
+
+        var dieResult = randomInteger(6) + moraleBonus;
         sendChat(sender, css.morale
-            + "Rolling Morale Check, 1d6: "
+            + "Rolling Morale Check, 1d6 "
+            + bonusStr
+            + ": "
             + css.rollValue
             + "**"
             + dieResult

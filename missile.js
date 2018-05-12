@@ -273,6 +273,7 @@ function getTargetMissileAC(unitType) {
         ) { return 1; }
     if (unitType === "Heavy Foot"
         || unitType === "Armored Foot"
+        || unitType === "Wizard"
         || unitType === "Medium Horse"
         || unitType === "Heavy Horse"
         ) { return 2; }

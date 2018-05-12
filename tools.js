@@ -156,3 +156,10 @@ function getArmySheetId(armyName) {
     return getPropertyValue(resultList[0], "_id");
 }
 
+function pingObject(obj) {
+    var x = getPropertyValue(obj, "left");
+    var y = getPropertyValue(obj, "top");
+    var pageId = getPropertyValue(obj, "pageid");
+    sendPing(x, y, pageId);
+}
+

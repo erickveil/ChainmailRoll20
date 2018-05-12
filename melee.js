@@ -34,6 +34,10 @@ function eventMeleeAttack(msg) {
 
     selectedObj = getObjectWithReport(tokenType, selectedId);
     targetObj = getObjectWithReport(tokenType, targetId);
+
+    //pingObject(selectedObj);
+    pingObject(targetObj);
+
     var selectedTroops = getTokenBarValue(selectedObj, 1);
     var targetTroops = getTokenBarValue(targetObj, 1);
     if (selectedTroops < 1) {
@@ -67,6 +71,7 @@ function eventPolarmAdvantageAttack(msg) {
 
     selectedObj = getObjectWithReport(tokenType, selectedId);
     targetObj = getObjectWithReport(tokenType, targetId);
+    pingObject(targetObj);
     var selectedTroops = getTokenBarValue(selectedObj, 1);
     var targetTroops = getTokenBarValue(targetObj, 1);
     if (selectedTroops < 1) {
@@ -100,6 +105,7 @@ function eventFlankAttack(msg) {
 
     selectedObj = getObjectWithReport(tokenType, selectedId);
     targetObj = getObjectWithReport(tokenType, targetId);
+    pingObject(targetObj);
     var selectedTroops = getTokenBarValue(selectedObj, 1);
     var targetTroops = getTokenBarValue(targetObj, 1);
     if (selectedTroops < 1) {
@@ -134,6 +140,7 @@ function eventRearAttack(msg) {
 
     selectedObj = getObjectWithReport(tokenType, selectedId);
     targetObj = getObjectWithReport(tokenType, targetId);
+    pingObject(targetObj);
     var selectedTroops = getTokenBarValue(selectedObj, 1);
     var targetTroops = getTokenBarValue(targetObj, 1);
     if (selectedTroops < 1) {

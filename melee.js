@@ -36,6 +36,7 @@ function eventMeleeAttack(msg) {
     targetObj = getObjectWithReport(tokenType, targetId);
 
     //pingObject(selectedObj);
+    tintAttacker(selectedObj);
     pingObject(targetObj);
 
     var selectedTroops = getTokenBarValue(selectedObj, 1);
@@ -71,6 +72,7 @@ function eventPolarmAdvantageAttack(msg) {
 
     selectedObj = getObjectWithReport(tokenType, selectedId);
     targetObj = getObjectWithReport(tokenType, targetId);
+    tintAttacker(selectedObj);
     pingObject(targetObj);
     var selectedTroops = getTokenBarValue(selectedObj, 1);
     var targetTroops = getTokenBarValue(targetObj, 1);
@@ -105,6 +107,7 @@ function eventFlankAttack(msg) {
 
     selectedObj = getObjectWithReport(tokenType, selectedId);
     targetObj = getObjectWithReport(tokenType, targetId);
+    tintAttacker(selectedObj);
     pingObject(targetObj);
     var selectedTroops = getTokenBarValue(selectedObj, 1);
     var targetTroops = getTokenBarValue(targetObj, 1);
@@ -140,6 +143,7 @@ function eventRearAttack(msg) {
 
     selectedObj = getObjectWithReport(tokenType, selectedId);
     targetObj = getObjectWithReport(tokenType, targetId);
+    tintAttacker(selectedObj);
     pingObject(targetObj);
     var selectedTroops = getTokenBarValue(selectedObj, 1);
     var targetTroops = getTokenBarValue(targetObj, 1);
@@ -593,6 +597,39 @@ function clearLocalCasualties(selectedUnit, targetUnit)
 {
     selectedUnit.set("bar3_value", 0);
     targetUnit.set("bar3_value", 0);
+}
+
+function tintAttacker(attackObj) {
+    var attackColor = "#ff0000";
+    var doneColor = "#000000";
+    setAttackerDone(doneColor);
+    attackObj.set('tint_color', attackColor);
+
+}
+
+function tintRanged(attackObj) {
+    var attackColor = "#ff0000";
+    var doneColor = "#ffffff";
+    setAttackerDone(doneColor);
+    attackObj.set('tint_color', attackColor);
+}
+
+function setAttackerDone(doneColor) {
+    var attackColor = "#ff0000";
+    var objList = findObjs({type: 'graphic'});
+    for (var i = 0; i < objList.length; ++i) {
+        var targetTint = getPropertyValue(objList[i], 'tint_color');
+        if (targetTint === attackColor) {
+            objList[i].set('tint_color', doneColor);
+        }
+    }
+}
+
+function removeAllTints() {
+    var objList = findObjs({type: 'graphic'});
+    for (var i = 0; i < objList.length; ++i) {
+        objList[i].set('tint_color', "transparent");
+    }
 }
 
 

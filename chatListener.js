@@ -25,6 +25,7 @@ on("chat:message", function(msg) {
         eventPolarmAdvantageAttack(msg);
         eventMeleeDiceRolled(msg);
         eventFearMoraleCheck(msg);
+        eventClearAllTints(msg);
     }
     catch(err) {
         if (typeof err === "string") {
@@ -44,6 +45,13 @@ on("chat:message", function(msg) {
         }
     }
 });
+
+function eventClearAllTints(msg) {
+    if (!(msg.type === "api" && msg.content.indexOf("!clearTints") !== -1)) {
+        return;
+    }
+    removeAllTints();
+}
 
 /**
  * Listens for the dice rolled during a melee attack.

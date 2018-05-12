@@ -63,6 +63,7 @@ function missileAttack(selectedId, targetId, msg, isIndirect) {
     var archerToken = getObjectWithReport(tokenType, selectedId);
     var targetToken = getObjectWithReport(tokenType, targetId);
     pingObject(targetToken);
+    tintRanged(archerToken);
 
     if (isObjectWizard(targetToken)) {
         sendChat(msg.who, css.error + "Wizards are immune to missile attacks." + css.spanEnd);

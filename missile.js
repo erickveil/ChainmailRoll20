@@ -62,6 +62,12 @@ function missileAttack(selectedId, targetId, msg, isIndirect) {
     var tokenType = "graphic";
     var archerToken = getObjectWithReport(tokenType, selectedId);
     var targetToken = getObjectWithReport(tokenType, targetId);
+
+    if (isObjectWizard(targetToken)) {
+        sendChat(msg.who, css.error + "Wizards are immune to missile attacks." + css.spanEnd);
+        return;
+    }
+
     clearLocalCasualties(archerToken, targetToken);
     var archerTroops = getTokenBarValue(archerToken, 1);
     var targetSheetId = getPropertyValue(targetToken, "represents");
@@ -273,7 +279,6 @@ function getTargetMissileAC(unitType) {
         ) { return 1; }
     if (unitType === "Heavy Foot"
         || unitType === "Armored Foot"
-        || unitType === "Wizard"
         || unitType === "Medium Horse"
         || unitType === "Heavy Horse"
         ) { return 2; }

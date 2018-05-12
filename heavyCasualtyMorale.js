@@ -63,15 +63,13 @@ function heavyLossMoraleCheck(msg, unitObj) {
  * @param msg
  */
 function eventFearMoraleCheck(msg) {
-
     if (!(msg.type === "api" && msg.content.indexOf("!fearMorale ") !== -1)) {
         return;
     }
 
-
     var argStr = msg.content.replace("!fearMorale ", "");
     // only one arg, and it should be @selected
-    argList = argStr.split(",");
+    var argList = argStr.split(",");
     var unitName = argList[0];
     var selectedId = argList[1];
 
@@ -94,7 +92,6 @@ function eventFearMoraleCheck(msg) {
 
     var moraleBonus = (isGetsBonus) ? 1 : 0;
     var moraleStr = (isGetsBonus) ? "+1 " : "";
-
 
     var rollResult = randomInteger(6) + randomInteger(6) + moraleBonus;
     sendChat(msg.who, css.morale
@@ -121,11 +118,13 @@ function getTargetSave(unitObj)
         return 8;
     }
     else if (unitType === "Heavy Foot"
-        || unittype === "Medium Horse"
+        || unitType === "Medium Horse"
     ) {
         return 7;
     }
-    else if (unitType === "Armored Foot") {
+    else if (unitType === "Armored Foot"
+        || unitType === "Wizard"
+    ) {
         return 6;
     }
     else if (unitType === "Heavy Horse") {

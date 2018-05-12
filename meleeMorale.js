@@ -214,6 +214,11 @@ function resolveMeleeMorale(sender, selectedObjList) {
     }
     sendChat(sender, css.morale + "**" + names[winner] + "** is the winner!" + css.spanEnd);
 
+    if (isObjectWizard(token[loser])) {
+        sendChat(sender, css.morale + names[loser] + " is not affected by morale." + css.spanEnd);
+        return;
+    }
+
     // get difference between scores
     var scoreDiff = Math.abs(score[0] - score[1]);
 

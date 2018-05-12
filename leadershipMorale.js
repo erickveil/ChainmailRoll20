@@ -13,8 +13,10 @@
 function isGetsLeadershipMoraleBonus(originToken) {
     var tokenList = getFirstLeaderInRange(originToken);
     var isGetsBonus = (tokenList.length !== 0);
+    /*
     if (isGetsBonus) { log("gets morale bonus.");}
     else { log("no morale bonus.");}
+    */
     return isGetsBonus;
 }
 
@@ -30,7 +32,7 @@ function getFirstLeaderInRange(originToken) {
             && isObjectInRange(originToken, obj)
             && isObjectOnMyTeam(originToken, obj));
     });
-    log(foundObjList);
+    //log(foundObjList);
     return foundObjList;
 }
 

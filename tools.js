@@ -88,14 +88,36 @@ function getPropertyValue(obj, property) {
  */
 function getAttributeWithError(characterId, attribute, valueType)
 {
-    var attVal = getAttrByName(characterId, attribute, valueType);
-    if (typeof attVal === "undefined") {
-        var logMsg = "Could not find attribute " + attribute
-            + " value from character id " + characterId;
+    if (characterId === "") {
+        var logMsg = "Empty characterId passed to getAttributeWithError. attribute: " + attribute;
         var chatMsg = "";
         throw new roll20Exception(logMsg, chatMsg);
     }
+
+    // ------
+    if (!isHasAttribute(characterId, attribute)) {
+        var debugList = findObjs({_id: characterId});
+        var debugName = getPropertyValue(debugList[0], "name");
+        logMsg = "Object does not have attribute -- charId: " + characterId + " attribute: " + attribute
+            + " name: " + debugName;
+        chatMsg = "";
+        throw new roll20Exception(logMsg, chatMsg);
+    }
+    // ------
+
+    var attVal = getAttrByName(characterId, attribute, valueType);
+    if (typeof attVal === "undefined") {
+        logMsg = "Could not find attribute " + attribute
+            + " value from character id " + characterId;
+        chatMsg = "";
+        throw new roll20Exception(logMsg, chatMsg);
+    }
     return attVal;
+}
+
+function isHasAttribute(objId, attributeName) {
+    var attributeObj = findObjs({ type: 'attribute', characterid: objId, name: attributeName });
+    return (attributeObj.length !== 0);
 }
 
 /**

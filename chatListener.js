@@ -33,7 +33,7 @@ on("chat:message", function(msg) {
         else if (typeof err === "object"
             && typeof err.chatMsg !== "undefined"
             ) {
-            log(err);
+            log("Exception: " + err);
             sendChat(msg.who, css.error + err.chatMsg + css.spanEnd);
         }
         else if (typeof err === "undefined") {

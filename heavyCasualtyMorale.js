@@ -19,6 +19,8 @@ var isRollingSave = false;
  */
 function heavyLossMoraleCheck(msg, unitObj) {
 
+    if (isObjectWizard(unitObj)) { return; }
+
     var casualties = getTokenBarValue(unitObj, 3);
     var threshold = getMaxCasualties(unitObj);
     unitObj.set("bar3_max", threshold);
@@ -66,6 +68,7 @@ function eventFearMoraleCheck(msg) {
         return;
     }
 
+
     var argStr = msg.content.replace("!fearMorale ", "");
     // only one arg, and it should be @selected
     argList = argStr.split(",");
@@ -74,6 +77,9 @@ function eventFearMoraleCheck(msg) {
 
     var tokenType = "graphic";
     var savingObj = getObjectWithReport(tokenType, selectedId);
+
+    if (isObjectWizard(savingObj)) { return; }
+
     currentlySavingUnitObj = savingObj;
     currentSaveTarget = getTargetSave(savingObj);
 

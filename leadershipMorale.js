@@ -37,11 +37,20 @@ function getFirstLeaderInRange(originToken) {
 }
 
 function isObjectOnMyTeam(myToken, targetToken) {
-    var mySheet = getPropertyValue(myToken, "represents");
-    var targetSheet = getPropertyValue(targetToken, "represents");
-    var myTeam = getAttributeWithError(mySheet, "Army");
-    var targetTeam = getAttributeWithError(targetSheet, "Army");
-    return (myTeam === targetTeam);
+    if (!isObjectToken(myToken)) {
+        return false;
+    }
+    try {
+        var mySheet = getPropertyValue(myToken, "represents");
+        var targetSheet = getPropertyValue(targetToken, "represents");
+        var myTeam = getAttributeWithError(mySheet, "Army");
+        var targetTeam = getAttributeWithError(targetSheet, "Army");
+        return (myTeam === targetTeam);
+    }
+    catch (err) {
+        // tokens might not have the expected attributes as they are not units
+        return false;
+    }
 }
 
 function isObjectWizard(obj) {
@@ -53,6 +62,7 @@ function isObjectWizard(obj) {
         return (unitType === "Wizard");
     }
     catch (err) {
+        // tokens might not have the expected attributes as they are not units
         return false;
     }
 }
@@ -70,6 +80,7 @@ function getTokenUnitType(token) {
 function isObjectInRange(originToken, testToken) {
     // if range proves to be variable, then this will need
     // to be refactored into an argument.
+    // morale range for wizards: 12
     var range = 12;
 
     // default grid is 70px

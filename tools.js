@@ -139,7 +139,17 @@ function getSheetById(sheetId) {
         var chatMsg = "Could not find the stat sheet.";
         throw new roll20Exception(logMsg, chatMsg);
     }
-    return sheetId;
+    return resultList[0];
+}
+
+function getTokenById(tokenId) {
+    var resultList = findObjs({type:"graphic", _id:tokenId});
+    if (resultList.length < 0 || typeof resultList[0] === "undefined") {
+        var logMsg = "token id: " + tokenId;
+        var chatMsg = "Could not find the token.";
+        throw new roll20Exception(logMsg, chatMsg);
+    }
+    return resultList[0];
 }
 
 function getArmyName(unitSheetId) {
@@ -154,6 +164,10 @@ function getArmySheetId(armyName) {
         throw new roll20Exception(logMsg, chatMsg);
     }
     return getPropertyValue(resultList[0], "_id");
+}
+
+function getTokenSheetId(tokenObj) {
+    return getPropertyValue(tokenObj, "represents");
 }
 
 function pingObject(obj) {

@@ -26,6 +26,10 @@ on("chat:message", function(msg) {
         eventMeleeDiceRolled(msg);
         eventFearMoraleCheck(msg);
         eventClearAllTints(msg);
+        eventToggleChargeRange(msg);
+        eventToggleMiscRange(msg);
+        eventToggleMissileRange(msg);
+        eventToggleMovementRange(msg);
     }
     catch(err) {
         if (typeof err === "string") {

@@ -179,6 +179,8 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
     var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
     var targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
 
+    if (isHasMagicSword(selectedSheetId)) { numberOfDice++; }
+
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
     counterAttack(targetUnitType, selectedUnitType, targetSheetId, weaponAttribute, targetTroops, msg);
 }
@@ -204,6 +206,8 @@ function polearmAdvantageAttack(selectedTroops, msg) {
     var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
     var targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
 
+    if (isHasMagicSword(selectedSheetId)) { numberOfDice++; }
+
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
 }
 
@@ -226,6 +230,8 @@ function flankAttack(selectedTroops, targetTroops, msg) {
     if (selectedUnitType === "Armored Foot" || selectedUnitType === "Heavy Horse") {
         --targetNumber;
     }
+
+    if (isHasMagicSword(selectedSheetId)) { numberOfDice++; }
 
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
     counterAttack(targetUnitType, selectedUnitType, targetSheetId, weaponAttribute, targetTroops, msg);
@@ -251,6 +257,8 @@ function rearAttack(selectedTroops, msg) {
         --targetNumber;
     }
 
+    if (isHasMagicSword(selectedSheetId)) { numberOfDice++; }
+
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
 }
 
@@ -264,6 +272,9 @@ function counterAttack(targetUnitType, selectedUnitType, targetSheetId, weaponAt
     var numberOfDice = Math.ceil(targetTroops * attackDiceFactor) + pikeMod;
     var targetNumber = getAttackerTargetNumber(targetUnitType, selectedUnitType);
     var targetName = getPropertyValue(targetObj, "name");
+
+    if (isHasMagicSword(targetSheetId)) { numberOfDice++; }
+
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + targetName);
 }
 

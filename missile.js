@@ -20,7 +20,7 @@ function eventMissileAttack(msg) {
     if (argList.length !== 2) {
         var logMsg = "Missile attack command takes 1 selected archer argument and "
             + "1 target argument.";
-        var chatMsg = "Missile attack macro set up incorrectly."
+        var chatMsg = "Missile attack macro set up incorrectly.";
         throw new roll20Exception(logMsg, chatMsg);
     }
 
@@ -28,6 +28,46 @@ function eventMissileAttack(msg) {
     var targetId = argList[1];
 
     missileAttack(selectedId, targetId, msg, false);
+}
+
+function eventMagicMissileAttack(msg) {
+    if (!(msg.type === "api" && msg.content.indexOf("!magicMissile ") !== -1)) {
+       return;
+    }
+
+    var argStr = msg.content.replace("!missile ", "");
+    var argList = argStr.split(",");
+
+    if (argList.length !== 2) {
+        var logMsg = "Missile attack command takes 1 selected archer argument and "
+            + "1 target argument.";
+        var chatMsg = "Missile attack macro set up incorrectly.";
+        throw new roll20Exception(logMsg, chatMsg);
+    }
+
+    var selectedId = argList[0];
+    var targetId = argList[1];
+
+    var selectedObj = getTokenById(selectedId);
+    var selectedSheetId = getPropertyValue(selectedObj, "represents");
+    var selectedName = getPropertyValue(selectedObj, "name");
+    if (!isHasMagicMissile(selectedSheetId)) {
+        sendChat(msg.who, css.error + selectedName + " does not have any enchanted arrows." + css.spanEnd);
+        return;
+    }
+
+    // all fantasy creatures go here
+    var isFantasyTarget = false;
+
+    if (!isFantasyTarget) {
+        missileAttack(selectedId, targetId, msg, true);
+        return;
+    }
+
+    // NOTE: Enchanted arrows get special attacks against fantasy creatures, but normal
+    // attacks against normal creatures.
+    // Wizards are still immune to *all* missiles.
+    // TODO: Define what happens when attacking fantasy foes with enchanted arrows here.
 }
 
 function eventIndirectMissileAttack(msg) {
@@ -41,7 +81,7 @@ function eventIndirectMissileAttack(msg) {
     if (argList.length !== 2) {
         var logMsg = "Missile attack command takes 1 selected archer argument and "
             + "1 target argument.";
-        var chatMsg = "Missile attack macro set up incorrectly."
+        var chatMsg = "Missile attack macro set up incorrectly.";
         throw new roll20Exception(logMsg, chatMsg);
     }
 

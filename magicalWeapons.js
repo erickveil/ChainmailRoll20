@@ -18,7 +18,7 @@ function isHasMagicMissile(sheetId) {
     if (!isHasAttribute(sheetId, attrName)) {
         return false;
     }
-    var missleQty = getAttributeWithError(sheetId, attrName);
+    var missileQty = getAttributeWithError(sheetId, attrName);
     return !(missileQty <= 0 || missileQty === "");
 }
 

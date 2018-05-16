@@ -195,8 +195,10 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
         }
     }
 
+    if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
+
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
-    counterAttack(targetUnitType, selectedUnitType, targetSheetId, weaponAttribute, targetTroops, msg);
+    counterAttack(targetUnitType, selectedUnitType, targetSheetId, selectedSheetId, weaponAttribute, targetTroops, msg);
 }
 
 /**
@@ -236,6 +238,8 @@ function polearmAdvantageAttack(selectedTroops, msg) {
         }
     }
 
+    if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
+
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
 }
 
@@ -272,12 +276,14 @@ function flankAttack(selectedTroops, targetTroops, msg) {
         }
     }
 
+    if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
+
     if (selectedUnitType === "Armored Foot" || selectedUnitType === "Heavy Horse") {
         --targetNumber;
     }
 
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
-    counterAttack(targetUnitType, selectedUnitType, targetSheetId, weaponAttribute, targetTroops, msg);
+    counterAttack(targetUnitType, selectedUnitType, targetSheetId, selectedSheetId, weaponAttribute, targetTroops, msg);
 }
 
 function rearAttack(selectedTroops, msg) {
@@ -313,6 +319,8 @@ function rearAttack(selectedTroops, msg) {
         }
     }
 
+    if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
+
     if (selectedUnitType === "Armored Foot" || selectedUnitType === "Heavy Horse") {
         --targetNumber;
     }
@@ -320,7 +328,7 @@ function rearAttack(selectedTroops, msg) {
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
 }
 
-function counterAttack(targetUnitType, selectedUnitType, targetSheetId, weaponAttribute, targetTroops, msg) {
+function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selectedSheetId, weaponAttribute, targetTroops, msg) {
     var attackDiceFactor = getAttackDiceFactor(targetUnitType, selectedUnitType);
     var targetWeapon = getAttributeWithError(targetSheetId, weaponAttribute);
     var pikeMod = (targetWeapon === "Pike"
@@ -345,6 +353,8 @@ function counterAttack(targetUnitType, selectedUnitType, targetSheetId, weaponAt
                 + getMagicSwordName(targetSheetId) + "!" + css.spanEnd);
         }
     }
+
+    if (isHasMagicArmor(selectedSheetId)) { ++targetNumber; }
 
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + targetName);
 }

@@ -29,6 +29,15 @@ var css = {
         + "margin:0px;"
         + "border-radius:12px;"
         + "' />",
+    magicItem: "<p style='"
+        + "font-size:medium;"
+        + "background-color:#545500;"
+        + "color:#fefeaa;"
+        + "padding:4px;"
+        + "padding-left:6px;"
+        + "margin:0px;"
+        + "border-radius:12px;"
+        + "' />",
     counterAttack: "<p style='"
         + "font-size:medium;"
         + "background-color:#aa5585;"

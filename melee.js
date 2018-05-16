@@ -176,10 +176,24 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
         || selectedWeapon === "Halbard"
         || selectedWeapon === "Pole"
         ) ? 1 : 0;
-    var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
-    var targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
 
-    if (isHasMagicSword(selectedSheetId)) { numberOfDice++; }
+    var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
+
+    var targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
+    var isFantasyTarget = (targetUnitType === "Wizard");
+
+    if (isHasMagicSword(selectedSheetId)) {
+        numberOfDice++;
+        if (isFantasyTarget) {
+            targetNumber -= getMagicSwordBonus(selectedSheetId);
+            sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die and a hit bonus from "
+                + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
+        }
+        else {
+            sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die from "
+                + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
+        }
+    }
 
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
     counterAttack(targetUnitType, selectedUnitType, targetSheetId, weaponAttribute, targetTroops, msg);
@@ -203,10 +217,24 @@ function polearmAdvantageAttack(selectedTroops, msg) {
     var attackDiceFactor = getAttackDiceFactor(selectedUnitType, targetUnitType);
     var selectedName = getPropertyValue(selectedObj, "name");
     var pikeMod = 1;
-    var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
-    var targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
 
-    if (isHasMagicSword(selectedSheetId)) { numberOfDice++; }
+    var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
+
+    var targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
+    var isFantasyTarget = (targetUnitType === "Wizard");
+
+    if (isHasMagicSword(selectedSheetId)) {
+        numberOfDice++;
+        if (isFantasyTarget) {
+            targetNumber -= getMagicSwordBonus(selectedSheetId);
+            sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die and a hit bonus from "
+                + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
+        }
+        else {
+            sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die from "
+                + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
+        }
+    }
 
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
 }
@@ -225,13 +253,28 @@ function flankAttack(selectedTroops, targetTroops, msg) {
         || selectedWeapon === "Halbard"
         || selectedWeapon === "Pole"
         ) ? 1 : 0;
+
     var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
-    var targetNumber = getFlankerTargetNumber(selectedUnitType, targetUnitType);
+
+    var targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
+    var isFantasyTarget = (targetUnitType === "Wizard");
+
+    if (isHasMagicSword(selectedSheetId)) {
+        numberOfDice++;
+        if (isFantasyTarget) {
+            targetNumber -= getMagicSwordBonus(selectedSheetId);
+            sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die and a hit bonus from "
+                + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
+        }
+        else {
+            sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die from "
+                + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
+        }
+    }
+
     if (selectedUnitType === "Armored Foot" || selectedUnitType === "Heavy Horse") {
         --targetNumber;
     }
-
-    if (isHasMagicSword(selectedSheetId)) { numberOfDice++; }
 
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
     counterAttack(targetUnitType, selectedUnitType, targetSheetId, weaponAttribute, targetTroops, msg);
@@ -251,13 +294,28 @@ function rearAttack(selectedTroops, msg) {
         || selectedWeapon === "Halbard"
         || selectedWeapon === "Pole"
         ) ? 1 : 0;
+
     var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
-    var targetNumber = getFlankerTargetNumber(selectedUnitType, targetUnitType);
+
+    var targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
+    var isFantasyTarget = (targetUnitType === "Wizard");
+
+    if (isHasMagicSword(selectedSheetId)) {
+        numberOfDice++;
+        if (isFantasyTarget) {
+            targetNumber -= getMagicSwordBonus(selectedSheetId);
+            sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die and a hit bonus from "
+                + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
+        }
+        else {
+            sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die from "
+                + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
+        }
+    }
+
     if (selectedUnitType === "Armored Foot" || selectedUnitType === "Heavy Horse") {
         --targetNumber;
     }
-
-    if (isHasMagicSword(selectedSheetId)) { numberOfDice++; }
 
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
 }
@@ -269,11 +327,24 @@ function counterAttack(targetUnitType, selectedUnitType, targetSheetId, weaponAt
         || targetWeapon === "Halbard"
         || targetWeapon === "Pole"
         ) ? 1 : 0;
-    var numberOfDice = Math.ceil(targetTroops * attackDiceFactor) + pikeMod;
-    var targetNumber = getAttackerTargetNumber(targetUnitType, selectedUnitType);
     var targetName = getPropertyValue(targetObj, "name");
 
-    if (isHasMagicSword(targetSheetId)) { numberOfDice++; }
+    var numberOfDice = Math.ceil(targetTroops * attackDiceFactor) + pikeMod;
+
+    var targetNumber = getAttackerTargetNumber(targetUnitType, selectedUnitType);
+    var isFantasyTarget = (selectedUnitType === "Wizard");
+    if (isHasMagicSword(targetSheetId)) {
+        numberOfDice++;
+        if (isFantasyTarget) {
+            targetNumber -= getMagicSwordBonus(targetSheetId);
+            sendChat(msg.who, css.magicItem + targetName + " gets a bonus attack die and a hit bonus from "
+                + getMagicSwordName(targetSheetId) + "!" + css.spanEnd);
+        }
+        else {
+            sendChat(msg.who, css.magicItem + targetName + " gets a bonus attack die from "
+                + getMagicSwordName(targetSheetId) + "!" + css.spanEnd);
+        }
+    }
 
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + targetName);
 }

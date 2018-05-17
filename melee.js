@@ -170,6 +170,7 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
     var targetUnitType = getAttributeWithError(targetSheetId, typeAttribute);
     var attackDiceFactor = getAttackDiceFactor(selectedUnitType, targetUnitType);
     var selectedName = getPropertyValue(selectedObj, "name");
+    var targetName = getPropertyValue(targetObj, "name");
     var weaponAttribute = "Weapon";
     var selectedWeapon = getAttributeWithError(selectedSheetId, weaponAttribute);
     var pikeMod = (selectedWeapon === "Pike"
@@ -177,14 +178,17 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
         || selectedWeapon === "Pole"
         ) ? 1 : 0;
 
-    var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
+    if (isImmuneToNormalAttacks(targetUnitType) && !isHasMagicSword(selectedSheetId)) {
+        sendChat(msg.who, css.error + targetName + " cannot be affected by nonmagical attacks.");
+        return;
+    }
 
+    var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
     var targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
-    var isFantasyTarget = (targetUnitType === "Wizard");
 
     if (isHasMagicSword(selectedSheetId)) {
         numberOfDice++;
-        if (isFantasyTarget) {
+        if (isFantasyTarget(targetUnitType)) {
             targetNumber -= getMagicSwordBonus(selectedSheetId);
             sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die and a hit bonus from "
                 + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
@@ -199,6 +203,19 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
 
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
     counterAttack(targetUnitType, selectedUnitType, targetSheetId, selectedSheetId, weaponAttribute, targetTroops, msg);
+}
+
+function isFantasyTarget(targetUnitType) {
+    return (
+           targetUnitType === "Wizard"
+        || targetUnitType === "Fire Elemental"
+    );
+}
+
+function isImmuneToNormalAttacks(targetUnitType) {
+    return (
+           targetUnitType === "Fire Elemental"
+    );
 }
 
 /**
@@ -220,14 +237,18 @@ function polearmAdvantageAttack(selectedTroops, msg) {
     var selectedName = getPropertyValue(selectedObj, "name");
     var pikeMod = 1;
 
-    var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
+    var targetName = getPropertyValue(targetObj, "name");
+    if (isImmuneToNormalAttacks(targetUnitType) && !isHasMagicSword(selectedSheetId)) {
+        sendChat(msg.who, css.error + targetName + " cannot be affected by nonmagical attacks.");
+        return;
+    }
 
+    var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
     var targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
-    var isFantasyTarget = (targetUnitType === "Wizard");
 
     if (isHasMagicSword(selectedSheetId)) {
         numberOfDice++;
-        if (isFantasyTarget) {
+        if (isFantasyTarget(targetUnitType)) {
             targetNumber -= getMagicSwordBonus(selectedSheetId);
             sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die and a hit bonus from "
                 + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
@@ -258,14 +279,18 @@ function flankAttack(selectedTroops, targetTroops, msg) {
         || selectedWeapon === "Pole"
         ) ? 1 : 0;
 
-    var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
+    var targetName = getPropertyValue(targetObj, "name");
+    if (isImmuneToNormalAttacks(targetUnitType) && !isHasMagicSword(selectedSheetId)) {
+        sendChat(msg.who, css.error + targetName + " cannot be affected by nonmagical attacks.");
+        return;
+    }
 
-    var targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
-    var isFantasyTarget = (targetUnitType === "Wizard");
+    var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
+    var targetNumber = getFlankerTargetNumber(selectedUnitType, targetUnitType);
 
     if (isHasMagicSword(selectedSheetId)) {
         numberOfDice++;
-        if (isFantasyTarget) {
+        if (isFantasyTarget(targetUnitType)) {
             targetNumber -= getMagicSwordBonus(selectedSheetId);
             sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die and a hit bonus from "
                 + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
@@ -301,14 +326,18 @@ function rearAttack(selectedTroops, msg) {
         || selectedWeapon === "Pole"
         ) ? 1 : 0;
 
-    var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
+    var targetName = getPropertyValue(targetObj, "name");
+    if (isImmuneToNormalAttacks(targetUnitType) && !isHasMagicSword(selectedSheetId)) {
+        sendChat(msg.who, css.error + targetName + " cannot be affected by nonmagical attacks.");
+        return;
+    }
 
-    var targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
-    var isFantasyTarget = (targetUnitType === "Wizard");
+    var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
+    var targetNumber = getFlankerTargetNumber(selectedUnitType, targetUnitType);
 
     if (isHasMagicSword(selectedSheetId)) {
         numberOfDice++;
-        if (isFantasyTarget) {
+        if (isFantasyTarget(targetUnitType)) {
             targetNumber -= getMagicSwordBonus(selectedSheetId);
             sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die and a hit bonus from "
                 + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
@@ -336,14 +365,19 @@ function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selected
         || targetWeapon === "Pole"
         ) ? 1 : 0;
     var targetName = getPropertyValue(targetObj, "name");
+    var selectedName = getPropertyValue(selectedObj, "name");
+
+    if (isImmuneToNormalAttacks(selectedUnitType) && !isHasMagicSword(targetSheetId)) {
+        sendChat(msg.who, css.error + selectedName + " cannot be affected by nonmagical attacks.");
+        return;
+    }
 
     var numberOfDice = Math.ceil(targetTroops * attackDiceFactor) + pikeMod;
-
     var targetNumber = getAttackerTargetNumber(targetUnitType, selectedUnitType);
-    var isFantasyTarget = (selectedUnitType === "Wizard");
+
     if (isHasMagicSword(targetSheetId)) {
         numberOfDice++;
-        if (isFantasyTarget) {
+        if (isFantasyTarget(selectedUnitType)) {
             targetNumber -= getMagicSwordBonus(targetSheetId);
             sendChat(msg.who, css.magicItem + targetName + " gets a bonus attack die and a hit bonus from "
                 + getMagicSwordName(targetSheetId) + "!" + css.spanEnd);
@@ -372,6 +406,7 @@ function getAttackerTargetNumber(selectedUnitType, targetUnitType) {
         if (targetUnitType === "Wizard") { return 6; }
         if (targetUnitType === "Light Horse") { return 6; }
         if (targetUnitType === "Medium Horse") { return 6; }
+        if (targetUnitType === "Fire Elemental") { return 6; }
         if (targetUnitType === "Heavy Horse") { return 6; }
         throw new roll20Exception(logMsg, chatMsg);
     }
@@ -382,6 +417,7 @@ function getAttackerTargetNumber(selectedUnitType, targetUnitType) {
         if (targetUnitType === "Wizard") { return 6; }
         if (targetUnitType === "Light Horse") { return 6; }
         if (targetUnitType === "Medium Horse") { return 6; }
+        if (targetUnitType === "Fire Elemental") { return 6; }
         if (targetUnitType === "Heavy Horse") { return 6; }
         throw new roll20Exception(logMsg, chatMsg);
     }
@@ -392,6 +428,7 @@ function getAttackerTargetNumber(selectedUnitType, targetUnitType) {
         if (targetUnitType === "Wizard") { return 6; }
         if (targetUnitType === "Light Horse") { return 6; }
         if (targetUnitType === "Medium Horse") { return 6; }
+        if (targetUnitType === "Fire Elemental") { return 6; }
         if (targetUnitType === "Heavy Horse") { return 6; }
         throw new roll20Exception(logMsg, chatMsg);
     }
@@ -402,6 +439,7 @@ function getAttackerTargetNumber(selectedUnitType, targetUnitType) {
         if (targetUnitType === "Wizard") { return 6; }
         if (targetUnitType === "Light Horse") { return 6; }
         if (targetUnitType === "Medium Horse") { return 6; }
+        if (targetUnitType === "Fire Elemental") { return 6; }
         if (targetUnitType === "Heavy Horse") { return 6; }
         throw new roll20Exception(logMsg, chatMsg);
     }
@@ -412,16 +450,18 @@ function getAttackerTargetNumber(selectedUnitType, targetUnitType) {
         if (targetUnitType === "Wizard") { return 6; }
         if (targetUnitType === "Light Horse") { return 6; }
         if (targetUnitType === "Medium Horse") { return 6; }
+        if (targetUnitType === "Fire Elemental") { return 6; }
         if (targetUnitType === "Heavy Horse") { return 6; }
         throw new roll20Exception(logMsg, chatMsg);
     }
-    else if (selectedUnitType === "Medium Horse") {
+    else if (selectedUnitType === "Medium Horse" || selectedUnitType === "Fire Elemental") {
         if (targetUnitType === "Light Foot") { return 4; }
         if (targetUnitType === "Heavy Foot") { return 5; }
         if (targetUnitType === "Armored Foot") { return 6; }
         if (targetUnitType === "Wizard") { return 6; }
         if (targetUnitType === "Light Horse") { return 5; }
         if (targetUnitType === "Medium Horse") { return 6; }
+        if (targetUnitType === "Fire Elemental") { return 6; }
         if (targetUnitType === "Heavy Horse") { return 6; }
         throw new roll20Exception(logMsg, chatMsg);
     }
@@ -432,6 +472,7 @@ function getAttackerTargetNumber(selectedUnitType, targetUnitType) {
         if (targetUnitType === "Wizard") { return 5; }
         if (targetUnitType === "Light Horse") { return 5; }
         if (targetUnitType === "Medium Horse") { return 5; }
+        if (targetUnitType === "Fire Elemental") { return 5; }
         if (targetUnitType === "Heavy Horse") { return 6; }
         throw new roll20Exception(logMsg, chatMsg);
     }
@@ -458,6 +499,7 @@ function getAttackDiceFactor(selectedUnitType, targetUnitType) {
         if (targetUnitType === "Wizard") { return 1/3; }
         if (targetUnitType === "Light Horse") { return 1/2; }
         if (targetUnitType === "Medium Horse") { return 1/3; }
+        if (targetUnitType === "Fire Elemental") { return 1/3; }
         if (targetUnitType === "Heavy Horse") { return 1/4; }
         throw new roll20Exception(logMsg, chatMsg);
     }
@@ -468,6 +510,7 @@ function getAttackDiceFactor(selectedUnitType, targetUnitType) {
         if (targetUnitType === "Wizard") { return 1/2; }
         if (targetUnitType === "Light Horse") { return 1/2; }
         if (targetUnitType === "Medium Horse") { return 1/3; }
+        if (targetUnitType === "Fire Elemental") { return 1/3; }
         if (targetUnitType === "Heavy Horse") { return 1/4; }
         throw new roll20Exception(logMsg, chatMsg);
     }
@@ -478,6 +521,7 @@ function getAttackDiceFactor(selectedUnitType, targetUnitType) {
         if (targetUnitType === "Wizard") { return 1; }
         if (targetUnitType === "Light Horse") { return 1; }
         if (targetUnitType === "Medium Horse") { return 1/2; }
+        if (targetUnitType === "Fire Elemental") { return 1/2; }
         if (targetUnitType === "Heavy Horse") { return 1/3; }
         throw new roll20Exception(logMsg, chatMsg);
     }
@@ -488,6 +532,7 @@ function getAttackDiceFactor(selectedUnitType, targetUnitType) {
         if (targetUnitType === "Wizard") { return 1; }
         if (targetUnitType === "Light Horse") { return 1; }
         if (targetUnitType === "Medium Horse") { return 1/2; }
+        if (targetUnitType === "Fire Elemental") { return 1/2; }
         if (targetUnitType === "Heavy Horse") { return 1/3; }
         throw new roll20Exception(logMsg, chatMsg);
     }
@@ -498,16 +543,18 @@ function getAttackDiceFactor(selectedUnitType, targetUnitType) {
         if (targetUnitType === "Wizard") { return 1; }
         if (targetUnitType === "Light Horse") { return 1; }
         if (targetUnitType === "Medium Horse") { return 1/2; }
+        if (targetUnitType === "Fire Elemental") { return 1/2; }
         if (targetUnitType === "Heavy Horse") { return 1/3; }
         throw new roll20Exception(logMsg, chatMsg);
     }
-    else if (selectedUnitType === "Medium Horse") {
+    else if (selectedUnitType === "Medium Horse" || selectedUnitType === "Fire Elemental") {
         if (targetUnitType === "Light Foot") { return 2; }
         if (targetUnitType === "Heavy Foot") { return 2; }
         if (targetUnitType === "Armored Foot") { return 2; }
         if (targetUnitType === "Wizard") { return 2; }
         if (targetUnitType === "Light Horse") { return 1; }
         if (targetUnitType === "Medium Horse") { return 1; }
+        if (targetUnitType === "Fire Elemental") { return 1; }
         if (targetUnitType === "Heavy Horse") { return 1/2; }
         throw new roll20Exception(logMsg, chatMsg);
     }
@@ -518,6 +565,7 @@ function getAttackDiceFactor(selectedUnitType, targetUnitType) {
         if (targetUnitType === "Wizard") { return 2; }
         if (targetUnitType === "Light Horse") { return 2; }
         if (targetUnitType === "Medium Horse") { return 1; }
+        if (targetUnitType === "Fire Elemental") { return 1; }
         if (targetUnitType === "Heavy Horse") { return 1; }
         throw new roll20Exception(logMsg, chatMsg);
     }
@@ -538,6 +586,7 @@ function getFlankerTargetNumber(selectedUnitType, targetUnitType) {
         if (targetUnitType === "Wizard") { return 6; }
         if (targetUnitType === "Light Horse") { return 6; }
         if (targetUnitType === "Medium Horse") { return 6; }
+        if (targetUnitType === "Fire Elemental") { return 6; }
         if (targetUnitType === "Heavy Horse") { return 6; }
         throw new roll20Exception(logMsg, chatMsg);
     }
@@ -551,6 +600,7 @@ function getFlankerTargetNumber(selectedUnitType, targetUnitType) {
         if (targetUnitType === "Wizard") { return 6; }
         if (targetUnitType === "Light Horse") { return 6; }
         if (targetUnitType === "Medium Horse") { return 6; }
+        if (targetUnitType === "Fire Elemental") { return 6; }
         if (targetUnitType === "Heavy Horse") { return 6; }
         throw new roll20Exception(logMsg, chatMsg);
     }
@@ -561,16 +611,21 @@ function getFlankerTargetNumber(selectedUnitType, targetUnitType) {
         if (targetUnitType === "Wizard") { return 6; }
         if (targetUnitType === "Light Horse") { return 5; }
         if (targetUnitType === "Medium Horse") { return 6; }
+        if (targetUnitType === "Fire Elemental") { return 6; }
         if (targetUnitType === "Heavy Horse") { return 6; }
         throw new roll20Exception(logMsg, chatMsg);
     }
-    else if (selectedUnitType === "Heavy Horse" || selectedUnitType === "Medium Horse") {
+    else if (selectedUnitType === "Heavy Horse"
+        || selectedUnitType === "Medium Horse"
+        || selectedUnitType === "Fire Elemental"
+    ) {
         if (targetUnitType === "Light Foot") { return 5; }
         if (targetUnitType === "Heavy Foot") { return 5; }
         if (targetUnitType === "Armored Foot") { return 5; }
         if (targetUnitType === "Wizard") { return 5; }
         if (targetUnitType === "Light Horse") { return 5; }
         if (targetUnitType === "Medium Horse") { return 5; }
+        if (targetUnitType === "Fire Elemental") { return 5; }
         if (targetUnitType === "Heavy Horse") { return 6; }
         throw new roll20Exception(logMsg, chatMsg);
     }
@@ -597,6 +652,7 @@ function getFlankerDiceFactor(selectedUnitType, targetUnitType) {
         if (targetUnitType === "Wizard") { return 1/2; }
         if (targetUnitType === "Light Horse") { return 1/2; }
         if (targetUnitType === "Medium Horse") { return 1/3; }
+        if (targetUnitType === "Fire Elemental") { return 1/3; }
         if (targetUnitType === "Heavy Horse") { return 1/4; }
         throw new roll20Exception(logMsg, chatMsg);
     }
@@ -610,6 +666,7 @@ function getFlankerDiceFactor(selectedUnitType, targetUnitType) {
         if (targetUnitType === "Wizard") { return 1; }
         if (targetUnitType === "Light Horse") { return 1; }
         if (targetUnitType === "Medium Horse") { return 1/2; }
+        if (targetUnitType === "Fire Elemental") { return 1/2; }
         if (targetUnitType === "Heavy Horse") { return 1/3; }
         throw new roll20Exception(logMsg, chatMsg);
     }
@@ -619,15 +676,20 @@ function getFlankerDiceFactor(selectedUnitType, targetUnitType) {
         if (targetUnitType === "Wizard") { return 2; }
         if (targetUnitType === "Light Horse") { return 1; }
         if (targetUnitType === "Medium Horse") { return 1; }
+        if (targetUnitType === "Fire Elemental") { return 1; }
         if (targetUnitType === "Heavy Horse") { return 1/2; }
         throw new roll20Exception(logMsg, chatMsg);
     }
-    else if (selectedUnitType === "Heavy Horse" || selectedUnitType === "Medium Foot") {
+    else if (selectedUnitType === "Heavy Horse"
+        || selectedUnitType === "Medium Horse"
+        || selectedUnitType === "Fire Elemental"
+    ) {
         if (targetUnitType === "Light Foot") { return 4; }
         if (targetUnitType === "Heavy Foot") { return 3; }
         if (targetUnitType === "Wizard") { return 2; }
         if (targetUnitType === "Light Horse") { return 2; }
         if (targetUnitType === "Medium Horse") { return 1; }
+        if (targetUnitType === "Fire Elemental") { return 1; }
         if (targetUnitType === "Heavy Horse") { return 1; }
         throw new roll20Exception(logMsg, chatMsg);
     }

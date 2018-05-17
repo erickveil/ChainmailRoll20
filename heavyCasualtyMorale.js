@@ -20,6 +20,7 @@ var isRollingSave = false;
 function heavyLossMoraleCheck(msg, unitObj) {
 
     if (isObjectWizard(unitObj)) { return; }
+    if (isFearless(unitObj)) { return; }
 
     var casualties = getTokenBarValue(unitObj, 3);
     var threshold = getMaxCasualties(unitObj);
@@ -77,6 +78,7 @@ function eventFearMoraleCheck(msg) {
     var savingObj = getObjectWithReport(tokenType, selectedId);
 
     if (isObjectWizard(savingObj)) { return; }
+    if (isFearless(savingObj)) { return; }
 
     currentlySavingUnitObj = savingObj;
     currentSaveTarget = getTargetSave(savingObj);
@@ -102,6 +104,23 @@ function eventFearMoraleCheck(msg) {
         + currentSaveTarget
         + css.spanEnd);
     resolveMassCasualtyCheck(msg, rollResult);
+}
+
+function isFearless(unitObj) {
+    if (!isObjectToken(unitObj)) {
+        return false;
+    }
+    try {
+        var unitType = getTokenUnitType(unitObj);
+        return (
+               unitType === "Wizard"
+            || unitType === "Fire Elemental"
+        );
+    }
+    catch (err) {
+        // tokens might not have the expected attributes as they are not units
+        return false;
+    }
 }
 
 function getTargetSave(unitObj)

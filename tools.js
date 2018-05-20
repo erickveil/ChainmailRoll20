@@ -160,9 +160,12 @@ function getArmyName(unitSheetId) {
 function getArmySheetId(armyName) {
     var resultList = findObjs({type:"character", name:armyName});
     if (resultList.length < 0 || typeof resultList[0] === "undefined") {
+        return "";
+        /*
         var chatMsg = "Could not find the army sheet for " + armyName;
         var logMsg = "";
         throw new roll20Exception(logMsg, chatMsg);
+        */
     }
     return getPropertyValue(resultList[0], "_id");
 }

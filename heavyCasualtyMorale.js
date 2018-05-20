@@ -20,6 +20,7 @@ var isRollingSave = false;
 function heavyLossMoraleCheck(msg, unitObj) {
 
     if (isObjectWizard(unitObj)) { return; }
+    if (isObjectFearless(unitObj)) { return; }
 
     var casualties = getTokenBarValue(unitObj, 3);
     var threshold = getMaxCasualties(unitObj);

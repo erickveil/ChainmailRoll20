@@ -116,7 +116,8 @@ function getAttributeWithError(characterId, attribute, valueType)
 }
 
 function isHasAttribute(objId, attributeName) {
-    var attributeObj = findObjs({ type: 'attribute', characterid: objId, name: attributeName });
+
+    var attributeObj = findObjs({ type: 'attribute', _characterid: objId, name: attributeName });
     return (attributeObj.length !== 0);
 }
 

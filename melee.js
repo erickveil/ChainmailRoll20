@@ -20,7 +20,6 @@ function eventMeleeAttack(msg) {
     if (!(msg.type === "api" && msg.content.indexOf("!melee ") !== -1)) {
         return;
     }
-    //log("melee attack");
     var argStr = msg.content.replace("!melee ", "");
     var argList = argStr.split(",");
     if (argList.length !== 2) {
@@ -165,9 +164,9 @@ function eventRearAttack(msg) {
 function frontalAttack(selectedTroops, targetTroops, msg) {
     var selectedSheetId = getPropertyValue(selectedObj, "represents");
     var targetSheetId = getPropertyValue(targetObj, "represents");
-    var typeAttribute = "Unit Type";
-    var selectedUnitType = getAttributeWithError(selectedSheetId, typeAttribute);
-    var targetUnitType = getAttributeWithError(targetSheetId, typeAttribute);
+    var selectedUnitType = getAttacksAs(selectedSheetId);
+    var targetUnitType = getAttacksAs(targetSheetId);
+    sendChat(msg.who, "A");
     var attackDiceFactor = getAttackDiceFactor(selectedUnitType, targetUnitType);
     var selectedName = getPropertyValue(selectedObj, "name");
     var weaponAttribute = "Weapon";
@@ -213,9 +212,9 @@ function polearmAdvantageAttack(selectedTroops, msg) {
 
     var selectedSheetId = getPropertyValue(selectedObj, "represents");
     var targetSheetId = getPropertyValue(targetObj, "represents");
-    var typeAttribute = "Unit Type";
-    var selectedUnitType = getAttributeWithError(selectedSheetId, typeAttribute);
-    var targetUnitType = getAttributeWithError(targetSheetId, typeAttribute);
+    var selectedUnitType = getAttacksAs(selectedSheetId);
+    var targetUnitType = getAttacksAs(targetSheetId);
+    sendChat(msg.who, "B");
     var attackDiceFactor = getAttackDiceFactor(selectedUnitType, targetUnitType);
     var selectedName = getPropertyValue(selectedObj, "name");
     var pikeMod = 1;
@@ -243,12 +242,19 @@ function polearmAdvantageAttack(selectedTroops, msg) {
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
 }
 
+function getAttacksAs(sheetId) {
+    if (isHasAttribute(sheetId, "Fights As")) {
+        var fightsAs = getAttributeWithError(sheetId, "Fights As");
+        if (fightsAs !== "") { return fightsAs; }
+    }
+    return getAttributeWithError(sheetId, "Unit Type");
+}
+
 function flankAttack(selectedTroops, targetTroops, msg) {
     var selectedSheetId = getPropertyValue(selectedObj, "represents");
     var targetSheetId = getPropertyValue(targetObj, "represents");
-    var typeAttribute = "Unit Type";
-    var selectedUnitType = getAttributeWithError(selectedSheetId, typeAttribute);
-    var targetUnitType = getAttributeWithError(targetSheetId, typeAttribute);
+    var selectedUnitType = getAttacksAs(selectedSheetId);
+    var targetUnitType = getAttacksAs(targetSheetId);
     var attackDiceFactor = getFlankerDiceFactor(selectedUnitType, targetUnitType);
     var selectedName = getPropertyValue(selectedObj, "name");
     var weaponAttribute = "Weapon";
@@ -289,9 +295,8 @@ function flankAttack(selectedTroops, targetTroops, msg) {
 function rearAttack(selectedTroops, msg) {
     var selectedSheetId = getPropertyValue(selectedObj, "represents");
     var targetSheetId = getPropertyValue(targetObj, "represents");
-    var typeAttribute = "Unit Type";
-    var selectedUnitType = getAttributeWithError(selectedSheetId, typeAttribute);
-    var targetUnitType = getAttributeWithError(targetSheetId, typeAttribute);
+    var selectedUnitType = getAttacksAs(selectedSheetId);
+    var targetUnitType = getAttacksAs(targetSheetId);
     var attackDiceFactor = getFlankerDiceFactor(selectedUnitType, targetUnitType);
     var selectedName = getPropertyValue(selectedObj, "name");
     var weaponAttribute = "Weapon";
@@ -329,6 +334,8 @@ function rearAttack(selectedTroops, msg) {
 }
 
 function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selectedSheetId, weaponAttribute, targetTroops, msg) {
+
+    sendChat(msg.who, "C");
     var attackDiceFactor = getAttackDiceFactor(targetUnitType, selectedUnitType);
     var targetWeapon = getAttributeWithError(targetSheetId, weaponAttribute);
     var pikeMod = (targetWeapon === "Pike"
@@ -363,7 +370,7 @@ function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selected
 function getAttackerTargetNumber(selectedUnitType, targetUnitType) {
 
     var logMsg = "";
-    var chatMsg = "Unrecognized target unit type: " + targetUnitType;
+    var chatMsg = "A. Unrecognized target unit type: " + targetUnitType;
 
     if (selectedUnitType === "Light Foot") {
         if (targetUnitType === "Light Foot") { return 6; }
@@ -436,7 +443,7 @@ function getAttackerTargetNumber(selectedUnitType, targetUnitType) {
         throw new roll20Exception(logMsg, chatMsg);
     }
 
-    chatMsg = "Unrecognized selected unit type: " + selectedUnitType;
+    chatMsg = "B. Unrecognized selected unit type: " + selectedUnitType;
     throw new roll20Exception(logMsg, chatMsg);
 }
 
@@ -449,7 +456,7 @@ function getAttackerTargetNumber(selectedUnitType, targetUnitType) {
 function getAttackDiceFactor(selectedUnitType, targetUnitType) {
 
     var logMsg = "";
-    var chatMsg = "Unrecognized target unit type: " + targetUnitType;
+    var chatMsg = "C. Unrecognized target unit type: " + targetUnitType;
 
     if (selectedUnitType === "Light Foot") {
         if (targetUnitType === "Light Foot") { return 1; }
@@ -522,14 +529,14 @@ function getAttackDiceFactor(selectedUnitType, targetUnitType) {
         throw new roll20Exception(logMsg, chatMsg);
     }
 
-    chatMsg = "Unrecognized selected unit type: " + selectedUnitType;
+    chatMsg = "D. Unrecognized selected unit type: " + selectedUnitType;
     throw new roll20Exception(logMsg, chatMsg);
 }
 
 function getFlankerTargetNumber(selectedUnitType, targetUnitType) {
 
     var logMsg = "";
-    var chatMsg = "Unrecognized target unit type: " + targetUnitType;
+    var chatMsg = "E. Unrecognized target unit type: " + targetUnitType;
 
     if (selectedUnitType === "Light Foot") {
         if (targetUnitType === "Light Foot") { return 5; }
@@ -575,7 +582,7 @@ function getFlankerTargetNumber(selectedUnitType, targetUnitType) {
         throw new roll20Exception(logMsg, chatMsg);
     }
 
-    chatMsg = "Unrecognized selected unit type: " + selectedUnitType;
+    chatMsg = "F. Unrecognized selected unit type: " + selectedUnitType;
     throw new roll20Exception(logMsg, chatMsg);
 }
 
@@ -588,7 +595,7 @@ function getFlankerTargetNumber(selectedUnitType, targetUnitType) {
 function getFlankerDiceFactor(selectedUnitType, targetUnitType) {
 
     var logMsg = "";
-    var chatMsg = "Unrecognized target unit type: " + targetUnitType;
+    var chatMsg = "G. Unrecognized target unit type: " + targetUnitType;
 
     if (selectedUnitType === "Light Foot") {
         if (targetUnitType === "Light Foot") { return 1; }
@@ -632,7 +639,7 @@ function getFlankerDiceFactor(selectedUnitType, targetUnitType) {
         throw new roll20Exception(logMsg, chatMsg);
     }
 
-    chatMsg = "Unrecognized selected unit type: " + selectedUnitType;
+    chatMsg = "H. Unrecognized selected unit type: " + selectedUnitType;
     throw new roll20Exception(logMsg, chatMsg);
 }
 

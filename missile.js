@@ -27,6 +27,15 @@ function eventMissileAttack(msg) {
     var selectedId = argList[0];
     var targetId = argList[1];
 
+    var targetObj = getObjectWithReport("graphic", targetId);
+    var targetSheetId = getPropertyValue(targetObj, "represents");
+    var targetName = getPropertyValue(targetObj, "name");
+
+    if (isHasMeleeImmunity(targetSheetId)) {
+        sendChat(msg.who, css.error + targetName + " is immune to normal attacks!" + css.spanEnd);
+        return;
+    }
+
     missileAttack(selectedId, targetId, msg, false);
 }
 
@@ -87,6 +96,15 @@ function eventIndirectMissileAttack(msg) {
 
     var selectedId = argList[0];
     var targetId = argList[1];
+
+    var targetObj = getObjectWithReport("graphic", targetId);
+    var targetSheetId = getPropertyValue(targetObj, "represents");
+    var targetName = getPropertyValue(targetObj, "name");
+
+    if (isHasMeleeImmunity(targetSheetId)) {
+        sendChat(msg.who, css.error + targetName + " is immune to normal attacks!" + css.spanEnd);
+        return;
+    }
 
     missileAttack(selectedId, targetId, msg, true);
 }

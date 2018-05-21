@@ -189,3 +189,7 @@ function pingObject(obj) {
 function isFlying(tokenObj) {
     return (tokenObj.get("status_fluffy-wing"));
 }
+
+function isInWater(tokenObj) {
+    return (tokenObj.get("status_chained-heart"));
+}

@@ -165,6 +165,8 @@ function isHasMeleeImmunity(sheetId) {
     return (isHasAttribute(sheetId, "Normal Attack Immunity"));
 }
 
+// ---------------------------------------------------------------
+
 function frontalAttack(selectedTroops, targetTroops, msg) {
     var selectedSheetId = getPropertyValue(selectedObj, "represents");
     var targetSheetId = getPropertyValue(targetObj, "represents");
@@ -180,16 +182,20 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
         || selectedWeapon === "Pole"
         ) ? 1 : 0;
 
-    if (isImmuneToNormalAttacks(targetUnitType) && !isHasMagicSword(selectedSheetId)) {
+    var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
+    var actualTargetType = getAttributeWithError(selectedSheetId, "Unit Type");
+
+    if (isHasMeleeImmunity(targetSheetId) && !isHasMagicSword(selectedSheetId)) {
         sendChat(msg.who, css.error + targetName + " cannot be affected by nonmagical attacks.");
         return;
+    }
+    if (isHasMeleeImmunity(selectedSheetId)) {
+        log("Attacker immune caught.");
+        isAttackerImmune = true;
     }
 
     var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
     var targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
-
-    var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
-    var actualTargetType = getAttributeWithError(selectedSheetId, "Unit Type");
 
     if (actualSelectedType === "Water Elemental" && isInWater(selectedObj)) {
         selectedUnitType = "Heavy Horse";
@@ -242,12 +248,6 @@ function isFantasyTarget(targetUnitType) {
     );
 }
 
-function isImmuneToNormalAttacks(targetUnitType) {
-    return (
-           targetUnitType === "Fire Elemental"
-    );
-}
-
 /**
  * All troops formed in close order with pole arms can ony take frontal melee damage from like-armed troops.
  * @param selectedTroops
@@ -268,10 +268,11 @@ function polearmAdvantageAttack(selectedTroops, msg) {
     var pikeMod = 1;
 
     var targetName = getPropertyValue(targetObj, "name");
-    if (isImmuneToNormalAttacks(targetUnitType) && !isHasMagicSword(selectedSheetId)) {
+    if (isHasMeleeImmunity(targetSheetId) && !isHasMagicSword(selectedSheetId)) {
         sendChat(msg.who, css.error + targetName + " cannot be affected by nonmagical attacks.");
         return;
     }
+    if (isHasMeleeImmunity(selectedSheetId)) { isAttackerImmune = true; }
 
     var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
     var targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
@@ -309,6 +310,7 @@ function polearmAdvantageAttack(selectedTroops, msg) {
     }
     else if (isHasMeleeImmunity(targetSheetId)) {
         sendChat(msg.who, css.error + targetName + " is immune to normal attacks!");
+        isAttackerImmune = true;
         return;
     }
 
@@ -340,10 +342,11 @@ function flankAttack(selectedTroops, targetTroops, msg) {
         ) ? 1 : 0;
 
     var targetName = getPropertyValue(targetObj, "name");
-    if (isImmuneToNormalAttacks(targetUnitType) && !isHasMagicSword(selectedSheetId)) {
+    if (isHasMeleeImmunity(targetSheetId) && !isHasMagicSword(selectedSheetId)) {
         sendChat(msg.who, css.error + targetName + " cannot be affected by nonmagical attacks.");
         return;
     }
+    if (isHasMeleeImmunity(selectedSheetId)) { isAttackerImmune = true; }
 
     var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
     var targetNumber = getFlankerTargetNumber(selectedUnitType, targetUnitType);
@@ -382,6 +385,7 @@ function flankAttack(selectedTroops, targetTroops, msg) {
     }
     else if (isHasMeleeImmunity(targetSheetId)) {
         sendChat(msg.who, css.error + targetName + " is immune to normal attacks!");
+        isAttackerImmune = true;
         return;
     }
 
@@ -410,10 +414,11 @@ function rearAttack(selectedTroops, msg) {
         ) ? 1 : 0;
 
     var targetName = getPropertyValue(targetObj, "name");
-    if (isImmuneToNormalAttacks(targetUnitType) && !isHasMagicSword(selectedSheetId)) {
+    if (isHasMeleeImmunity(targetSheetId) && !isHasMagicSword(selectedSheetId)) {
         sendChat(msg.who, css.error + targetName + " cannot be affected by nonmagical attacks.");
         return;
     }
+    if (isHasMeleeImmunity(selectedSheetId)) { isAttackerImmune = true; }
 
     var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
     var targetNumber = getFlankerTargetNumber(selectedUnitType, targetUnitType);
@@ -451,6 +456,7 @@ function rearAttack(selectedTroops, msg) {
     }
     else if (isHasMeleeImmunity(targetSheetId)) {
         sendChat(msg.who, css.error + targetName + " is immune to normal attacks!");
+        isAttackerImmune = true;
         return;
     }
 
@@ -465,7 +471,6 @@ function rearAttack(selectedTroops, msg) {
 
 function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selectedSheetId, weaponAttribute, targetTroops, msg) {
 
-    log("target: " + targetUnitType + " selected: " + selectedUnitType);
     var attackDiceFactor = getAttackDiceFactor(targetUnitType, selectedUnitType);
     var targetWeapon = getAttributeWithError(targetSheetId, weaponAttribute);
     var pikeMod = (targetWeapon === "Pike"
@@ -475,7 +480,7 @@ function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selected
     var targetName = getPropertyValue(targetObj, "name");
     var selectedName = getPropertyValue(selectedObj, "name");
 
-    if (isImmuneToNormalAttacks(selectedUnitType) && !isHasMagicSword(targetSheetId)) {
+    if (isHasMeleeImmunity(selectedSheetId) && !isHasMagicSword(targetSheetId)) {
         sendChat(msg.who, css.error + selectedName + " cannot be affected by nonmagical attacks.");
         return;
     }
@@ -524,6 +529,8 @@ function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selected
 
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + targetName);
 }
+
+// ---------------------------------------------------------------
 
 function getAttackerTargetNumber(selectedUnitType, targetUnitType) {
 

@@ -10,6 +10,7 @@
 var isSelectedDone = false;
 var isTargetDone = false;
 var isRearAttack = false;
+var isAttackerImmune = false;
 
 /**
  * On Chat Listener
@@ -102,10 +103,13 @@ function eventMeleeDiceRolled(msg) {
         if (survived) { heavyLossMoraleCheck(msg, targetObj); }
 
         isSelectedDone = true;
-        if (isTargetDone || isRearAttack) {
+        if (isAttackerImmune) { log("Attacker is immune"); }
+        else { log("Attacker is not immune."); }
+        if (isTargetDone || isRearAttack || isAttackerImmune) {
             isSelectedDone = false;
             isTargetDone = false;
             isRearAttack = false;
+            isAttackerImmune = false;
             checkMorale(msg);
         }
     }
@@ -137,10 +141,13 @@ function eventMeleeDiceRolled(msg) {
         // resolve melee morale
         // end of melee
         isTargetDone = true;
-        if (isSelectedDone || isRearAttack) {
+        if (isAttackerImmune) { log("Attacker is immune"); }
+        else { log("Attacker is not immune."); }
+        if (isSelectedDone || isRearAttack || isAttackerImmune) {
             isSelectedDone = false;
             isTargetDone = false;
             isRearAttack = false;
+            isAttackerImmune = false;
             checkMorale(msg);
         }
     }

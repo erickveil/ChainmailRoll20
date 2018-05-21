@@ -207,6 +207,10 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
         targetNumber -= 2;
         sendChat(msg.who, css.counterAttack + selectedName + " gets a bonus to hit flying units." + css.spanEnd);
     }
+    else if (actualSelectedType === "Earth Elemental" && !isFlying(targetObj)) {
+        targetNumber -= 1;
+        sendChat(msg.who, css.counterAttack + selectedName + " gets a bonus to hit earth-bound units." + css.spanEnd);
+    }
 
 
     if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
@@ -262,7 +266,10 @@ function polearmAdvantageAttack(selectedTroops, msg) {
         targetNumber -= 2;
         sendChat(msg.who, css.counterAttack + selectedName + " gets a bonus to hit flying units." + css.spanEnd);
     }
-
+    else if (actualSelectedType === "Earth Elemental" && !isFlying(targetObj)) {
+        targetNumber -= 1;
+        sendChat(msg.who, css.counterAttack + selectedName + " gets a bonus to hit earth-bound units." + css.spanEnd);
+    }
 
     if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
 
@@ -319,6 +326,10 @@ function flankAttack(selectedTroops, targetTroops, msg) {
         targetNumber -= 2;
         sendChat(msg.who, css.counterAttack + selectedName + " gets a bonus to hit flying units." + css.spanEnd);
     }
+    else if (actualSelectedType === "Earth Elemental" && !isFlying(targetObj)) {
+        targetNumber -= 1;
+        sendChat(msg.who, css.counterAttack + selectedName + " gets a bonus to hit earth-bound units." + css.spanEnd);
+    }
 
     if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
 
@@ -372,6 +383,10 @@ function rearAttack(selectedTroops, msg) {
         targetNumber -= 2;
         sendChat(msg.who, css.counterAttack + selectedName + " gets a bonus to hit flying units." + css.spanEnd);
     }
+    else if (actualSelectedType === "Earth Elemental" && !isFlying(targetObj)) {
+        targetNumber -= 1;
+        sendChat(msg.who, css.counterAttack + selectedName + " gets a bonus to hit earth-bound units." + css.spanEnd);
+    }
 
     if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
 
@@ -418,6 +433,10 @@ function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selected
     if (actualTargetType === "Air Elemental" && isFlying(selectedObj)) {
         targetNumber -= 2;
         sendChat(msg.who, css.counterAttack + targetName + " gets a bonus to hit flying units." + css.spanEnd);
+    }
+    else if (actualTargetType === "Earth Elemental" && !isFlying(selectedObj)) {
+        targetNumber -= 1;
+        sendChat(msg.who, css.counterAttack + targetName + " gets a bonus to hit earth-bound units." + css.spanEnd);
     }
 
     if (isHasMagicArmor(selectedSheetId)) { ++targetNumber; }

@@ -188,11 +188,29 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
     var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
     var targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
 
-    log("A");
+    var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
+    var actualTargetType = getAttributeWithError(selectedSheetId, "Unit Type");
+
+    if (actualSelectedType === "Water Elemental" && isInWater(selectedObj)) {
+        selectedUnitType = "Heavy Horse";
+        targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
+        targetNumber -= 2;
+        sendChat(msg.who, css.attack + selectedName + " is more powerful while in water." + css.spanEnd);
+    }
+    if (actualTargetType === "Water Elemental" && isInWater(targetObj)) { targetUnitType = "Heavy Horse"; }
+
+    if (actualSelectedType === "Air Elemental" && isFlying(targetObj)) {
+        targetNumber -= 2;
+        sendChat(msg.who, css.attack + selectedName + " gets a bonus to hit flying units." + css.spanEnd);
+    }
+    else if (actualSelectedType === "Earth Elemental" && !isFlying(targetObj)) {
+        targetNumber -= 1;
+        sendChat(msg.who, css.attack + selectedName + " gets a bonus to hit earth-bound units." + css.spanEnd);
+    }
+
     if (isHasMagicSword(selectedSheetId)) {
-        log("B");
         numberOfDice++;
-        if (isFantasyTarget(targetUnitType)) {
+        if (isFantasyTarget(actualTargetType)) {
             targetNumber -= getMagicSwordBonus(selectedSheetId);
             sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die and a hit bonus from "
                 + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
@@ -207,25 +225,6 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
         return;
     }
 
-    var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
-
-    if (actualSelectedType === "Water Elemental" && isInWater(selectedObj)) {
-        selectedUnitType = "Heavy Horse";
-        targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
-        targetNumber -= 2;
-        sendChat(msg.who, css.attack + selectedName + " is more powerful while in water." + css.spanEnd);
-    }
-
-    if (actualSelectedType === "Air Elemental" && isFlying(targetObj)) {
-        targetNumber -= 2;
-        sendChat(msg.who, css.attack + selectedName + " gets a bonus to hit flying units." + css.spanEnd);
-    }
-    else if (actualSelectedType === "Earth Elemental" && !isFlying(targetObj)) {
-        targetNumber -= 1;
-        sendChat(msg.who, css.attack + selectedName + " gets a bonus to hit earth-bound units." + css.spanEnd);
-    }
-
-
 
     if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
 
@@ -236,7 +235,10 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
 function isFantasyTarget(targetUnitType) {
     return (
            targetUnitType === "Wizard"
-        || targetUnitType === "Fire Elemental"
+           || targetUnitType === "Fire Elemental"
+           || targetUnitType === "Earth Elemental"
+           || targetUnitType === "Air Elemental"
+           || targetUnitType === "Water Elemental"
     );
 }
 
@@ -274,24 +276,8 @@ function polearmAdvantageAttack(selectedTroops, msg) {
     var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
     var targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
 
-    if (isHasMagicSword(selectedSheetId)) {
-        numberOfDice++;
-        if (isFantasyTarget(targetUnitType)) {
-            targetNumber -= getMagicSwordBonus(selectedSheetId);
-            sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die and a hit bonus from "
-                + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
-        }
-        else {
-            sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die from "
-                + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
-        }
-    }
-    else if (isHasMeleeImmunity(targetSheetId)) {
-        sendChat(msg.who, css.error + targetName + " is immune to normal attacks!");
-        return;
-    }
-
     var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
+    var actualTargetType = getAttributeWithError(selectedSheetId, "Unit Type");
 
     if (actualSelectedType === "Water Elemental" && isInWater(selectedObj)) {
         selectedUnitType = "Heavy Horse";
@@ -307,6 +293,23 @@ function polearmAdvantageAttack(selectedTroops, msg) {
     else if (actualSelectedType === "Earth Elemental" && !isFlying(targetObj)) {
         targetNumber -= 1;
         sendChat(msg.who, css.attack + selectedName + " gets a bonus to hit earth-bound units." + css.spanEnd);
+    }
+
+    if (isHasMagicSword(selectedSheetId)) {
+        numberOfDice++;
+        if (isFantasyTarget(actualTargetType)) {
+            targetNumber -= getMagicSwordBonus(selectedSheetId);
+            sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die and a hit bonus from "
+                + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
+        }
+        else {
+            sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die from "
+                + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
+        }
+    }
+    else if (isHasMeleeImmunity(targetSheetId)) {
+        sendChat(msg.who, css.error + targetName + " is immune to normal attacks!");
+        return;
     }
 
     if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
@@ -345,9 +348,29 @@ function flankAttack(selectedTroops, targetTroops, msg) {
     var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
     var targetNumber = getFlankerTargetNumber(selectedUnitType, targetUnitType);
 
+    var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
+    var actualTargetType = getAttributeWithError(targetSheetId, "Unit Type");
+
+    if (actualSelectedType === "Water Elemental" && isInWater(selectedObj)) {
+        selectedUnitType = "Heavy Horse";
+        targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
+        targetNumber -= 2;
+        sendChat(msg.who, css.attack + selectedName + " is more powerful while in water." + css.spanEnd);
+    }
+    if (actualTargetType === "Water Elemental" && isInWater(targetObj)) { targetUnitType = "Heavy Horse"; }
+
+    if (actualSelectedType === "Air Elemental" && isFlying(targetObj)) {
+        targetNumber -= 2;
+        sendChat(msg.who, css.attack + selectedName + " gets a bonus to hit flying units." + css.spanEnd);
+    }
+    else if (actualSelectedType === "Earth Elemental" && !isFlying(targetObj)) {
+        targetNumber -= 1;
+        sendChat(msg.who, css.attack + selectedName + " gets a bonus to hit earth-bound units." + css.spanEnd);
+    }
+
     if (isHasMagicSword(selectedSheetId)) {
         numberOfDice++;
-        if (isFantasyTarget(targetUnitType)) {
+        if (isFantasyTarget(actualTargetType)) {
             targetNumber -= getMagicSwordBonus(selectedSheetId);
             sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die and a hit bonus from "
                 + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
@@ -360,24 +383,6 @@ function flankAttack(selectedTroops, targetTroops, msg) {
     else if (isHasMeleeImmunity(targetSheetId)) {
         sendChat(msg.who, css.error + targetName + " is immune to normal attacks!");
         return;
-    }
-
-    var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
-
-    if (actualSelectedType === "Water Elemental" && isInWater(selectedObj)) {
-        selectedUnitType = "Heavy Horse";
-        targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
-        targetNumber -= 2;
-        sendChat(msg.who, css.attack + selectedName + " is more powerful while in water." + css.spanEnd);
-    }
-
-    if (actualSelectedType === "Air Elemental" && isFlying(targetObj)) {
-        targetNumber -= 2;
-        sendChat(msg.who, css.attack + selectedName + " gets a bonus to hit flying units." + css.spanEnd);
-    }
-    else if (actualSelectedType === "Earth Elemental" && !isFlying(targetObj)) {
-        targetNumber -= 1;
-        sendChat(msg.who, css.attack + selectedName + " gets a bonus to hit earth-bound units." + css.spanEnd);
     }
 
     if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
@@ -413,24 +418,8 @@ function rearAttack(selectedTroops, msg) {
     var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
     var targetNumber = getFlankerTargetNumber(selectedUnitType, targetUnitType);
 
-    if (isHasMagicSword(selectedSheetId)) {
-        numberOfDice++;
-        if (isFantasyTarget(targetUnitType)) {
-            targetNumber -= getMagicSwordBonus(selectedSheetId);
-            sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die and a hit bonus from "
-                + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
-        }
-        else {
-            sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die from "
-                + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
-        }
-    }
-    else if (isHasMeleeImmunity(targetSheetId)) {
-        sendChat(msg.who, css.error + targetName + " is immune to normal attacks!");
-        return;
-    }
-
     var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
+    var actualTargetType = getAttributeWithError(selectedSheetId, "Unit Type");
 
     if (actualSelectedType === "Water Elemental" && isInWater(selectedObj)) {
         selectedUnitType = "Heavy Horse";
@@ -448,6 +437,23 @@ function rearAttack(selectedTroops, msg) {
         sendChat(msg.who, css.attack + selectedName + " gets a bonus to hit earth-bound units." + css.spanEnd);
     }
 
+    if (isHasMagicSword(selectedSheetId)) {
+        numberOfDice++;
+        if (isFantasyTarget(actualTargetType)) {
+            targetNumber -= getMagicSwordBonus(selectedSheetId);
+            sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die and a hit bonus from "
+                + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
+        }
+        else {
+            sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die from "
+                + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
+        }
+    }
+    else if (isHasMeleeImmunity(targetSheetId)) {
+        sendChat(msg.who, css.error + targetName + " is immune to normal attacks!");
+        return;
+    }
+
     if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
 
     if (selectedUnitType === "Armored Foot" || selectedUnitType === "Heavy Horse") {
@@ -459,6 +465,7 @@ function rearAttack(selectedTroops, msg) {
 
 function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selectedSheetId, weaponAttribute, targetTroops, msg) {
 
+    log("target: " + targetUnitType + " selected: " + selectedUnitType);
     var attackDiceFactor = getAttackDiceFactor(targetUnitType, selectedUnitType);
     var targetWeapon = getAttributeWithError(targetSheetId, weaponAttribute);
     var pikeMod = (targetWeapon === "Pike"
@@ -474,26 +481,11 @@ function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selected
     }
 
     var numberOfDice = Math.ceil(targetTroops * attackDiceFactor) + pikeMod;
+
     var targetNumber = getAttackerTargetNumber(targetUnitType, selectedUnitType);
 
-    if (isHasMagicSword(targetSheetId)) {
-        numberOfDice++;
-        if (isFantasyTarget(selectedUnitType)) {
-            targetNumber -= getMagicSwordBonus(targetSheetId);
-            sendChat(msg.who, css.magicItem + targetName + " gets a bonus attack die and a hit bonus from "
-                + getMagicSwordName(targetSheetId) + "!" + css.spanEnd);
-        }
-        else {
-            sendChat(msg.who, css.magicItem + targetName + " gets a bonus attack die from "
-                + getMagicSwordName(targetSheetId) + "!" + css.spanEnd);
-        }
-    }
-    else if (isHasMeleeImmunity(selectedSheetId)) {
-        sendChat(msg.who, css.error + selectedName + " is immune to normal attacks!");
-        return;
-    }
-
     var actualTargetType = getAttributeWithError(targetSheetId, "Unit Type");
+    var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
 
     if (actualTargetType === "Water Elemental" && isInWater(targetObj)) {
         selectedUnitType = "Heavy Horse";
@@ -509,6 +501,23 @@ function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selected
     else if (actualTargetType === "Earth Elemental" && !isFlying(selectedObj)) {
         targetNumber -= 1;
         sendChat(msg.who, css.counterAttack + targetName + " gets a bonus to hit earth-bound units." + css.spanEnd);
+    }
+
+    if (isHasMagicSword(targetSheetId)) {
+        numberOfDice++;
+        if (isFantasyTarget(actualSelectedType)) {
+            targetNumber -= getMagicSwordBonus(targetSheetId);
+            sendChat(msg.who, css.magicItem + targetName + " gets a bonus attack die and a hit bonus from "
+                + getMagicSwordName(targetSheetId) + "!" + css.spanEnd);
+        }
+        else {
+            sendChat(msg.who, css.magicItem + targetName + " gets a bonus attack die from "
+                + getMagicSwordName(targetSheetId) + "!" + css.spanEnd);
+        }
+    }
+    else if (isHasMeleeImmunity(selectedSheetId)) {
+        sendChat(msg.who, css.error + selectedName + " is immune to normal attacks!");
+        return;
     }
 
     if (isHasMagicArmor(selectedSheetId)) { ++targetNumber; }

@@ -161,14 +161,18 @@ function eventRearAttack(msg) {
     rearAttack(selectedTroops, msg);
 }
 
+function isHasMeleeImmunity(sheetId) {
+    return (isHasAttribute(sheetId, "Normal Attack Immunity"));
+}
+
 function frontalAttack(selectedTroops, targetTroops, msg) {
     var selectedSheetId = getPropertyValue(selectedObj, "represents");
     var targetSheetId = getPropertyValue(targetObj, "represents");
     var selectedUnitType = getAttacksAs(selectedSheetId);
     var targetUnitType = getAttacksAs(targetSheetId);
-    sendChat(msg.who, "A");
     var attackDiceFactor = getAttackDiceFactor(selectedUnitType, targetUnitType);
     var selectedName = getPropertyValue(selectedObj, "name");
+    var targetName = getPropertyValue(targetObj, "name");
     var weaponAttribute = "Weapon";
     var selectedWeapon = getAttributeWithError(selectedSheetId, weaponAttribute);
     var pikeMod = (selectedWeapon === "Pike"
@@ -192,6 +196,10 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
             sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die from "
                 + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
         }
+    }
+    else if (isHasMeleeImmunity(targetSheetId)) {
+        sendChat(msg.who, css.error + targetName + " is immune to normal attacks!");
+        return;
     }
 
     var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
@@ -224,6 +232,7 @@ function polearmAdvantageAttack(selectedTroops, msg) {
     sendChat(msg.who, "B");
     var attackDiceFactor = getAttackDiceFactor(selectedUnitType, targetUnitType);
     var selectedName = getPropertyValue(selectedObj, "name");
+    var targetName = getPropertyValue(targetObj, "name");
     var pikeMod = 1;
 
     var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
@@ -242,6 +251,10 @@ function polearmAdvantageAttack(selectedTroops, msg) {
             sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die from "
                 + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
         }
+    }
+    else if (isHasMeleeImmunity(targetSheetId)) {
+        sendChat(msg.who, css.error + targetName + " is immune to normal attacks!");
+        return;
     }
 
     var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
@@ -271,6 +284,7 @@ function flankAttack(selectedTroops, targetTroops, msg) {
     var targetUnitType = getAttacksAs(targetSheetId);
     var attackDiceFactor = getFlankerDiceFactor(selectedUnitType, targetUnitType);
     var selectedName = getPropertyValue(selectedObj, "name");
+    var targetName = getPropertyValue(targetObj, "name");
     var weaponAttribute = "Weapon";
     var selectedWeapon = getAttributeWithError(selectedSheetId, weaponAttribute);
     var pikeMod = (selectedWeapon === "Pike"
@@ -294,6 +308,10 @@ function flankAttack(selectedTroops, targetTroops, msg) {
             sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die from "
                 + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
         }
+    }
+    else if (isHasMeleeImmunity(targetSheetId)) {
+        sendChat(msg.who, css.error + targetName + " is immune to normal attacks!");
+        return;
     }
 
     var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
@@ -319,6 +337,7 @@ function rearAttack(selectedTroops, msg) {
     var targetUnitType = getAttacksAs(targetSheetId);
     var attackDiceFactor = getFlankerDiceFactor(selectedUnitType, targetUnitType);
     var selectedName = getPropertyValue(selectedObj, "name");
+    var targetName = getPropertyValue(targetObj, "name");
     var weaponAttribute = "Weapon";
     var selectedWeapon = getAttributeWithError(selectedSheetId, weaponAttribute);
     var pikeMod = (selectedWeapon === "Pike"
@@ -343,6 +362,10 @@ function rearAttack(selectedTroops, msg) {
                 + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
         }
     }
+    else if (isHasMeleeImmunity(targetSheetId)) {
+        sendChat(msg.who, css.error + targetName + " is immune to normal attacks!");
+        return;
+    }
 
     var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
     if (actualSelectedType === "Air Elemental" && isFlying(targetObj)) {
@@ -361,7 +384,6 @@ function rearAttack(selectedTroops, msg) {
 
 function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selectedSheetId, weaponAttribute, targetTroops, msg) {
 
-    sendChat(msg.who, "C");
     var attackDiceFactor = getAttackDiceFactor(targetUnitType, selectedUnitType);
     var targetWeapon = getAttributeWithError(targetSheetId, weaponAttribute);
     var pikeMod = (targetWeapon === "Pike"
@@ -369,6 +391,7 @@ function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selected
         || targetWeapon === "Pole"
         ) ? 1 : 0;
     var targetName = getPropertyValue(targetObj, "name");
+    var selectedName = getPropertyValue(selectedObj, "name");
 
     var numberOfDice = Math.ceil(targetTroops * attackDiceFactor) + pikeMod;
 
@@ -386,6 +409,11 @@ function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selected
                 + getMagicSwordName(targetSheetId) + "!" + css.spanEnd);
         }
     }
+    else if (isHasMeleeImmunity(selectedSheetId)) {
+        sendChat(msg.who, css.error + selectedName + " is immune to normal attacks!");
+        return;
+    }
+
     var actualTargetType = getAttributeWithError(targetSheetId, "Unit Type");
     if (actualTargetType === "Air Elemental" && isFlying(selectedObj)) {
         targetNumber -= 2;
@@ -396,7 +424,6 @@ function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selected
 
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + targetName);
 }
-
 
 function getAttackerTargetNumber(selectedUnitType, targetUnitType) {
 

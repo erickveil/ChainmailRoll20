@@ -183,9 +183,16 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
         ) ? 1 : 0;
 
     var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
-    var actualTargetType = getAttributeWithError(selectedSheetId, "Unit Type");
+    var actualTargetType = getAttributeWithError(targetSheetId, "Unit Type");
 
-    if (isHasMeleeImmunity(targetSheetId) && !isHasMagicSword(selectedSheetId)) {
+    if (isElementalVsElementalMelee(actualSelectedType, actualTargetType)) {
+        log("ele vs ele");
+    }
+    else {
+        log("invalid for ele");
+    }
+    if (isHasMeleeImmunity(targetSheetId) && !isHasMagicSword(selectedSheetId)
+        && !isElementalVsElementalMelee(actualSelectedType, actualTargetType)) {
         sendChat(msg.who, css.error + targetName + " cannot be affected by nonmagical attacks.");
         return;
     }
@@ -226,7 +233,7 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
                 + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
         }
     }
-    else if (isHasMeleeImmunity(targetSheetId)) {
+    else if (isHasMeleeImmunity(targetSheetId) && !isElementalVsElementalMelee(actualSelectedType, actualTargetType)) {
         sendChat(msg.who, css.error + targetName + " is immune to normal attacks!");
         return;
     }
@@ -236,6 +243,23 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
 
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
     counterAttack(targetUnitType, selectedUnitType, targetSheetId, selectedSheetId, weaponAttribute, targetTroops, msg);
+}
+
+function isElementalVsElementalMelee(selectedActualType, targetActualType) {
+    log ("selected: " + selectedActualType + " vs " + targetActualType);
+    if (selectedActualType === "Earth Elemental") {
+        return targetActualType === "Air Elemental";
+    }
+    if (selectedActualType === "Air Elemental") {
+        return targetActualType === "Earth Elemental";
+    }
+    if (selectedActualType === "Fire Elemental") {
+        return targetActualType === "Water Elemental";
+    }
+    if (selectedActualType === "Water Elemental") {
+        return targetActualType === "Fire Elemental";
+    }
+    return false;
 }
 
 function isFantasyTarget(targetUnitType) {
@@ -267,8 +291,12 @@ function polearmAdvantageAttack(selectedTroops, msg) {
     var selectedName = getPropertyValue(selectedObj, "name");
     var pikeMod = 1;
 
+    var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
+    var actualTargetType = getAttributeWithError(targetSheetId, "Unit Type");
+
     var targetName = getPropertyValue(targetObj, "name");
-    if (isHasMeleeImmunity(targetSheetId) && !isHasMagicSword(selectedSheetId)) {
+    if (isHasMeleeImmunity(targetSheetId) && !isHasMagicSword(selectedSheetId)
+        && !isElementalVsElementalMelee(actualSelectedType, actualTargetType)) {
         sendChat(msg.who, css.error + targetName + " cannot be affected by nonmagical attacks.");
         return;
     }
@@ -276,9 +304,6 @@ function polearmAdvantageAttack(selectedTroops, msg) {
 
     var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
     var targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
-
-    var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
-    var actualTargetType = getAttributeWithError(selectedSheetId, "Unit Type");
 
     if (actualSelectedType === "Water Elemental" && isInWater(selectedObj)) {
         selectedUnitType = "Heavy Horse";
@@ -308,7 +333,7 @@ function polearmAdvantageAttack(selectedTroops, msg) {
                 + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
         }
     }
-    else if (isHasMeleeImmunity(targetSheetId)) {
+    else if (isHasMeleeImmunity(targetSheetId) && !isElementalVsElementalMelee(actualSelectedType, actualTargetType)) {
         sendChat(msg.who, css.error + targetName + " is immune to normal attacks!");
         isAttackerImmune = true;
         return;
@@ -340,19 +365,20 @@ function flankAttack(selectedTroops, targetTroops, msg) {
         || selectedWeapon === "Halbard"
         || selectedWeapon === "Pole"
         ) ? 1 : 0;
+    var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
+    var actualTargetType = getAttributeWithError(targetSheetId, "Unit Type");
 
     var targetName = getPropertyValue(targetObj, "name");
-    if (isHasMeleeImmunity(targetSheetId) && !isHasMagicSword(selectedSheetId)) {
+    if (isHasMeleeImmunity(targetSheetId) && !isHasMagicSword(selectedSheetId)
+        && !isElementalVsElementalMelee(actualSelectedType, actualTargetType)) {
         sendChat(msg.who, css.error + targetName + " cannot be affected by nonmagical attacks.");
         return;
     }
+
     if (isHasMeleeImmunity(selectedSheetId)) { isAttackerImmune = true; }
 
     var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
     var targetNumber = getFlankerTargetNumber(selectedUnitType, targetUnitType);
-
-    var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
-    var actualTargetType = getAttributeWithError(targetSheetId, "Unit Type");
 
     if (actualSelectedType === "Water Elemental" && isInWater(selectedObj)) {
         selectedUnitType = "Heavy Horse";
@@ -383,7 +409,7 @@ function flankAttack(selectedTroops, targetTroops, msg) {
                 + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
         }
     }
-    else if (isHasMeleeImmunity(targetSheetId)) {
+    else if (isHasMeleeImmunity(targetSheetId) && !isElementalVsElementalMelee(actualSelectedType, actualTargetType)) {
         sendChat(msg.who, css.error + targetName + " is immune to normal attacks!");
         isAttackerImmune = true;
         return;
@@ -413,8 +439,12 @@ function rearAttack(selectedTroops, msg) {
         || selectedWeapon === "Pole"
         ) ? 1 : 0;
 
+    var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
+    var actualTargetType = getAttributeWithError(targetSheetId, "Unit Type");
+
     var targetName = getPropertyValue(targetObj, "name");
-    if (isHasMeleeImmunity(targetSheetId) && !isHasMagicSword(selectedSheetId)) {
+    if (isHasMeleeImmunity(targetSheetId) && !isHasMagicSword(selectedSheetId)
+        && !isElementalVsElementalMelee(actualSelectedType, actualTargetType)) {
         sendChat(msg.who, css.error + targetName + " cannot be affected by nonmagical attacks.");
         return;
     }
@@ -422,9 +452,6 @@ function rearAttack(selectedTroops, msg) {
 
     var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
     var targetNumber = getFlankerTargetNumber(selectedUnitType, targetUnitType);
-
-    var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
-    var actualTargetType = getAttributeWithError(selectedSheetId, "Unit Type");
 
     if (actualSelectedType === "Water Elemental" && isInWater(selectedObj)) {
         selectedUnitType = "Heavy Horse";
@@ -454,7 +481,7 @@ function rearAttack(selectedTroops, msg) {
                 + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
         }
     }
-    else if (isHasMeleeImmunity(targetSheetId)) {
+    else if (isHasMeleeImmunity(targetSheetId) && !isElementalVsElementalMelee(actualSelectedType, actualTargetType)) {
         sendChat(msg.who, css.error + targetName + " is immune to normal attacks!");
         isAttackerImmune = true;
         return;
@@ -480,7 +507,11 @@ function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selected
     var targetName = getPropertyValue(targetObj, "name");
     var selectedName = getPropertyValue(selectedObj, "name");
 
-    if (isHasMeleeImmunity(selectedSheetId) && !isHasMagicSword(targetSheetId)) {
+    var actualTargetType = getAttributeWithError(targetSheetId, "Unit Type");
+    var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
+
+    if (isHasMeleeImmunity(selectedSheetId) && !isHasMagicSword(targetSheetId)
+        && !isElementalVsElementalMelee(actualTargetType, actualSelectedType)) {
         sendChat(msg.who, css.error + selectedName + " cannot be affected by nonmagical attacks.");
         return;
     }
@@ -488,9 +519,6 @@ function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selected
     var numberOfDice = Math.ceil(targetTroops * attackDiceFactor) + pikeMod;
 
     var targetNumber = getAttackerTargetNumber(targetUnitType, selectedUnitType);
-
-    var actualTargetType = getAttributeWithError(targetSheetId, "Unit Type");
-    var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
 
     if (actualTargetType === "Water Elemental" && isInWater(targetObj)) {
         selectedUnitType = "Heavy Horse";
@@ -520,7 +548,7 @@ function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selected
                 + getMagicSwordName(targetSheetId) + "!" + css.spanEnd);
         }
     }
-    else if (isHasMeleeImmunity(selectedSheetId)) {
+    else if (isHasMeleeImmunity(selectedSheetId) && !isElementalVsElementalMelee(actualTargetType, actualSelectedType)) {
         sendChat(msg.who, css.error + selectedName + " is immune to normal attacks!");
         return;
     }

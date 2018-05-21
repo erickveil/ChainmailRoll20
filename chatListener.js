@@ -103,8 +103,6 @@ function eventMeleeDiceRolled(msg) {
         if (survived) { heavyLossMoraleCheck(msg, targetObj); }
 
         isSelectedDone = true;
-        if (isAttackerImmune) { log("Attacker is immune"); }
-        else { log("Attacker is not immune."); }
         if (isTargetDone || isRearAttack || isAttackerImmune) {
             isSelectedDone = false;
             isTargetDone = false;
@@ -141,8 +139,6 @@ function eventMeleeDiceRolled(msg) {
         // resolve melee morale
         // end of melee
         isTargetDone = true;
-        if (isAttackerImmune) { log("Attacker is immune"); }
-        else { log("Attacker is not immune."); }
         if (isSelectedDone || isRearAttack || isAttackerImmune) {
             isSelectedDone = false;
             isTargetDone = false;

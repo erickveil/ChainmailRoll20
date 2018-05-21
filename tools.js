@@ -181,3 +181,11 @@ function pingObject(obj) {
     sendPing(x, y, pageId);
 }
 
+/**
+ *
+ * @param tokenObj
+ * @returns false if not flying, or the altitude of the flier (1-9) if it is.
+ */
+function isFlying(tokenObj) {
+    return (tokenObj.get("status_fluffy-wing"));
+}

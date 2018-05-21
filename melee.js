@@ -194,6 +194,13 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
         }
     }
 
+    var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
+    if (actualSelectedType === "Air Elemental" && isFlying(targetObj)) {
+        targetNumber -= 2;
+        sendChat(msg.who, css.counterAttack + selectedName + " gets a bonus to hit flying units." + css.spanEnd);
+    }
+
+
     if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
 
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
@@ -236,6 +243,13 @@ function polearmAdvantageAttack(selectedTroops, msg) {
                 + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
         }
     }
+
+    var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
+    if (actualSelectedType === "Air Elemental" && isFlying(targetObj)) {
+        targetNumber -= 2;
+        sendChat(msg.who, css.counterAttack + selectedName + " gets a bonus to hit flying units." + css.spanEnd);
+    }
+
 
     if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
 
@@ -282,6 +296,12 @@ function flankAttack(selectedTroops, targetTroops, msg) {
         }
     }
 
+    var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
+    if (actualSelectedType === "Air Elemental" && isFlying(targetObj)) {
+        targetNumber -= 2;
+        sendChat(msg.who, css.counterAttack + selectedName + " gets a bonus to hit flying units." + css.spanEnd);
+    }
+
     if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
 
     if (selectedUnitType === "Armored Foot" || selectedUnitType === "Heavy Horse") {
@@ -324,6 +344,12 @@ function rearAttack(selectedTroops, msg) {
         }
     }
 
+    var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
+    if (actualSelectedType === "Air Elemental" && isFlying(targetObj)) {
+        targetNumber -= 2;
+        sendChat(msg.who, css.counterAttack + selectedName + " gets a bonus to hit flying units." + css.spanEnd);
+    }
+
     if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
 
     if (selectedUnitType === "Armored Foot" || selectedUnitType === "Heavy Horse") {
@@ -359,6 +385,11 @@ function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selected
             sendChat(msg.who, css.magicItem + targetName + " gets a bonus attack die from "
                 + getMagicSwordName(targetSheetId) + "!" + css.spanEnd);
         }
+    }
+    var actualTargetType = getAttributeWithError(targetSheetId, "Unit Type");
+    if (actualTargetType === "Air Elemental" && isFlying(selectedObj)) {
+        targetNumber -= 2;
+        sendChat(msg.who, css.counterAttack + targetName + " gets a bonus to hit flying units." + css.spanEnd);
     }
 
     if (isHasMagicArmor(selectedSheetId)) { ++targetNumber; }

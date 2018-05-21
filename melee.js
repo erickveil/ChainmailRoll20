@@ -188,7 +188,9 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
     var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
     var targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
 
+    log("A");
     if (isHasMagicSword(selectedSheetId)) {
+        log("B");
         numberOfDice++;
         if (isFantasyTarget(targetUnitType)) {
             targetNumber -= getMagicSwordBonus(selectedSheetId);
@@ -261,7 +263,6 @@ function polearmAdvantageAttack(selectedTroops, msg) {
     sendChat(msg.who, "B");
     var attackDiceFactor = getAttackDiceFactor(selectedUnitType, targetUnitType);
     var selectedName = getPropertyValue(selectedObj, "name");
-    var targetName = getPropertyValue(targetObj, "name");
     var pikeMod = 1;
 
     var targetName = getPropertyValue(targetObj, "name");
@@ -328,7 +329,6 @@ function flankAttack(selectedTroops, targetTroops, msg) {
     var targetUnitType = getAttacksAs(targetSheetId);
     var attackDiceFactor = getFlankerDiceFactor(selectedUnitType, targetUnitType);
     var selectedName = getPropertyValue(selectedObj, "name");
-    var targetName = getPropertyValue(targetObj, "name");
     var weaponAttribute = "Weapon";
     var selectedWeapon = getAttributeWithError(selectedSheetId, weaponAttribute);
     var pikeMod = (selectedWeapon === "Pike"
@@ -397,7 +397,6 @@ function rearAttack(selectedTroops, msg) {
     var targetUnitType = getAttacksAs(targetSheetId);
     var attackDiceFactor = getFlankerDiceFactor(selectedUnitType, targetUnitType);
     var selectedName = getPropertyValue(selectedObj, "name");
-    var targetName = getPropertyValue(targetObj, "name");
     var weaponAttribute = "Weapon";
     var selectedWeapon = getAttributeWithError(selectedSheetId, weaponAttribute);
     var pikeMod = (selectedWeapon === "Pike"

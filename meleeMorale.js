@@ -249,7 +249,6 @@ function resolveMeleeMorale(sender, selectedObjList) {
     }
 }
 
-
 /**
  *
  * @param selectedArray
@@ -273,7 +272,6 @@ function getSideWithFewerCasualties(selected, target) {
     if (selected < target) { return 0; }
     if (selected > target) { return 1; }
 }
-
 
 /**
  *

@@ -176,8 +176,8 @@ function resolveMeleeMorale(sender, selectedObjList) {
     armySheetId[0] = (armyName[0] === "") ? "" : getArmySheetId(armyName[0]);
     armySheetId[1] = (armyName[1] === "") ? "" : getArmySheetId(armyName[1]);
     var armySize = [];
-    armySize[0] = (armyName[0] === "") ? 20 : getAttributeWithError(armySheetId[0], "Figures");
-    armySize[1] = (armyName[1] === "") ? 20 : getAttributeWithError(armySheetId[1], "Figures");
+    armySize[0] = armySheetId[0] === "" ? 20 : getAttributeWithError(armySheetId[0], "Figures");
+    armySize[1] = armySheetId[1] === "" ? 20 : getAttributeWithError(armySheetId[1], "Figures");
     var isLowUnits = armySize[0] < 20 || armySize[1] < 20;
 
     survivalMorale[0] = armySize[0] * moraleAttr[0];
@@ -214,7 +214,7 @@ function resolveMeleeMorale(sender, selectedObjList) {
     }
     sendChat(sender, css.morale + "**" + names[winner] + "** is the winner!" + css.spanEnd);
 
-    if (isObjectWizard(token[loser]) || isFearless(token[loser])) {
+    if (isObjectWizard(token[loser]) || isObjectFearless(token[loser])) {
         sendChat(sender, css.morale + names[loser] + " is not affected by morale." + css.spanEnd);
         return;
     }

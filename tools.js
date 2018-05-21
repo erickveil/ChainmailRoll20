@@ -115,8 +115,9 @@ function getAttributeWithError(characterId, attribute, valueType)
     return attVal;
 }
 
-function isHasAttribute(objId, attributeName) {
-    var attributeObj = findObjs({ type: 'attribute', characterid: objId, name: attributeName });
+function isHasAttribute(sheetId, attributeName) {
+
+    var attributeObj = findObjs({ type: 'attribute', _characterid: sheetId, name: attributeName });
     return (attributeObj.length !== 0);
 }
 
@@ -159,9 +160,12 @@ function getArmyName(unitSheetId) {
 function getArmySheetId(armyName) {
     var resultList = findObjs({type:"character", name:armyName});
     if (resultList.length < 0 || typeof resultList[0] === "undefined") {
+        return "";
+        /*
         var chatMsg = "Could not find the army sheet for " + armyName;
         var logMsg = "";
         throw new roll20Exception(logMsg, chatMsg);
+        */
     }
     return getPropertyValue(resultList[0], "_id");
 }
@@ -176,4 +180,19 @@ function pingObject(obj) {
     var pageId = getPropertyValue(obj, "pageid");
     sendPing(x, y, pageId);
 }
+
+/**
+ *
+ * @param tokenObj
+ * @returns false if not flying, or the altitude of the flier (1-9) if it is.
+ */
+function isFlying(tokenObj) {
+    return (tokenObj.get("status_fluffy-wing"));
+}
+
+function isInWater(tokenObj) {
+    return (tokenObj.get("status_chained-heart"));
+}
+
+
 

@@ -67,6 +67,22 @@ function isObjectWizard(obj) {
     }
 }
 
+function isObjectFearless(obj) {
+    if (!isObjectToken(obj)) {
+        return false;
+    }
+    try {
+        var unitType = getTokenUnitType(obj);
+        if (unitType === "Wizard") { return true; }
+        var sheetId = getPropertyValue(obj, "represents");
+        return (isHasAttribute(sheetId, "Fearless"));
+    }
+    catch (err) {
+        // tokens might not have the expected attributes as they are not units
+        return false;
+    }
+}
+
 function isObjectToken(obj) {
     if (getPropertyValue(obj, "_type") !== "graphic") { return false; }
     return (getPropertyValue(obj, "_subtype") === "token");

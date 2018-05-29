@@ -97,6 +97,7 @@ function resolveMeleeMorale(sender, selectedObjList) {
     var icon_retreat = "tread";
     var icon_rout = "broken-heart";
     var icon_surrender = "dead";
+    var icon_fallBack = "screaming";
 
     announceMoraleFactors(sender, names[0], casualties[0], troops[0]);
     announceMoraleFactors(sender, names[1], casualties[1], troops[1]);
@@ -230,18 +231,20 @@ function resolveMeleeMorale(sender, selectedObjList) {
         sendChat(sender, css.morale + "**Melee continues.**" + css.spanEnd + css.spanEnd);
     }
     else if (scoreDiff >= 20 && scoreDiff <= 39) {
-        sendChat(sender, css.morale + "**" + names[loser] + "** moves back 2 move, good order" + css.spanEnd);
+        sendChat(sender, css.morale + "**" + names[loser] + "** falls back 2 full moves, good order" + css.spanEnd);
+        token[loser].set("status_" + icon_fallBack, "2");
     }
     else if (scoreDiff >= 40 && scoreDiff <= 59) {
-        sendChat(sender, css.morale + "**" + names[loser] + "** moves back 1 move, good order" + css.spanEnd);
+        sendChat(sender, css.morale + "**" + names[loser] + "** falls back 1 full moves, good order" + css.spanEnd);
+        token[loser].set("status_" + icon_fallBack, "1");
     }
     else if (scoreDiff >= 60 && scoreDiff <= 79) {
-        sendChat(sender, css.morale + "**" + names[loser] + "** retreat 1 move" + css.spanEnd);
-        token[loser].set("status_" + icon_retreat, true, retreatRounds);
+        sendChat(sender, css.morale + "**" + names[loser] + "** retreat 1 full moves" + css.spanEnd);
+        token[loser].set("status_" + icon_retreat, "1");
     }
     else if (scoreDiff >= 80 && scoreDiff <= 99) {
-        sendChat(sender, css.morale + "**" + names[loser] + "** rout 1 1/2 move" + css.spanEnd);
-        token[loser].set("status_" + icon_rout, true, retreatRounds);
+        sendChat(sender, css.morale + "**" + names[loser] + "** rout 2 full moves" + css.spanEnd);
+        token[loser].set("status_" + icon_rout, "2");
     }
     else {
         sendChat(sender, css.morale + "**" + names[loser] + "** surrenders. Remove unit from play." + css.spanEnd);

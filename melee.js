@@ -809,7 +809,7 @@ function getFlankerTargetNumber(selectedUnitType, targetUnitType) {
 function getFlankerDiceFactor(selectedUnitType, targetUnitType) {
 
     var logMsg = "";
-    var chatMsg = "G. Unrecognized target unit type: " + targetUnitType;
+    var chatMsg = "Unrecognized target unit type: " + targetUnitType;
 
     if (selectedUnitType === "Light Foot") {
         if (targetUnitType === "Light Foot") { return 1; }
@@ -839,6 +839,7 @@ function getFlankerDiceFactor(selectedUnitType, targetUnitType) {
     else if (selectedUnitType === "Light Horse") {
         if (targetUnitType === "Light Foot") { return 2; }
         if (targetUnitType === "Heavy Foot") { return 2; }
+        if (targetUnitType === "Armored Foot") { return 2; }
         if (targetUnitType === "Wizard") { return 2; }
         if (targetUnitType === "Light Horse") { return 1; }
         if (targetUnitType === "Medium Horse") { return 1; }
@@ -852,6 +853,7 @@ function getFlankerDiceFactor(selectedUnitType, targetUnitType) {
     ) {
         if (targetUnitType === "Light Foot") { return 4; }
         if (targetUnitType === "Heavy Foot") { return 3; }
+        if (targetUnitType === "Armored Foot") { return 2; }
         if (targetUnitType === "Wizard") { return 2; }
         if (targetUnitType === "Light Horse") { return 2; }
         if (targetUnitType === "Medium Horse") { return 1; }

@@ -83,7 +83,7 @@ function getPropertyValue(obj, property) {
  *
  * @param characterId
  * @param attribute
- * @param valueType
+ * @param valueType "max" for the max, or omit for just the current value.
  * @returns {*}
  */
 function getAttributeWithError(characterId, attribute, valueType)
@@ -113,6 +113,43 @@ function getAttributeWithError(characterId, attribute, valueType)
         throw new roll20Exception(logMsg, chatMsg);
     }
     return attVal;
+}
+
+/**
+ * Sets an attribute on a character sheet
+ *
+ * Throws if the attribute does not exist.
+ *
+ * @param sheetId
+ * @param attributeName
+ * @param newValue
+ * @param valueType
+ */
+function setAttributeWithError(sheetId, attributeName, newValue, valueType)
+{
+    log("findObjs: " + attributeName + ", " + sheetId);
+    var attributeList = findObjs({
+        name: attributeName,
+        type: 'attribute',
+        characterid: sheetId
+    });
+
+    log(attributeList);
+
+    if (attributeList.length === 0) {
+        var logMsg = "No attribute found to set. Sheet: " + sheetId + ", attribute: " + attributeName;
+        var chatMsg = "Could not find attribute";
+        throw new roll20Exception(logMsg, chatMsg);
+    }
+
+    var attributeObj = attributeList[0];
+
+    if (valueType === "max") {
+        attributeObj.set({max: newValue});
+    }
+    else {
+        attributeObj.set({current: newValue});
+    }
 }
 
 function isHasAttribute(sheetId, attributeName) {

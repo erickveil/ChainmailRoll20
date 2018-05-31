@@ -127,14 +127,11 @@ function getAttributeWithError(characterId, attribute, valueType)
  */
 function setAttributeWithError(sheetId, attributeName, newValue, valueType)
 {
-    log("findObjs: " + attributeName + ", " + sheetId);
     var attributeList = findObjs({
         name: attributeName,
         type: 'attribute',
         characterid: sheetId
     });
-
-    log(attributeList);
 
     if (attributeList.length === 0) {
         var logMsg = "No attribute found to set. Sheet: " + sheetId + ", attribute: " + attributeName;

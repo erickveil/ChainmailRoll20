@@ -56,7 +56,14 @@ function incrementArmyFigureCount(addedObj) {
 }
 
 function decrementArmyFigureCount(deletedObj) {
-
+var sheetId = getPropertyValue(deletedObj, "represents");
+    var armyName = getArmyName(sheetId);
+    // No army, no need.
+    if (armyName === "") { return; }
+    var armySheetId = getArmySheetId(armyName);
+    var currentFiguresValue = getAttributeWithError(armySheetId, "Figures");
+    if (currentFiguresValue === "") { currentFiguresValue = 0; }
+    setAttributeWithError(armySheetId, "Figures", parseInt(currentFiguresValue) - 1);
 }
 
 

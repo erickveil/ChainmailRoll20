@@ -31,6 +31,7 @@ on("chat:message", function(msg) {
         eventToggleMiscRange(msg);
         eventToggleMissileRange(msg);
         eventToggleMovementRange(msg);
+        eventTallyArmy(msg);
     }
     catch(err) {
         if (typeof err === "string") {

@@ -186,20 +186,18 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
     var actualTargetType = getAttributeWithError(targetSheetId, "Unit Type");
 
     if (isElementalVsElementalMelee(actualSelectedType, actualTargetType)) {
-        log("ele vs ele");
+        log("elemental vs elemental combat needs attention");
     }
     else {
-        log("invalid for ele");
+        // log("invalid for ele");
     }
+
     if (isHasMeleeImmunity(targetSheetId) && !isHasMagicSword(selectedSheetId)
         && !isElementalVsElementalMelee(actualSelectedType, actualTargetType)) {
         sendChat(msg.who, css.error + targetName + " cannot be affected by nonmagical attacks.");
         return;
     }
-    if (isHasMeleeImmunity(selectedSheetId)) {
-        log("Attacker immune caught.");
-        isAttackerImmune = true;
-    }
+    if (isHasMeleeImmunity(selectedSheetId)) { isAttackerImmune = true; }
 
     var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
     var targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
@@ -246,7 +244,7 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
 }
 
 function isElementalVsElementalMelee(selectedActualType, targetActualType) {
-    log ("selected: " + selectedActualType + " vs " + targetActualType);
+    //log ("selected: " + selectedActualType + " vs " + targetActualType);
     if (selectedActualType === "Earth Elemental") {
         return targetActualType === "Air Elemental";
     }

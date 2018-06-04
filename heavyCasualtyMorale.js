@@ -78,7 +78,7 @@ function eventFearMoraleCheck(msg) {
     var savingObj = getObjectWithReport(tokenType, selectedId);
 
     if (isObjectWizard(savingObj)) { return; }
-    if (isFearless(savingObj)) { return; }
+    if (isObjectFearless(savingObj)) { return; }
 
     currentlySavingUnitObj = savingObj;
     currentSaveTarget = getTargetSave(savingObj);
@@ -104,6 +104,10 @@ function eventFearMoraleCheck(msg) {
         + currentSaveTarget
         + css.spanEnd);
     resolveMassCasualtyCheck(msg, rollResult);
+}
+
+function isFearless(obj) {
+    return isObjectFearless(obj);
 }
 
 function getTargetSave(unitObj)

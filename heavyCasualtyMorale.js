@@ -36,6 +36,11 @@ function heavyLossMoraleCheck(msg, unitObj) {
     currentlySavingUnitObj = unitObj;
     currentSaveTarget = getTargetSave(unitObj);
 
+    if (isDaylight() && isUnitLightSensitive(currentlySavingUnitObj)) {
+        sendChat(msg.who, css.morale + unitName + " has poor morale in this light!" + css.spanEnd);
+        ++currentSaveTarget;
+    }
+
     // Determine if inspiring figure is nearby
     var isGetsBonus = isGetsLeadershipMoraleBonus(unitObj);
     if (isGetsBonus) {
@@ -83,6 +88,11 @@ function eventFearMoraleCheck(msg) {
     currentlySavingUnitObj = savingObj;
     currentSaveTarget = getTargetSave(savingObj);
 
+    if (isDaylight() && isUnitLightSensitive(currentlySavingUnitObj)) {
+        sendChat(msg.who, css.morale + unitName + " has poor morale in this light!" + css.spanEnd);
+        ++currentSaveTarget;
+    }
+
     // Determine if inspiring figure is nearby
     var isGetsBonus = isGetsLeadershipMoraleBonus(savingObj);
     if (isGetsBonus) {
@@ -114,7 +124,8 @@ function getTargetSave(unitObj)
 {
     var typeAttribute = "Unit Type";
     var sheetId = getPropertyValue(unitObj, "represents");
-    var unitType = getAttributeWithError(sheetId, typeAttribute);
+    //var unitType = getAttributeWithError(sheetId, typeAttribute);
+    var unitType = getAttacksAs(sheetId);
 
     if (unitType === "Light Foot"
         || unitType === "Peasant"
@@ -150,7 +161,8 @@ function getMaxCasualties(unitObj)
 {
     var typeAttribute = "Unit Type";
     var sheetId = getPropertyValue(unitObj, "represents");
-    var unitType = getAttributeWithError(sheetId, typeAttribute);
+    //var unitType = getAttributeWithError(sheetId, typeAttribute);
+    var unitType = getAttacksAs(sheetId);
     var maxTroops = getTokenBarMax(unitObj, 1);
     var targetLoss;
     if (unitType === "Light Foot"

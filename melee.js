@@ -353,7 +353,7 @@ function polearmAdvantageAttack(selectedTroops, msg) {
 
 function getAttacksAs(sheetId) {
     if (isHasAttribute(sheetId, "Fights As")) {
-        var fightsAs = getAttributeWithError(sheetId, "Fights As");
+        var fightsAs = getAttribute(sheetId, "Fights As");
         if (fightsAs !== "") { return fightsAs; }
     }
     return getAttributeWithError(sheetId, "Unit Type");

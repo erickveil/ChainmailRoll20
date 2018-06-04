@@ -126,7 +126,14 @@ function resolveMeleeMorale(sender, selectedObjList) {
                 + " added to their roll!" + css.spanEnd);
         }
         var moraleBonus = (isGetsBonus) ? 1 : 0;
-        var bonusStr = (isGetsBonus) ? "+1 " : "";
+
+        if (isDaylight() && isUnitLightSensitive(token[fewerCasualtiesSide])) {
+            sendChat(sender, css.morale + names[fewerCasualtiesSide] + " suffers diminished morale in this light!"
+                + css.spanEnd);
+            --moraleBonus;
+        }
+
+        var bonusStr = (moraleBonus > 0) ? "+" + moraleBonus : (moraleBonus < 0) ? moraleBonus : "";
 
         var dieResult = randomInteger(6) + moraleBonus;
         sendChat(sender, css.morale

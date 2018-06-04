@@ -36,7 +36,7 @@ function onAddedGraphic(addedObj) {
 }
 
 function onDestroyGraphic(destroyedObj) {
-
+    decrementArmyFigureCount(destroyedObj);
 }
 
 /**
@@ -53,6 +53,10 @@ function incrementArmyFigureCount(addedObj) {
     var currentFiguresValue = getAttributeWithError(armySheetId, "Figures");
     if (currentFiguresValue === "") { currentFiguresValue = 0; }
     setAttributeWithError(armySheetId, "Figures", parseInt(currentFiguresValue) + 1);
+}
+
+function decrementArmyFigureCount(deletedObj) {
+
 }
 
 

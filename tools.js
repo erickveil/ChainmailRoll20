@@ -88,9 +88,11 @@ function getPropertyValue(obj, property) {
  */
 function getAttributeWithError(characterId, attribute, valueType)
 {
+    var logMsg;
+    var chatMsg;
     if (characterId === "") {
-        var logMsg = "Empty characterId passed to getAttributeWithError. attribute: " + attribute;
-        var chatMsg = "";
+        logMsg = "Empty characterId passed to getAttributeWithError. attribute: " + attribute;
+        chatMsg = "";
         throw new roll20Exception(logMsg, chatMsg);
     }
 
@@ -187,8 +189,17 @@ function getTokenById(tokenId) {
     return resultList[0];
 }
 
+function getAttribute(characterId, attribute, valueType)
+{
+    if (characterId === "") { return ""; }
+    if (!isHasAttribute(characterId, attribute)) { return "" }
+    var attVal = getAttrByName(characterId, attribute, valueType);
+    if (typeof attVal === "undefined") { return ""; }
+    return attVal;
+}
+
 function getArmyName(unitSheetId) {
-    return getAttributeWithError(unitSheetId, "Army");
+    return getAttribute(unitSheetId, "Army");
 }
 
 function getArmySheetId(armyName) {

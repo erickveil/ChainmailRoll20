@@ -236,8 +236,12 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
         return;
     }
 
-
     if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
+
+    if (isDaylight() && isUnitLightSensitive(selectedObj)) {
+        sendChat(msg.who, css.attack + selectedName + " does not like the light!" + css.spanEnd);
+        ++targetNumber;
+    }
 
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
     counterAttack(targetUnitType, selectedUnitType, targetSheetId, selectedSheetId, weaponAttribute, targetTroops, msg);
@@ -339,6 +343,11 @@ function polearmAdvantageAttack(selectedTroops, msg) {
 
     if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
 
+    if (isDaylight() && isUnitLightSensitive(selectedObj)) {
+        sendChat(msg.who, css.attack + selectedName + " does not like the light!" + css.spanEnd);
+        ++targetNumber;
+    }
+
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
 }
 
@@ -419,6 +428,11 @@ function flankAttack(selectedTroops, targetTroops, msg) {
         --targetNumber;
     }
 
+    if (isDaylight() && isUnitLightSensitive(selectedObj)) {
+        sendChat(msg.who, css.attack + selectedName + " does not like the light!" + css.spanEnd);
+        ++targetNumber;
+    }
+
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
     counterAttack(targetUnitType, selectedUnitType, targetSheetId, selectedSheetId, weaponAttribute, targetTroops, msg);
 }
@@ -487,6 +501,11 @@ function rearAttack(selectedTroops, msg) {
 
     if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
 
+    if (isDaylight() && isUnitLightSensitive(selectedObj)) {
+        sendChat(msg.who, css.attack + selectedName + " does not like the light!" + css.spanEnd);
+        ++targetNumber;
+    }
+
     if (selectedUnitType === "Armored Foot" || selectedUnitType === "Heavy Horse") {
         --targetNumber;
     }
@@ -553,10 +572,41 @@ function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selected
 
     if (isHasMagicArmor(selectedSheetId)) { ++targetNumber; }
 
+    if (isDaylight() && isUnitLightSensitive(targetObj)) {
+        sendChat(msg.who, css.attack + targetName + " does not like the light!" + css.spanEnd);
+        ++targetNumber;
+    }
+
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + targetName);
 }
 
 // ---------------------------------------------------------------
+
+function isDaylight() {
+    var battleField = getBattlefieldSheet();
+    var battleFieldId = getPropertyValue(battleField, "id");
+    var lightLevel = getAttributeWithError(battleFieldId, "Light Level");
+    return (parseInt(lightLevel) === 2);
+}
+
+function isUnitLightSensitive(tokenObj) {
+    var sheetId = getPropertyValue(tokenObj, "represents");
+    if (!isHasAttribute(sheetId, "Light Sensitive")) { return false; }
+    var sensitivity = getAttributeWithError(sheetId, "Light Sensitive");
+    return (parseInt(sensitivity) === 1);
+}
+
+function getBattlefieldSheet() {
+    var searchList = findObjs({
+        type: "character",
+        name: "Battlefield Settings"
+    });
+    if (searchList.length === 0) {
+        var msg = "Cannot find the Battlefield Settings";
+        throw new roll20Exception(msg, css.error + msg + css.spanEnd);
+    }
+    return searchList[0];
+}
 
 function getAttackerTargetNumber(selectedUnitType, targetUnitType) {
 

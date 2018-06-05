@@ -78,13 +78,13 @@ function eventToggleMiscRange(msg) {
     }
     var argStr = msg.content.replace("!miscRange ", "");
     var argList = argStr.split(",");
-    if (argList.length !== 2) {
+    if (argList.length !== 3) {
         var logMsg = "Not enough arguments for toggleMiscRange: " + msg.content;
         var chatMsg = logMsg;
         throw new roll20Exception(logMsg, chatMsg);
     }
-    var tokenId = argStr[0];
-    var range = arglist[1];
+    var tokenId = argList[0];
+    var range = argList[1];
     var color = argList[2];
 
     var selectedToken = getTokenById(tokenId);

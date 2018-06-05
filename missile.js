@@ -128,6 +128,13 @@ function missileAttack(selectedId, targetId, msg, isIndirect) {
         return;
     }
 
+    selectedObj = getObjectWithReport("graphic", selectedId);
+    var selectedName = getPropertyValue(selectedObj, "name");
+    if (isDarkness() && !isUnitLightSensitive(selectedObj)) {
+        sendChat(msg.who, css.error + selectedName + " cannot aim in the dark!" + css.spanEnd);
+        return;
+    }
+
     clearLocalCasualties(archerToken, targetToken);
     var archerTroops = getTokenBarValue(archerToken, 1);
     var targetSheetId = getPropertyValue(targetToken, "represents");

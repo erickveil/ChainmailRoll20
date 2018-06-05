@@ -11,7 +11,7 @@
  * Determines if a leader type unit is nearby and returns true if they are.
  */
 function isGetsLeadershipMoraleBonus(originToken) {
-    var tokenList = getFirstLeaderInRange(originToken);
+    var tokenList = getFirstLeaderInRange(originToken, 12);
     var isGetsBonus = (tokenList.length !== 0);
     /*
     if (isGetsBonus) { log("gets morale bonus.");}
@@ -21,15 +21,15 @@ function isGetsLeadershipMoraleBonus(originToken) {
 }
 
 function getLeaderName(originToken) {
-    var tokenList = getFirstLeaderInRange(originToken);
+    var tokenList = getFirstLeaderInRange(originToken, 12);
     return getPropertyValue(tokenList[0], "name");
 }
 
-function getFirstLeaderInRange(originToken) {
+function getFirstLeaderInRange(originToken, range) {
     var foundObjList = filterObjs(function(obj) {
         // isObjectWizard, isObjectCommander, etc all go here.
         return (isObjectWizard(obj)
-            && isObjectInRange(originToken, obj)
+            && isObjectInRange(originToken, obj, range)
             && isObjectOnMyTeam(originToken, obj));
     });
     //log(foundObjList);
@@ -93,12 +93,7 @@ function getTokenUnitType(token) {
     return getAttributeWithError(represents, "Unit Type");
 }
 
-function isObjectInRange(originToken, testToken) {
-    // if range proves to be variable, then this will need
-    // to be refactored into an argument.
-    // morale range for wizards: 12
-    var range = 12;
-
+function isObjectInRange(originToken, testToken, range) {
     // default grid is 70px
     var GRID_SIZE = 70;
     var distance = getDistance(originToken, testToken);

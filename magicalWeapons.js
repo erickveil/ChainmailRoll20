@@ -51,4 +51,30 @@ function getMagicSwordName(sheetId) {
     return swordName;
 }
 
+function isInSwordLight(tokenObj) {
+    var tokenList = getFirstMagicItemInRange(tokenObj);
+    return (tokenList.length !== 0);
+}
+
+function getFirstMagicItemInRange(originToken) {
+    var foundObjList = filterObjs(function(obj) {
+        var objType = getPropertyValue(obj, "type");
+        if (objType !== "graphic") { return false; }
+        var subType = getPropertyValue(obj, "subtype");
+        if (subType !== "token") { return false; }
+        var objName = getPropertyValue(obj, "name");
+
+        var sheetId = getPropertyValue(obj, "represents");
+        var isCanHaveSword = isHasAttribute(sheetId, "Magic Sword");
+        if (!isCanHaveSword) { return false; }
+
+        var magicItemLightRange = 12;
+        if (!isObjectInRange(originToken, obj, magicItemLightRange)) { return false; }
+
+        var swordVal = getAttribute(sheetId, "Magic Sword");
+        return (swordVal !== "" || parseInt(swordVal) > 0);
+    });
+    return foundObjList;
+}
+
 

@@ -206,10 +206,14 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
         sendChat(msg.who, css.attack + selectedName + " does not like the light!" + css.spanEnd);
         ++targetNumber;
     }
-    else if (isDarkness() && !isUnitLightSensitive(selectedObj)) {
+    else if (isDarkness() && !isUnitLightSensitive(selectedObj) && !isInSwordLight(selectedObj)) {
         sendChat(msg.who, css.error + selectedName + " cannot attack in the dark!" + css.spanEnd);
         isForceCheck = true;
         return;
+    }
+
+    if (isInSwordLight(targetObj) && isDarkness()) {
+        sendChat(msg.who, css.attack + selectedName + " is bathed in the light of a magic sword." + css.spanEnd);
     }
 
     if (actualSelectedType === "Water Elemental" && isInWater(selectedObj)) {
@@ -319,11 +323,16 @@ function polearmAdvantageAttack(selectedTroops, msg) {
         sendChat(msg.who, css.attack + selectedName + " does not like the light!" + css.spanEnd);
         ++targetNumber;
     }
-    else if (isDarkness() && !isUnitLightSensitive(selectedObj)) {
+    else if (isDarkness() && !isUnitLightSensitive(selectedObj) && !isInSwordLight(selectedObj)) {
         sendChat(msg.who, css.error + selectedName + " cannot attack in the dark!" + css.spanEnd);
         isForceCheck = true;
         return;
     }
+
+    if (isInSwordLight(selectedObj) && isDarkness()) {
+        sendChat(msg.who, css.attack + selectedName + " is bathed in the light of a magic sword." + css.spanEnd);
+    }
+
 
     if (actualSelectedType === "Water Elemental" && isInWater(selectedObj)) {
         selectedUnitType = "Heavy Horse";
@@ -406,10 +415,14 @@ function flankAttack(selectedTroops, targetTroops, msg) {
         sendChat(msg.who, css.attack + selectedName + " does not like the light!" + css.spanEnd);
         ++targetNumber;
     }
-    else if (isDarkness() && !isUnitLightSensitive(selectedObj)) {
+    else if (isDarkness() && !isUnitLightSensitive(selectedObj) && !isInSwordLight(selectedObj)) {
         sendChat(msg.who, css.error + selectedName + " cannot attack in the dark!" + css.spanEnd);
         isForceCheck = true;
         return;
+    }
+
+    if (isInSwordLight(targetObj) && isDarkness()) {
+        sendChat(msg.who, css.attack + selectedName + " is bathed in the light of a magic sword." + css.spanEnd);
     }
 
     if (actualSelectedType === "Water Elemental" && isInWater(selectedObj)) {
@@ -490,10 +503,14 @@ function rearAttack(selectedTroops, msg) {
         sendChat(msg.who, css.attack + selectedName + " does not like the light!" + css.spanEnd);
         ++targetNumber;
     }
-    else if (isDarkness() && !isUnitLightSensitive(selectedObj)) {
+    else if (isDarkness() && !isUnitLightSensitive(selectedObj) && !isInSwordLight(selectedObj)) {
         sendChat(msg.who, css.error + selectedName + " cannot attack in the dark!" + css.spanEnd);
         isForceCheck = true;
         return;
+    }
+
+    if (isInSwordLight(selectedObj) && isDarkness()) {
+        sendChat(msg.who, css.attack + selectedName + " is bathed in the light of a magic sword." + css.spanEnd);
     }
 
     if (actualSelectedType === "Water Elemental" && isInWater(selectedObj)) {
@@ -567,13 +584,16 @@ function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selected
     var targetNumber = getAttackerTargetNumber(targetUnitType, selectedUnitType);
 
     if (isDaylight() && isUnitLightSensitive(targetObj)) {
-        sendChat(msg.who, css.attack + targetName + " does not like the light!" + css.spanEnd);
+        sendChat(msg.who, css.counterAttack + targetName + " does not like the light!" + css.spanEnd);
         ++targetNumber;
     }
-    else if (isDarkness() && !isUnitLightSensitive(targetObj)) {
+    else if (isDarkness() && !isUnitLightSensitive(targetObj) && !isInSwordLight(targetObj)) {
         sendChat(msg.who, css.error + targetName + " cannot attack in the dark!");
         isForceCheck = true;
         return;
+    }
+    if (isInSwordLight(targetObj) && isDarkness()) {
+        sendChat(msg.who, css.counterAttack + targetName + " is bathed in the light of a magic sword." + css.spanEnd);
     }
 
     if (actualTargetType === "Water Elemental" && isInWater(targetObj)) {

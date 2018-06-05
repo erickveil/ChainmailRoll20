@@ -202,6 +202,16 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
     var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
     var targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
 
+    if (isDaylight() && isUnitLightSensitive(selectedObj)) {
+        sendChat(msg.who, css.attack + selectedName + " does not like the light!" + css.spanEnd);
+        ++targetNumber;
+    }
+    else if (isDarkness() && !isUnitLightSensitive(selectedObj)) {
+        sendChat(msg.who, css.error + selectedName + " cannot attack in the dark!" + css.spanEnd);
+        isForceCheck = true;
+        return;
+    }
+
     if (actualSelectedType === "Water Elemental" && isInWater(selectedObj)) {
         selectedUnitType = "Heavy Horse";
         targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
@@ -238,10 +248,7 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
 
     if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
 
-    if (isDaylight() && isUnitLightSensitive(selectedObj)) {
-        sendChat(msg.who, css.attack + selectedName + " does not like the light!" + css.spanEnd);
-        ++targetNumber;
-    }
+
 
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
     counterAttack(targetUnitType, selectedUnitType, targetSheetId, selectedSheetId, weaponAttribute, targetTroops, msg);
@@ -307,6 +314,16 @@ function polearmAdvantageAttack(selectedTroops, msg) {
     var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
     var targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
 
+    if (isDaylight() && isUnitLightSensitive(selectedObj)) {
+        sendChat(msg.who, css.attack + selectedName + " does not like the light!" + css.spanEnd);
+        ++targetNumber;
+    }
+    else if (isDarkness() && !isUnitLightSensitive(selectedObj)) {
+        sendChat(msg.who, css.error + selectedName + " cannot attack in the dark!" + css.spanEnd);
+        isForceCheck = true;
+        return;
+    }
+
     if (actualSelectedType === "Water Elemental" && isInWater(selectedObj)) {
         selectedUnitType = "Heavy Horse";
         targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
@@ -343,10 +360,7 @@ function polearmAdvantageAttack(selectedTroops, msg) {
 
     if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
 
-    if (isDaylight() && isUnitLightSensitive(selectedObj)) {
-        sendChat(msg.who, css.attack + selectedName + " does not like the light!" + css.spanEnd);
-        ++targetNumber;
-    }
+
 
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
 }
@@ -386,6 +400,16 @@ function flankAttack(selectedTroops, targetTroops, msg) {
 
     var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
     var targetNumber = getFlankerTargetNumber(selectedUnitType, targetUnitType);
+
+    if (isDaylight() && isUnitLightSensitive(selectedObj)) {
+        sendChat(msg.who, css.attack + selectedName + " does not like the light!" + css.spanEnd);
+        ++targetNumber;
+    }
+    else if (isDarkness() && !isUnitLightSensitive(selectedObj)) {
+        sendChat(msg.who, css.error + selectedName + " cannot attack in the dark!" + css.spanEnd);
+        isForceCheck = true;
+        return;
+    }
 
     if (actualSelectedType === "Water Elemental" && isInWater(selectedObj)) {
         selectedUnitType = "Heavy Horse";
@@ -428,10 +452,6 @@ function flankAttack(selectedTroops, targetTroops, msg) {
         --targetNumber;
     }
 
-    if (isDaylight() && isUnitLightSensitive(selectedObj)) {
-        sendChat(msg.who, css.attack + selectedName + " does not like the light!" + css.spanEnd);
-        ++targetNumber;
-    }
 
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
     counterAttack(targetUnitType, selectedUnitType, targetSheetId, selectedSheetId, weaponAttribute, targetTroops, msg);
@@ -464,6 +484,16 @@ function rearAttack(selectedTroops, msg) {
 
     var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
     var targetNumber = getFlankerTargetNumber(selectedUnitType, targetUnitType);
+
+    if (isDaylight() && isUnitLightSensitive(selectedObj)) {
+        sendChat(msg.who, css.attack + selectedName + " does not like the light!" + css.spanEnd);
+        ++targetNumber;
+    }
+    else if (isDarkness() && !isUnitLightSensitive(selectedObj)) {
+        sendChat(msg.who, css.error + selectedName + " cannot attack in the dark!" + css.spanEnd);
+        isForceCheck = true;
+        return;
+    }
 
     if (actualSelectedType === "Water Elemental" && isInWater(selectedObj)) {
         selectedUnitType = "Heavy Horse";
@@ -501,10 +531,8 @@ function rearAttack(selectedTroops, msg) {
 
     if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
 
-    if (isDaylight() && isUnitLightSensitive(selectedObj)) {
-        sendChat(msg.who, css.attack + selectedName + " does not like the light!" + css.spanEnd);
-        ++targetNumber;
-    }
+
+
 
     if (selectedUnitType === "Armored Foot" || selectedUnitType === "Heavy Horse") {
         --targetNumber;
@@ -536,6 +564,16 @@ function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selected
     var numberOfDice = Math.ceil(targetTroops * attackDiceFactor) + pikeMod;
 
     var targetNumber = getAttackerTargetNumber(targetUnitType, selectedUnitType);
+
+    if (isDaylight() && isUnitLightSensitive(targetObj)) {
+        sendChat(msg.who, css.attack + targetName + " does not like the light!" + css.spanEnd);
+        ++targetNumber;
+    }
+    else if (isDarkness() && !isUnitLightSensitive(targetObj)) {
+        sendChat(msg.who, css.error + targetName + " cannot attack in the dark!");
+        isForceCheck = true;
+        return;
+    }
 
     if (actualTargetType === "Water Elemental" && isInWater(targetObj)) {
         selectedUnitType = "Heavy Horse";
@@ -572,10 +610,7 @@ function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selected
 
     if (isHasMagicArmor(selectedSheetId)) { ++targetNumber; }
 
-    if (isDaylight() && isUnitLightSensitive(targetObj)) {
-        sendChat(msg.who, css.attack + targetName + " does not like the light!" + css.spanEnd);
-        ++targetNumber;
-    }
+
 
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + targetName);
 }
@@ -587,6 +622,13 @@ function isDaylight() {
     var battleFieldId = getPropertyValue(battleField, "id");
     var lightLevel = getAttributeWithError(battleFieldId, "Light Level");
     return (parseInt(lightLevel) === 2);
+}
+
+function isDarkness() {
+    var battleField = getBattlefieldSheet();
+    var battleFieldId = getPropertyValue(battleField, "id");
+    var lightLevel = getAttributeWithError(battleFieldId, "Light Level");
+    return (parseInt(lightLevel) === 0);
 }
 
 function isUnitLightSensitive(tokenObj) {

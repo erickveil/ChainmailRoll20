@@ -271,14 +271,15 @@ function isElementalVsElementalMelee(selectedActualType, targetActualType) {
     return false;
 }
 
-function isFantasyTarget(targetUnitType) {
-    return (
+function isFantasyTarget(targetUnitType, sheetId) {
+    if (
            targetUnitType === "Wizard"
            || targetUnitType === "Fire Elemental"
            || targetUnitType === "Earth Elemental"
            || targetUnitType === "Air Elemental"
            || targetUnitType === "Water Elemental"
-    );
+    ) { return true; }
+    return isAttrSetTrue(sheetId, "Fantasy");
 }
 
 /**

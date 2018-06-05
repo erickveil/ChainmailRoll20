@@ -239,5 +239,23 @@ function isInWater(tokenObj) {
     return (tokenObj.get("status_chained-heart"));
 }
 
+/**
+ * Returns true if an Attribute exists and is set positively
+ *
+ * @param sheetId
+ * @param attrName
+ * @returns {boolean}
+ */
+function isAttrSetTrue(sheetId, attrName) {
+    var isHasAttr = isHasAttribute(sheetId, attrName);
+    if (isHasAttr) {
+        var attrVal = getAttribute(sheetId, attrName);
+        if (parseInt(attrVal) === 1 || attrVal === "true" || attrVal === true) {
+            return true;
+        }
+    }
+    return false;
+}
+
 
 

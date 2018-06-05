@@ -186,12 +186,23 @@ function missileAttack(selectedId, targetId, msg, isIndirect) {
  */
 function calcMissileDamage(numTroops, msg, targetArmor, unitNum, targetToken) {
     var roll = randomInteger(6);
+    var selectedName = getPropertyValue(selectedObj, "name");
+    var rollMod = 0;
+    var modStr = "";
+    if (isDaylight() && isUnitLightSensitive(selectedObj)) {
+        sendChat(msg.who, css.error + selectedName + " is hindered by the light!" + css.spanEnd);
+        --rollMod;
+        modStr = (rollMod < 0) ? rollMod : (rollMod > 0) ? "+" + rollMod : "";
+    }
     sendChat(msg.who, css.missile
         + "Rolling 1d6: "
         + css.rollValue
         + roll
         + css.endValue
+        + modStr
         + css.spanEnd);
+
+    roll += rollMod;
 
     var unitDamage = 0;
     if (targetArmor === 0) {
@@ -214,12 +225,26 @@ function calcMissileDamage(numTroops, msg, targetArmor, unitNum, targetToken) {
 
 function calcIndirectMissileDamage(numTroops, msg, targetArmor, unitNum, targetToken) {
     var roll = randomInteger(6);
+    var selectedName = getPropertyValue(selectedObj, "name");
+    var rollMod = 0;
+    var modStr = "";
+
+    if (isDaylight() && isUnitLightSensitive(selectedObj)) {
+        sendChat(msg.who, css.error + selectedName + " is hindered by the light!" + css.spanEnd);
+        --rollMod;
+        modStr = (rollMod < 0) ? rollMod : (rollMod > 0) ? "+" + rollMod : "";
+    }
+
     sendChat(msg.who, css.indirectMissile
         + "Rolling 1d6: "
         + css.rollValue
         + roll
         + css.endValue
+        + modStr
         + css.spanEnd);
+
+    roll += rollMod;
+
     var unitDamage = 0;
     if (targetArmor === 0) {
         unitDamage = getHalfArmorMissileDamage(numTroops, roll);

@@ -213,7 +213,7 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
     }
 
     if (isInSwordLight(targetObj) && isDarkness()) {
-        sendChat(msg.who, css.attack + selectedName + " is bathed in the light of a magic sword." + css.spanEnd);
+        sendChat(msg.who, css.magicItem + selectedName + " is bathed in the light of a magic sword." + css.spanEnd);
     }
 
     if (actualSelectedType === "Water Elemental" && isInWater(selectedObj)) {
@@ -330,7 +330,7 @@ function polearmAdvantageAttack(selectedTroops, msg) {
     }
 
     if (isInSwordLight(selectedObj) && isDarkness()) {
-        sendChat(msg.who, css.attack + selectedName + " is bathed in the light of a magic sword." + css.spanEnd);
+        sendChat(msg.who, css.magicItem + selectedName + " is bathed in the light of a magic sword." + css.spanEnd);
     }
 
 
@@ -422,7 +422,7 @@ function flankAttack(selectedTroops, targetTroops, msg) {
     }
 
     if (isInSwordLight(targetObj) && isDarkness()) {
-        sendChat(msg.who, css.attack + selectedName + " is bathed in the light of a magic sword." + css.spanEnd);
+        sendChat(msg.who, css.magicItem + selectedName + " is bathed in the light of a magic sword." + css.spanEnd);
     }
 
     if (actualSelectedType === "Water Elemental" && isInWater(selectedObj)) {
@@ -510,7 +510,7 @@ function rearAttack(selectedTroops, msg) {
     }
 
     if (isInSwordLight(selectedObj) && isDarkness()) {
-        sendChat(msg.who, css.attack + selectedName + " is bathed in the light of a magic sword." + css.spanEnd);
+        sendChat(msg.who, css.magicItem + selectedName + " is bathed in the light of a magic sword." + css.spanEnd);
     }
 
     if (actualSelectedType === "Water Elemental" && isInWater(selectedObj)) {
@@ -593,7 +593,7 @@ function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selected
         return;
     }
     if (isInSwordLight(targetObj) && isDarkness()) {
-        sendChat(msg.who, css.counterAttack + targetName + " is bathed in the light of a magic sword." + css.spanEnd);
+        sendChat(msg.who, css.magicItem + targetName + " is bathed in the light of a magic sword." + css.spanEnd);
     }
 
     if (actualTargetType === "Water Elemental" && isInWater(targetObj)) {

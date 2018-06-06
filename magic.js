@@ -7,12 +7,21 @@
  */
 
 function isHasLightSpell(tokenObj) {
-    return (tokenObj.get("status_half-haze"));
+    if (tokenObj.get("status_half-haze")) {
+        log("has half-haze");
+        return true;
+    }
+    return false;
 }
 
 function isNearLightSpell(tokenObj) {
     var tokenList = getFirstLightSourceInRange(tokenObj);
-    return (tokenList.length !== 0);
+    log(tokenList);
+    if (tokenList.length !== 0) {
+        log("is near light spell");
+        return true;
+    }
+    return false;
 }
 
 function getFirstLightSourceInRange(tokenObj) {
@@ -22,7 +31,11 @@ function getFirstLightSourceInRange(tokenObj) {
         var subType = getPropertyValue(obj, "subtype");
         if (subType !== "token") { return false; }
 
-        if (!isHasLightSpell(tokenObj)) { return false; }
+        var objName = getPropertyValue(obj, "name");
+        log(objName);
+
+        if (!isHasLightSpell(obj)) { return false; }
+        log("Found someone with light");
 
         var lightRange = 24;
         return isObjectInRange(tokenObj, obj, lightRange);
@@ -30,4 +43,10 @@ function getFirstLightSourceInRange(tokenObj) {
     return foundObjList;
 }
 
-// TODO: NEXT: Check isNearLightSpell when attacking or shooting in the dark.
+function sayLightEffect(tokenObj, who) {
+    var tokenName = getPropertyValue(tokenObj, "name");
+    if (isDarkness() && isNearLightSpell(tokenObj) && !isInSwordLight(tokenObj)) {
+        sendChat(who, css.spells + tokenName + " are illuminated by Wizard Light!" + css.spanEnd);
+    }
+}
+

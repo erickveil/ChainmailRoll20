@@ -202,19 +202,32 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
     var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
     var targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
 
+    log("isDaylight: " + isDaylight());
+    log("isLightSenesitive: " + isUnitLightSensitive(selectedObj));
+    log("isDark: " + isDarkness());
+    log("is NOT light sensitive: " + !isUnitLightSensitive(selectedObj));
+    log("is NOT in sword Light: " + !isInSwordLight(selectedObj));
+    log("is NOT near light spell: " + !isNearLightSpell(selectedObj));
+
     if (isDaylight() && isUnitLightSensitive(selectedObj)) {
         sendChat(msg.who, css.attack + selectedName + " does not like the light!" + css.spanEnd);
         ++targetNumber;
     }
-    else if (isDarkness() && !isUnitLightSensitive(selectedObj) && !isInSwordLight(selectedObj)) {
+    else if (isDarkness()
+        && !isUnitLightSensitive(selectedObj)
+        && !isInSwordLight(selectedObj)
+        && !isNearLightSpell(selectedObj) ) {
+
         sendChat(msg.who, css.error + selectedName + " cannot attack in the dark!" + css.spanEnd);
         isForceCheck = true;
         return;
     }
+    log("None of it");
 
-    if (isInSwordLight(targetObj) && isDarkness()) {
+    if (isInSwordLight(selectedObj) && isDarkness()) {
         sendChat(msg.who, css.magicItem + selectedName + " is bathed in the light of a magic sword." + css.spanEnd);
     }
+    sayLightEffect(selectedObj, msg.who);
 
     if (actualSelectedType === "Water Elemental" && isInWater(selectedObj)) {
         selectedUnitType = "Heavy Horse";
@@ -323,7 +336,11 @@ function polearmAdvantageAttack(selectedTroops, msg) {
         sendChat(msg.who, css.attack + selectedName + " does not like the light!" + css.spanEnd);
         ++targetNumber;
     }
-    else if (isDarkness() && !isUnitLightSensitive(selectedObj) && !isInSwordLight(selectedObj)) {
+    else if (isDarkness()
+        && !isUnitLightSensitive(selectedObj)
+        && !isInSwordLight(selectedObj)
+        && !isNearLightSpell(selectedObj) ) {
+
         sendChat(msg.who, css.error + selectedName + " cannot attack in the dark!" + css.spanEnd);
         isForceCheck = true;
         return;
@@ -332,6 +349,7 @@ function polearmAdvantageAttack(selectedTroops, msg) {
     if (isInSwordLight(selectedObj) && isDarkness()) {
         sendChat(msg.who, css.magicItem + selectedName + " is bathed in the light of a magic sword." + css.spanEnd);
     }
+    sayLightEffect(selectedObj, msg.who);
 
 
     if (actualSelectedType === "Water Elemental" && isInWater(selectedObj)) {
@@ -415,15 +433,20 @@ function flankAttack(selectedTroops, targetTroops, msg) {
         sendChat(msg.who, css.attack + selectedName + " does not like the light!" + css.spanEnd);
         ++targetNumber;
     }
-    else if (isDarkness() && !isUnitLightSensitive(selectedObj) && !isInSwordLight(selectedObj)) {
+    else if (isDarkness()
+        && !isUnitLightSensitive(selectedObj)
+        && !isInSwordLight(selectedObj)
+        && !isNearLightSpell(selectedObj) ) {
+
         sendChat(msg.who, css.error + selectedName + " cannot attack in the dark!" + css.spanEnd);
         isForceCheck = true;
         return;
     }
 
-    if (isInSwordLight(targetObj) && isDarkness()) {
+    if (isInSwordLight(selectedObj) && isDarkness()) {
         sendChat(msg.who, css.magicItem + selectedName + " is bathed in the light of a magic sword." + css.spanEnd);
     }
+    sayLightEffect(selectedObj, msg.who);
 
     if (actualSelectedType === "Water Elemental" && isInWater(selectedObj)) {
         selectedUnitType = "Heavy Horse";
@@ -503,7 +526,11 @@ function rearAttack(selectedTroops, msg) {
         sendChat(msg.who, css.attack + selectedName + " does not like the light!" + css.spanEnd);
         ++targetNumber;
     }
-    else if (isDarkness() && !isUnitLightSensitive(selectedObj) && !isInSwordLight(selectedObj)) {
+    else if (isDarkness()
+        && !isUnitLightSensitive(selectedObj)
+        && !isInSwordLight(selectedObj)
+        && !isNearLightSpell(selectedObj) ) {
+
         sendChat(msg.who, css.error + selectedName + " cannot attack in the dark!" + css.spanEnd);
         isForceCheck = true;
         return;
@@ -512,6 +539,7 @@ function rearAttack(selectedTroops, msg) {
     if (isInSwordLight(selectedObj) && isDarkness()) {
         sendChat(msg.who, css.magicItem + selectedName + " is bathed in the light of a magic sword." + css.spanEnd);
     }
+    sayLightEffect(selectedObj, msg.who);
 
     if (actualSelectedType === "Water Elemental" && isInWater(selectedObj)) {
         selectedUnitType = "Heavy Horse";
@@ -584,17 +612,22 @@ function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selected
     var targetNumber = getAttackerTargetNumber(targetUnitType, selectedUnitType);
 
     if (isDaylight() && isUnitLightSensitive(targetObj)) {
-        sendChat(msg.who, css.counterAttack + targetName + " does not like the light!" + css.spanEnd);
+        sendChat(msg.who, css.counterAttack + targetName + " do not like the light!" + css.spanEnd);
         ++targetNumber;
     }
-    else if (isDarkness() && !isUnitLightSensitive(targetObj) && !isInSwordLight(targetObj)) {
+    else if (isDarkness()
+        && !isUnitLightSensitive(targetObj)
+        && !isInSwordLight(targetObj)
+        && !isNearLightSpell(targetObj)) {
+
         sendChat(msg.who, css.error + targetName + " cannot attack in the dark!");
         isForceCheck = true;
         return;
     }
     if (isInSwordLight(targetObj) && isDarkness()) {
-        sendChat(msg.who, css.magicItem + targetName + " is bathed in the light of a magic sword." + css.spanEnd);
+        sendChat(msg.who, css.magicItem + targetName + " are bathed in the light of a magic sword." + css.spanEnd);
     }
+    sayLightEffect(targetObj, msg.who);
 
     if (actualTargetType === "Water Elemental" && isInWater(targetObj)) {
         selectedUnitType = "Heavy Horse";

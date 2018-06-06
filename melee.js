@@ -202,13 +202,6 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
     var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
     var targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
 
-    log("isDaylight: " + isDaylight());
-    log("isLightSenesitive: " + isUnitLightSensitive(selectedObj));
-    log("isDark: " + isDarkness());
-    log("is NOT light sensitive: " + !isUnitLightSensitive(selectedObj));
-    log("is NOT in sword Light: " + !isInSwordLight(selectedObj));
-    log("is NOT near light spell: " + !isNearLightSpell(selectedObj));
-
     if (isDaylight() && isUnitLightSensitive(selectedObj)) {
         sendChat(msg.who, css.attack + selectedName + " does not like the light!" + css.spanEnd);
         ++targetNumber;
@@ -222,7 +215,6 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
         isForceCheck = true;
         return;
     }
-    log("None of it");
 
     if (isInSwordLight(selectedObj) && isDarkness()) {
         sendChat(msg.who, css.magicItem + selectedName + " is bathed in the light of a magic sword." + css.spanEnd);

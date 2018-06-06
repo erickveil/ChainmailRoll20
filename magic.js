@@ -7,21 +7,12 @@
  */
 
 function isHasLightSpell(tokenObj) {
-    if (tokenObj.get("status_half-haze")) {
-        log("has half-haze");
-        return true;
-    }
-    return false;
+    return (tokenObj.get("status_half-haze"));
 }
 
 function isNearLightSpell(tokenObj) {
     var tokenList = getFirstLightSourceInRange(tokenObj);
-    log(tokenList);
-    if (tokenList.length !== 0) {
-        log("is near light spell");
-        return true;
-    }
-    return false;
+    return (tokenList.length !== 0);
 }
 
 function getFirstLightSourceInRange(tokenObj) {
@@ -31,11 +22,7 @@ function getFirstLightSourceInRange(tokenObj) {
         var subType = getPropertyValue(obj, "subtype");
         if (subType !== "token") { return false; }
 
-        var objName = getPropertyValue(obj, "name");
-        log(objName);
-
         if (!isHasLightSpell(obj)) { return false; }
-        log("Found someone with light");
 
         var lightRange = 24;
         return isObjectInRange(tokenObj, obj, lightRange);

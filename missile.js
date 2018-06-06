@@ -130,10 +130,15 @@ function missileAttack(selectedId, targetId, msg, isIndirect) {
 
     selectedObj = getObjectWithReport("graphic", selectedId);
     var selectedName = getPropertyValue(selectedObj, "name");
-    if (isDarkness() && !isUnitLightSensitive(selectedObj) && !isInSwordLight(targetToken)) {
+
+    if (isDarkness()
+        && !isUnitLightSensitive(selectedObj)
+        && !isInSwordLight(targetToken)
+        && !isNearLightSpell(targetToken)) {
         sendChat(msg.who, css.error + selectedName + " cannot aim in the dark!" + css.spanEnd);
         return;
     }
+    sayLightEffect(targetToken, msg.who);
 
     if (isInSwordLight(targetToken) && isDarkness()) {
         sendChat(msg.who, css.magicItem + "The target is illuminated by the light of a magic sword." + css.spanEnd);

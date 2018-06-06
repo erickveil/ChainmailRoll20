@@ -130,11 +130,14 @@ function missileAttack(selectedId, targetId, msg, isIndirect) {
 
     selectedObj = getObjectWithReport("graphic", selectedId);
     var selectedName = getPropertyValue(selectedObj, "name");
+    var selectedSheetId = getPropertyValue(selectedObj, "represents");
 
     if (isDarkness()
         && !isUnitLightSensitive(selectedObj)
         && !isInSwordLight(targetToken)
-        && !isNearLightSpell(targetToken)) {
+        && !isNearLightSpell(targetToken)
+        && !isHasDarkvision(selectedSheetId)
+    ) {
         sendChat(msg.who, css.error + selectedName + " cannot aim in the dark!" + css.spanEnd);
         return;
     }

@@ -209,7 +209,9 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
     else if (isDarkness()
         && !isUnitLightSensitive(selectedObj)
         && !isInSwordLight(selectedObj)
-        && !isNearLightSpell(selectedObj) ) {
+        && !isNearLightSpell(selectedObj)
+        && !isHasDarkvision(selectedSheetId)
+    ) {
 
         sendChat(msg.who, css.error + selectedName + " cannot attack in the dark!" + css.spanEnd);
         isForceCheck = true;
@@ -331,7 +333,9 @@ function polearmAdvantageAttack(selectedTroops, msg) {
     else if (isDarkness()
         && !isUnitLightSensitive(selectedObj)
         && !isInSwordLight(selectedObj)
-        && !isNearLightSpell(selectedObj) ) {
+        && !isNearLightSpell(selectedObj)
+        && !isHasDarkvision(selectedSheetId)
+    ) {
 
         sendChat(msg.who, css.error + selectedName + " cannot attack in the dark!" + css.spanEnd);
         isForceCheck = true;
@@ -428,7 +432,9 @@ function flankAttack(selectedTroops, targetTroops, msg) {
     else if (isDarkness()
         && !isUnitLightSensitive(selectedObj)
         && !isInSwordLight(selectedObj)
-        && !isNearLightSpell(selectedObj) ) {
+        && !isNearLightSpell(selectedObj)
+        && !isHasDarkvision(selectedSheetId)
+    ) {
 
         sendChat(msg.who, css.error + selectedName + " cannot attack in the dark!" + css.spanEnd);
         isForceCheck = true;
@@ -521,7 +527,9 @@ function rearAttack(selectedTroops, msg) {
     else if (isDarkness()
         && !isUnitLightSensitive(selectedObj)
         && !isInSwordLight(selectedObj)
-        && !isNearLightSpell(selectedObj) ) {
+        && !isNearLightSpell(selectedObj)
+        && !isHasDarkvision(selectedSheetId)
+    ) {
 
         sendChat(msg.who, css.error + selectedName + " cannot attack in the dark!" + css.spanEnd);
         isForceCheck = true;
@@ -610,7 +618,9 @@ function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selected
     else if (isDarkness()
         && !isUnitLightSensitive(targetObj)
         && !isInSwordLight(targetObj)
-        && !isNearLightSpell(targetObj)) {
+        && !isNearLightSpell(targetObj)
+        && !isHasDarkvision(targetSheetId)
+    ) {
 
         sendChat(msg.who, css.error + targetName + " cannot attack in the dark!");
         isForceCheck = true;

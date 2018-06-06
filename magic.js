@@ -10,6 +10,11 @@ function isHasLightSpell(tokenObj) {
     return (tokenObj.get("status_half-haze"));
 }
 
+function isHasDarkvision(sheetId) {
+    if (!isHasAttribute(sheetId, "Darkvision")) { return false; }
+    return isAttrSetTrue(sheetId, "Darkvision");
+}
+
 function isNearLightSpell(tokenObj) {
     var tokenList = getFirstLightSourceInRange(tokenObj);
     return (tokenList.length !== 0);

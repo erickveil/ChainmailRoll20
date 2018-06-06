@@ -32,7 +32,7 @@ function eventMissileAttack(msg) {
     var targetName = getPropertyValue(targetObj, "name");
 
     if (isHasMeleeImmunity(targetSheetId)) {
-        sendChat(msg.who, css.error + targetName + " is immune to normal attacks!" + css.spanEnd);
+        sendChat(msg.who, css.warning + targetName + " is immune to normal attacks!" + css.spanEnd);
         return;
     }
 
@@ -102,7 +102,7 @@ function eventIndirectMissileAttack(msg) {
     var targetName = getPropertyValue(targetObj, "name");
 
     if (isHasMeleeImmunity(targetSheetId)) {
-        sendChat(msg.who, css.error + targetName + " is immune to normal attacks!" + css.spanEnd);
+        sendChat(msg.who, css.warning + targetName + " is immune to normal attacks!" + css.spanEnd);
         return;
     }
 
@@ -124,7 +124,7 @@ function missileAttack(selectedId, targetId, msg, isIndirect) {
     tintRanged(archerToken);
 
     if (isObjectWizard(targetToken)) {
-        sendChat(msg.who, css.error + "Wizards are immune to missile attacks." + css.spanEnd);
+        sendChat(msg.who, css.warning + "Wizards are immune to missile attacks." + css.spanEnd);
         return;
     }
 
@@ -138,7 +138,7 @@ function missileAttack(selectedId, targetId, msg, isIndirect) {
         && !isNearLightSpell(targetToken)
         && !isHasDarkvision(selectedSheetId)
     ) {
-        sendChat(msg.who, css.error + selectedName + " cannot aim in the dark!" + css.spanEnd);
+        sendChat(msg.who, css.warning + selectedName + " cannot aim in the dark!" + css.spanEnd);
         return;
     }
     sayLightEffect(targetToken, msg.who);
@@ -202,7 +202,7 @@ function calcMissileDamage(numTroops, msg, targetArmor, unitNum, targetToken) {
     var rollMod = 0;
     var modStr = "";
     if (isDaylight() && isUnitLightSensitive(selectedObj)) {
-        sendChat(msg.who, css.error + selectedName + " is hindered by the light!" + css.spanEnd);
+        sendChat(msg.who, css.warning + selectedName + " is hindered by the light!" + css.spanEnd);
         --rollMod;
         modStr = (rollMod < 0) ? rollMod : (rollMod > 0) ? "+" + rollMod : "";
     }
@@ -242,7 +242,7 @@ function calcIndirectMissileDamage(numTroops, msg, targetArmor, unitNum, targetT
     var modStr = "";
 
     if (isDaylight() && isUnitLightSensitive(selectedObj)) {
-        sendChat(msg.who, css.error + selectedName + " is hindered by the light!" + css.spanEnd);
+        sendChat(msg.who, css.warning + selectedName + " is hindered by the light!" + css.spanEnd);
         --rollMod;
         modStr = (rollMod < 0) ? rollMod : (rollMod > 0) ? "+" + rollMod : "";
     }

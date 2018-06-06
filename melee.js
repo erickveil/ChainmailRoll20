@@ -194,7 +194,7 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
 
     if (isHasMeleeImmunity(targetSheetId) && !isHasMagicSword(selectedSheetId)
         && !isElementalVsElementalMelee(actualSelectedType, actualTargetType)) {
-        sendChat(msg.who, css.error + targetName + " cannot be affected by nonmagical attacks.");
+        sendChat(msg.who, css.warning + targetName + " cannot be affected by nonmagical attacks.");
         return;
     }
     if (isHasMeleeImmunity(selectedSheetId)) { isAttackerImmune = true; }
@@ -213,7 +213,7 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
         && !isHasDarkvision(selectedSheetId)
     ) {
 
-        sendChat(msg.who, css.error + selectedName + " cannot attack in the dark!" + css.spanEnd);
+        sendChat(msg.who, css.warning + selectedName + " cannot attack in the dark!" + css.spanEnd);
         isForceCheck = true;
         return;
     }
@@ -253,7 +253,7 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
         }
     }
     else if (isHasMeleeImmunity(targetSheetId) && !isElementalVsElementalMelee(actualSelectedType, actualTargetType)) {
-        sendChat(msg.who, css.error + targetName + " is immune to normal attacks!");
+        sendChat(msg.who, css.warning + targetName + " is immune to normal attacks!");
         return;
     }
 
@@ -318,7 +318,7 @@ function polearmAdvantageAttack(selectedTroops, msg) {
     var targetName = getPropertyValue(targetObj, "name");
     if (isHasMeleeImmunity(targetSheetId) && !isHasMagicSword(selectedSheetId)
         && !isElementalVsElementalMelee(actualSelectedType, actualTargetType)) {
-        sendChat(msg.who, css.error + targetName + " cannot be affected by nonmagical attacks.");
+        sendChat(msg.who, css.warning + targetName + " cannot be affected by nonmagical attacks.");
         return;
     }
     if (isHasMeleeImmunity(selectedSheetId)) { isAttackerImmune = true; }
@@ -337,7 +337,7 @@ function polearmAdvantageAttack(selectedTroops, msg) {
         && !isHasDarkvision(selectedSheetId)
     ) {
 
-        sendChat(msg.who, css.error + selectedName + " cannot attack in the dark!" + css.spanEnd);
+        sendChat(msg.who, css.warning + selectedName + " cannot attack in the dark!" + css.spanEnd);
         isForceCheck = true;
         return;
     }
@@ -377,7 +377,7 @@ function polearmAdvantageAttack(selectedTroops, msg) {
         }
     }
     else if (isHasMeleeImmunity(targetSheetId) && !isElementalVsElementalMelee(actualSelectedType, actualTargetType)) {
-        sendChat(msg.who, css.error + targetName + " is immune to normal attacks!");
+        sendChat(msg.who, css.warning + targetName + " is immune to normal attacks!");
         isAttackerImmune = true;
         return;
     }
@@ -416,7 +416,7 @@ function flankAttack(selectedTroops, targetTroops, msg) {
     var targetName = getPropertyValue(targetObj, "name");
     if (isHasMeleeImmunity(targetSheetId) && !isHasMagicSword(selectedSheetId)
         && !isElementalVsElementalMelee(actualSelectedType, actualTargetType)) {
-        sendChat(msg.who, css.error + targetName + " cannot be affected by nonmagical attacks.");
+        sendChat(msg.who, css.warning + targetName + " cannot be affected by nonmagical attacks.");
         return;
     }
 
@@ -436,7 +436,7 @@ function flankAttack(selectedTroops, targetTroops, msg) {
         && !isHasDarkvision(selectedSheetId)
     ) {
 
-        sendChat(msg.who, css.error + selectedName + " cannot attack in the dark!" + css.spanEnd);
+        sendChat(msg.who, css.warning + selectedName + " cannot attack in the dark!" + css.spanEnd);
         isForceCheck = true;
         return;
     }
@@ -476,7 +476,7 @@ function flankAttack(selectedTroops, targetTroops, msg) {
         }
     }
     else if (isHasMeleeImmunity(targetSheetId) && !isElementalVsElementalMelee(actualSelectedType, actualTargetType)) {
-        sendChat(msg.who, css.error + targetName + " is immune to normal attacks!");
+        sendChat(msg.who, css.warning + targetName + " is immune to normal attacks!");
         isAttackerImmune = true;
         return;
     }
@@ -512,7 +512,7 @@ function rearAttack(selectedTroops, msg) {
     var targetName = getPropertyValue(targetObj, "name");
     if (isHasMeleeImmunity(targetSheetId) && !isHasMagicSword(selectedSheetId)
         && !isElementalVsElementalMelee(actualSelectedType, actualTargetType)) {
-        sendChat(msg.who, css.error + targetName + " cannot be affected by nonmagical attacks.");
+        sendChat(msg.who, css.warning + targetName + " cannot be affected by nonmagical attacks.");
         return;
     }
     if (isHasMeleeImmunity(selectedSheetId)) { isAttackerImmune = true; }
@@ -531,7 +531,7 @@ function rearAttack(selectedTroops, msg) {
         && !isHasDarkvision(selectedSheetId)
     ) {
 
-        sendChat(msg.who, css.error + selectedName + " cannot attack in the dark!" + css.spanEnd);
+        sendChat(msg.who, css.warning + selectedName + " cannot attack in the dark!" + css.spanEnd);
         isForceCheck = true;
         return;
     }
@@ -570,7 +570,7 @@ function rearAttack(selectedTroops, msg) {
         }
     }
     else if (isHasMeleeImmunity(targetSheetId) && !isElementalVsElementalMelee(actualSelectedType, actualTargetType)) {
-        sendChat(msg.who, css.error + targetName + " is immune to normal attacks!");
+        sendChat(msg.who, css.warning + targetName + " is immune to normal attacks!");
         isAttackerImmune = true;
         return;
     }
@@ -603,7 +603,7 @@ function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selected
 
     if (isHasMeleeImmunity(selectedSheetId) && !isHasMagicSword(targetSheetId)
         && !isElementalVsElementalMelee(actualTargetType, actualSelectedType)) {
-        sendChat(msg.who, css.error + selectedName + " cannot be affected by nonmagical attacks.");
+        sendChat(msg.who, css.warning + selectedName + " cannot be affected by nonmagical attacks.");
         return;
     }
 
@@ -622,7 +622,7 @@ function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selected
         && !isHasDarkvision(targetSheetId)
     ) {
 
-        sendChat(msg.who, css.error + targetName + " cannot attack in the dark!");
+        sendChat(msg.who, css.warning + targetName + " cannot attack in the dark!");
         isForceCheck = true;
         return;
     }
@@ -660,7 +660,7 @@ function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selected
         }
     }
     else if (isHasMeleeImmunity(selectedSheetId) && !isElementalVsElementalMelee(actualTargetType, actualSelectedType)) {
-        sendChat(msg.who, css.error + selectedName + " is immune to normal attacks!");
+        sendChat(msg.who, css.warning + selectedName + " is immune to normal attacks!");
         return;
     }
 

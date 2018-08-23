@@ -31,6 +31,7 @@ on("chat:message", function(msg) {
         eventToggleChargeRange(msg);
         eventToggleMiscRange(msg);
         eventToggleMissileRange(msg);
+        eventToggleIndirectMissileRange(msg);
         eventToggleMovementRange(msg);
         eventTallyArmy(msg);
     }

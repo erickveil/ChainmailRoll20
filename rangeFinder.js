@@ -28,6 +28,27 @@ function eventToggleMissileRange(msg) {
     selectedToken.set("aura1_radius", templateRadius);
 }
 
+function eventToggleIndirectMissileRange(msg) {
+    if (!(msg.type === "api" && msg.content.indexOf("!indirectRange ") !== -1)) {
+        return;
+    }
+    var argStr = msg.content.replace("!indirectRange ", "");
+    var tokenId = argStr;
+    var selectedToken = getTokenById(tokenId);
+    var sheetId = getTokenSheetId(selectedToken);
+    var missileRange = getAttributeWithError(sheetId, "Missile Range");
+    var templateRadius = (missileRange * 10) * (2/3);
+    var currentRadius = getPropertyValue(selectedToken, "aura1_radius");
+    var missileRangeColor = "#77bb88";
+    if (currentRadius !== "") {
+        selectedToken.set("aura1_radius", "");
+        return;
+    }
+    selectedToken.set("aura1_square", false);
+    selectedToken.set("aura1_color", missileRangeColor);
+    selectedToken.set("aura1_radius", templateRadius);
+}
+
 function eventToggleMovementRange(msg) {
     if (!(msg.type === "api" && msg.content.indexOf("!moveRange ") !== -1)) {
         return;

@@ -13,6 +13,13 @@ var isRearAttack = false;
 var isAttackerImmune = false;
 var isForceCheck = false;
 
+// Melee between similar unit type tracking:
+var numTurnsMeleeDiceRecieved = 0;
+var gNumRolled1 = -1;
+var gNumRolled2 = -1;
+var gNumKills1 = -1;
+var gNumKills2 = -1;
+
 /**
  * On Chat Listener
  */
@@ -62,6 +69,24 @@ function eventClearAllTints(msg) {
 }
 
 /**
+ * Extracts the number of dice that were rolled from the roll data object.
+ *
+ * @param rollData object - Result of JSON.parse(msg.content) when msg.type is "rollresult"
+ * @returns int
+ */
+function getDiceRolled(rollData) {
+
+    var rollsList = rollData.rolls;
+    for (var i = 0; i < rollsList.length; ++i) {
+        var record = rollsList[i];
+        var recordType = record.type;
+        if (recordType !== "R") { continue; }
+        return parseInt(record.dice);
+    }
+    return 0;
+}
+
+/**
  * Listens for the dice rolled during a melee attack.
  *
  * Listening for dice this way, rather than using the sendChat callback, allows us to
@@ -82,12 +107,124 @@ function eventMeleeDiceRolled(msg) {
         //log(msg.content);
     }
 
-    if (msg.type === "rollresult"
+    /* If selectedName and targetName are the same (orcs like to fight each other)
+     * then it will be difficult to discern who gets what damage.
+     */
+    selectedName = getPropertyValue(selectedObj, "name");
+    targetName = getPropertyValue(targetObj, "name");
+
+    var isSameUnitType = (selectedName === targetName);
+    if (msg.type ==="rollresult" && isSameUnitType) {
+
+        ++numTurnsMeleeDiceRecieved;
+        kills = parseInt(rollData.total);
+
+        // store number of dice rolled:
+        if (gNumRolled1 === -1) { gNumRolled1 = getDiceRolled(rollData); }
+        else { gNumRolled2 = getDiceRolled(rollData); }
+
+        // store number of kills:
+        if (gNumKills1 === -1) { gNumKills1 = kills; }
+        else { gNumKills2 = kills; }
+
+        var isBothSidesAccountedFor = (numTurnsMeleeDiceRecieved >= 2 || isRearAttack || isAttackerImmune);
+        if (isBothSidesAccountedFor) {
+            numTurnsMeleeDiceRecieved = 0;
+            var selectedTroops = parseInt(getTokenBarValue(selectedObj, 1));
+            var targetTroops = parseInt(getTokenBarValue(targetObj, 1));
+
+            var attackerObj;
+            var victimObj;
+
+            var isNoDifference = (selectedTroops === targetTroops);
+            var isOneSidedAttack = (gNumKills2 === -1);
+            if (isOneSidedAttack) {
+                attackerObj = targetObj;
+                victimObj = selectedObj;
+            }
+            else if (isNoDifference) {
+                var side = randomInteger(2);
+                if (side === 1) {
+                    attackerObj = selectedObj;
+                    victimObj = targetObj;
+                }
+                else {
+                    attackerObj = targetObj;
+                    victimObj = selectedObj;
+                }
+            }
+            else if (selectedTroops > targetTroops) {
+                if (gNumRolled1 > gNumRolled2) {
+                    attackerObj = targetObj;
+                    victimObj = selectedObj;
+                }
+                else {
+                    attackerObj = selectedObj;
+                    victimObj = targetObj;
+                }
+            }
+            else {
+                if (gNumRolled1 > gNumRolled2) {
+                    attackerObj = selectedObj;
+                    victimObj = targetObj;
+                }
+                else {
+                    attackerObj = targetObj;
+                    victimObj = selectedObj;
+                }
+            }
+
+            // apply kills 1 to attacker side
+            applyCasualties(attackerObj, gNumKills1);
+            // Names don't matter here, all the same
+            sendChat(msg.who, css.attack
+                + "**"
+                + selectedName
+                + "** attacks "
+                + selectedName
+                + " and kills "
+                + css.killValue + "**" + gNumKills1 + "**" + css.endValue
+                + " troops." + css.spanEnd);
+            survived = calculateTroopLoss(msg, attackerObj);
+            if (survived) { heavyLossMoraleCheck(msg, attackerObj); }
+
+            // apply kills 2 to victim side
+            if (!isOneSidedAttack) {
+                applyCasualties(victimObj, gNumKills2);
+                // Names don't matter here, all the same
+                sendChat(msg.who, css.attack
+                    + "**"
+                    + selectedName
+                    + "** attacks "
+                    + selectedName
+                    + " and kills "
+                    + css.killValue + "**" + gNumKills2 + "**" + css.endValue
+                    + " troops." + css.spanEnd);
+                survived = calculateTroopLoss(msg, victimObj);
+                if (survived) { heavyLossMoraleCheck(msg, victimObj); }
+            }
+
+            // cleanup
+            isSelectedDone = true;
+            isSelectedDone = false;
+            isTargetDone = false;
+            isRearAttack = false;
+            isAttackerImmune = false;
+            isForceCheck = false;
+            checkMorale(msg);
+
+            gNumRolled1 = -1;
+            gNumRolled2 = -1;
+            gNumKills1 = -1;
+            gNumKills2 = -1;
+        }
+
+    }
+
+    else if (msg.type === "rollresult"
         && isMyMeleeRollResult(rollData, selectedObj)) {
         //log("melee dice rolled: selected");
 
-        selectedName = getPropertyValue(selectedObj, "name");
-        targetName = getPropertyValue(targetObj, "name");
         kills = (rollData.total)*1;
         applyCasualties(targetObj, kills);
 
@@ -119,8 +256,6 @@ function eventMeleeDiceRolled(msg) {
         && isMyMeleeRollResult(rollData, targetObj)) {
         //log("melee dice rolled: target");
 
-        selectedName = getPropertyValue(selectedObj, "name");
-        targetName = getPropertyValue(targetObj, "name");
         kills = (rollData.total)*1;
 
         // add casualties to defender
@@ -173,6 +308,9 @@ function isOneSideDefeated(unitList) {
 }
 
 function isMyMeleeRollResult(rollData, unitObj) {
+
+    //log("Rolldata: " + JSON.stringify(rollData));
+    //log("unitObj: " + JSON.stringify(unitObj));
 
     var unitName = getPropertyValue(unitObj, "name");
     var rollName = getRollResultText(rollData);

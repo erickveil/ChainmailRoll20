@@ -208,16 +208,16 @@ function resolveMeleeMorale(sender, selectedObjList) {
     // get looser
     var winner;
     var loser;
-    if (casualties[0] !== casualties[1]) {
-        // if one side had 0 casualties, and the other side did, the 0 casualties side is winner.
-        if (casualties[0] === 0) {
-            winner = 0;
-            loser = 1;
-        }
-        else if (casualties[1] === 0) {
-            winner = 1;
-            loser = 0;
-        }
+    //if (casualties[0] !== casualties[1]) {
+
+    // if one side had 0 casualties, and the other side did, the 0 casualties side is winner.
+    if (parseInt(casualties[0]) === 0 && parseInt(casualties[1]) !== 0) {
+        winner = 0;
+        loser = 1;
+    }
+    else if (parseInt(casualties[1]) === 0 && parseInt(casualties[0]) !== 0) {
+        winner = 1;
+        loser = 0;
     }
     else if (parseInt(casualties[0]) === 0 && parseInt(casualties[1]) === 0) {
         sendChat(sender, css.morale + "**No winner this round.**" + css.spanEnd);
@@ -235,6 +235,7 @@ function resolveMeleeMorale(sender, selectedObjList) {
         sendChat(sender, css.morale + "**No winner this round.**" + css.spanEnd);
         return;
     }
+
     sendChat(sender, css.morale + "**" + names[winner] + "** is the winner!" + css.spanEnd);
 
     if (isObjectWizard(token[loser]) || isObjectFearless(token[loser])) {

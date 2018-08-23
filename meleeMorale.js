@@ -208,7 +208,22 @@ function resolveMeleeMorale(sender, selectedObjList) {
     // get looser
     var winner;
     var loser;
-    if (score[0] > score[1]) {
+    if (casualties[0] !== casualties[1]) {
+        // if one side had 0 casualties, and the other side did, the 0 casualties side is winner.
+        if (casualties[0] === 0) {
+            winner = 0;
+            loser = 1;
+        }
+        else if (casualties[1] === 0) {
+            winner = 1;
+            loser = 0;
+        }
+    }
+    else if (parseInt(casualties[0]) === 0 && parseInt(casualties[1]) === 0) {
+        sendChat(sender, css.morale + "**No winner this round.**" + css.spanEnd);
+        return;
+    }
+    else if (score[0] > score[1]) {
         winner = 0;
         loser = 1;
     }

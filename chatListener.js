@@ -41,6 +41,7 @@ on("chat:message", function(msg) {
         eventToggleIndirectMissileRange(msg);
         eventToggleMovementRange(msg);
         eventTallyArmy(msg);
+        eventToggleTerrainToLayer(msg);
     }
     catch(err) {
         if (typeof err === "string") {
@@ -60,6 +61,31 @@ on("chat:message", function(msg) {
         }
     }
 });
+
+var gIsTerrainOnMap = false;
+function eventToggleTerrainToLayer(msg) {
+    if (!(msg.type === "api" && msg.content.indexOf("!terrainToggle") !== -1)) { return; }
+    if (gIsTerrainOnMap) {
+        sendChat(msg.who, "Sending Terrain to Object Layer.");
+        gIsTerrainOnMap = false;
+        moveTerrainToObjectLayer();
+    }
+    else {
+        sendChat(msg.who, "Sending Terrain to Map Layer.");
+        gIsTerrainOnMap = true;
+        moveTerrainToMapLayer();
+    }
+}
+
+function eventMoveTerrainToMapLayer(msg) {
+    if (!(msg.type === "api" && msg.content.indexOf("!terrainObj") !== -1)) { return; }
+    moveTerrainToObjectLayer();
+}
+
+function eventMoveTerrainToObjectsLayer(msg) {
+    if (!(msg.type === "api" && msg.content.indexOf("!terrainMap") !== -1)) { return; }
+    moveTerrainToMapLayer();
+}
 
 function eventClearAllTints(msg) {
     if (!(msg.type === "api" && msg.content.indexOf("!clearTints") !== -1)) {

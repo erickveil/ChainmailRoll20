@@ -43,7 +43,7 @@ function validateObjectType(targetObj, tokenType) {
 /**
  * Gets the value set to one of the three token bars
  *
- * @param tokenId
+ * @param tokenObj
  * @param barNum
  */
 function getTokenBarValue(tokenObj, barNum) {

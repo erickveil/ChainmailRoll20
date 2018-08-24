@@ -110,8 +110,13 @@ function eventMeleeDiceRolled(msg) {
     /* If selectedName and targetName are the same (orcs like to fight each other)
      * then it will be difficult to discern who gets what damage.
      */
-    selectedName = getPropertyValue(selectedObj, "name");
-    targetName = getPropertyValue(targetObj, "name");
+    if (msg.type === "rollresult"
+        && typeof(selectedObj) !== "undefined"
+        && typeof(targetObj) !== "undefined"
+    ) {
+        selectedName = getPropertyValue(selectedObj, "name");
+        targetName = getPropertyValue(targetObj, "name");
+    }
 
     var isSameUnitType = (selectedName === targetName);
     if (msg.type ==="rollresult" && isSameUnitType) {

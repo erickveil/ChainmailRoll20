@@ -168,7 +168,7 @@ function eventMeleeDiceRolled(msg) {
                     victimObj = targetObj;
                 }
             }
-            else {
+            else { // selectedTroops < targetTroops
                 if (gNumRolled1 > gNumRolled2) {
                     attackerObj = selectedObj;
                     victimObj = targetObj;

@@ -158,6 +158,19 @@ function isHasAttribute(sheetId, attributeName) {
 }
 
 /**
+ * Character abilities can be turned on or off by setting them on the character and setting
+ * their value to 1.
+ * 
+ * @param {string} sheetId 
+ * @param {string} abilityName 
+ */
+function isCharacterHasAbility(sheetId, abilityName) {
+    if (!isHasAttribute(sheetId, attributeName)) { return false; }
+    var isAbilityOn = getAttribute(sheetId, abilityName);
+    return parseInt(isAbilityOn) === 1 || isAbilityOn.toLowerCase() === "true";
+}
+
+/**
  * An exception with data for log and chat
  *
  * @param pLogMsg

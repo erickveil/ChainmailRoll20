@@ -42,6 +42,7 @@ on("chat:message", function(msg) {
         eventToggleMovementRange(msg);
         eventTallyArmy(msg);
         eventToggleTerrainToLayer(msg);
+        eventNukeArmy(msg);
     }
     catch(err) {
         if (typeof err === "string") {

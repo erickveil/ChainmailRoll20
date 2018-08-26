@@ -120,8 +120,15 @@ function setFigureAndPointBalance(armyCrestToken) {
     });
     var figureCount = 0;
     var pointCount = 0;
+    var crestPageId = getPropertyValue(armyCrestToken, "pageid");
+
     for (var i = 0; i < objectList.length; ++i) {
         var targetSheetId = getPropertyValue(objectList[i], "represents");
+
+        // only count the units on this page
+        var targetPageId = getPropertyValue(objectList[i], "pageid");
+        if (targetPageId !== crestPageId) { continue; }
+
         var tokenArmyName = getAttribute(targetSheetId, "Army");
         if (tokenArmyName !== armyName) { continue; }
         ++figureCount;
@@ -133,9 +140,34 @@ function setFigureAndPointBalance(armyCrestToken) {
         }
         pointCount += parseFloat(pointValue);
     }
-
     setAttributeWithError(sheetId, "Figures", figureCount);
     setAttributeWithError(sheetId, "Points", pointCount);
+}
+
+function nukeArmy(armyCrestToken) {
+    var sheetId = getPropertyValue(armyCrestToken, "represents");
+    var armySheet = getSheetById(sheetId);
+    var armyName = getPropertyValue(armySheet, "name");
+    var objectList = findObjs({
+        type: "graphic",
+        subtype: "token"
+    });
+    var crestPageId = getPropertyValue(armyCrestToken, "pageid");
+
+    for (var i = 0; i < objectList.length; ++i) {
+        var targetSheetId = getPropertyValue(objectList[i], "represents");
+
+        // only count the units on this page
+        var targetPageId = getPropertyValue(objectList[i], "pageid");
+        if (targetPageId !== crestPageId) { continue; }
+
+        var tokenArmyName = getAttribute(targetSheetId, "Army");
+        if (tokenArmyName !== armyName) { continue; }
+
+        objectList[i].remove();
+    }
+    setAttributeWithError(sheetId, "Figures", 0);
+    setAttributeWithError(sheetId, "Points", 0);
 }
 
 function eventTallyArmy(msg) {
@@ -154,6 +186,21 @@ function eventTallyArmy(msg) {
     setFigureAndPointBalance(selectedObj);
 }
 
+function eventNukeArmy(msg) {
+    if (!(msg.type === "api" && msg.content.indexOf("!nukeArmy ") !== -1)) {
+        return;
+    }
+    var argStr = msg.content.replace("!nukeArmy ", "");
+    var argList = argStr.split(",");
+    if (argList.length !== 1) {
+        var logMsg = "Not enough arguments in !tallyArmy command: " + msg.content;
+        var chatMsg = css.error + "The !tallyArmy macro is set up incorrectly." + css.spanEnd;
+        throw new roll20Exception(logMsg, chatMsg);
+    }
+    var selectedId = argList[0];
+    var armyCrestObj = getObjectWithReport("graphic", selectedId);
+    nukeArmy(armyCrestObj);
+}
 
 
 

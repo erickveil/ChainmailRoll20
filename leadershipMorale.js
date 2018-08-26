@@ -20,20 +20,56 @@ function isGetsLeadershipMoraleBonus(originToken) {
     return isGetsBonus;
 }
 
+function isGetsLeadershipCombatBonus(originToken) {
+    var tokenList = getFirstCommanderInRange(originToken, 6);
+    var isGetsBonus = (tokenList.length !== 0);
+    return isGetsBonus;
+}
+
 function getLeaderName(originToken) {
     var tokenList = getFirstLeaderInRange(originToken, 12);
     return getPropertyValue(tokenList[0], "name");
 }
 
-function getFirstLeaderInRange(originToken, range) {
+function getCommanderName(originToken) {
+    var tokenList = getFirstCommanderInRange(originToken, 6);
+    return getPropertyValue(tokenList[0], "name");
+}
+
+function getFirstCommanderInRange(originToken, range) {
+
     var foundObjList = filterObjs(function(obj) {
-        // isObjectWizard, isObjectCommander, etc all go here.
-        return (isObjectWizard(obj)
+
+        var isMyCommanderNear = (isObjectCommander(obj)
             && isObjectInRange(originToken, obj, range)
             && isObjectOnMyTeam(originToken, obj));
+            
+        return isMyCommanderNear;
+    });
+    return foundObjList;
+}
+
+function getFirstLeaderInRange(originToken, range) {
+
+    var foundObjList = filterObjs(function(obj) {
+
+        var isMyWizardNear = (isObjectWizard(obj)
+            && isObjectInRange(originToken, obj, range)
+            && isObjectOnMyTeam(originToken, obj));
+        var isMyCommanderNear = (isObjectCommander(obj)
+            && isObjectInRange(originToken, obj, range)
+            && isObjectOnMyTeam(originToken, obj));
+            
+        return isMyWizardNear || isMyCommanderNear;
     });
     //log(foundObjList);
     return foundObjList;
+}
+
+function isObjectCommander(obj) {
+    var sheetId = getTokenSheetId(obj);
+    var isCommander = isCharacterHasAbility(sheetId, "Commander Inspiration");
+    return isCommander;
 }
 
 function isObjectOnMyTeam(myToken, targetToken) {

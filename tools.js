@@ -165,7 +165,7 @@ function isHasAttribute(sheetId, attributeName) {
  * @param {string} abilityName 
  */
 function isCharacterHasAbility(sheetId, abilityName) {
-    if (!isHasAttribute(sheetId, attributeName)) { return false; }
+    if (!isHasAttribute(sheetId, abilityName)) { return false; }
     var isAbilityOn = getAttribute(sheetId, abilityName);
     return parseInt(isAbilityOn) === 1 || isAbilityOn.toLowerCase() === "true";
 }
@@ -229,7 +229,10 @@ function getArmySheetId(armyName) {
 }
 
 function getTokenSheetId(tokenObj) {
-    return getPropertyValue(tokenObj, "represents");
+
+    var propVal = tokenObj.get("represents");
+    if (typeof propVal === "undefined") { return ""; }
+    return propVal;
 }
 
 function pingObject(obj) {

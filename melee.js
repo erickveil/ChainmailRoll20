@@ -259,6 +259,12 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
 
     if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
 
+    if (isGetsLeadershipCombatBonus(selectedObj)) {
+        --targetNumber;
+        var commanderName = getCommanderName(selectedObj);
+        sendChat(msg.who, css.attack + selectedName + " gets an attack bonus from " + commanderName);
+    }
+
 
 
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
@@ -384,6 +390,12 @@ function polearmAdvantageAttack(selectedTroops, msg) {
 
     if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
 
+    if (isGetsLeadershipCombatBonus(selectedObj)) {
+        --targetNumber;
+        var commanderName = getCommanderName(selectedObj);
+        sendChat(msg.who, css.attack + selectedName + " gets an attack bonus from " + commanderName);
+    }
+
 
 
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
@@ -483,6 +495,12 @@ function flankAttack(selectedTroops, targetTroops, msg) {
 
     if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
 
+    if (isGetsLeadershipCombatBonus(selectedObj)) {
+        --targetNumber;
+        var commanderName = getCommanderName(selectedObj);
+        sendChat(msg.who, css.attack + selectedName + " gets an attack bonus from " + commanderName);
+    }
+
     if (selectedUnitType === "Armored Foot" || selectedUnitType === "Heavy Horse") {
         --targetNumber;
     }
@@ -577,8 +595,11 @@ function rearAttack(selectedTroops, msg) {
 
     if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
 
-
-
+    if (isGetsLeadershipCombatBonus(selectedObj)) {
+        --targetNumber;
+        var commanderName = getCommanderName(selectedObj);
+        sendChat(msg.who, css.attack + selectedName + " gets an attack bonus from " + commanderName);
+    }
 
     if (selectedUnitType === "Armored Foot" || selectedUnitType === "Heavy Horse") {
         --targetNumber;
@@ -666,7 +687,11 @@ function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selected
 
     if (isHasMagicArmor(selectedSheetId)) { ++targetNumber; }
 
-
+    if (isGetsLeadershipCombatBonus(targetObj)) {
+        --targetNumber;
+        var commanderName = getCommanderName(targetObj);
+        sendChat(msg.who, css.attack + targetName + " gets an attack bonus from " + commanderName);
+    }
 
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + targetName);
 }

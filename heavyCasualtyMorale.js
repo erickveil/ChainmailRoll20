@@ -102,8 +102,8 @@ function eventFearMoraleCheck(msg) {
             + css.spanEnd);
     }
 
-    var moraleBonus = (isGetsBonus) ? 1 : 0;
-    var moraleStr = (isGetsBonus) ? "+1 " : "";
+    var moraleBonus = (isGetsBonus) ? 2 : 0;
+    var moraleStr = (isGetsBonus) ? "+2 " : "";
 
     var rollResult = randomInteger(6) + randomInteger(6) + moraleBonus;
     sendChat(msg.who, css.morale

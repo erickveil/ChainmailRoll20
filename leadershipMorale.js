@@ -11,7 +11,7 @@
  * Determines if a leader type unit is nearby and returns true if they are.
  */
 function isGetsLeadershipMoraleBonus(originToken) {
-    var tokenList = getFirstLeaderInRange(originToken, 12);
+    var tokenList = getFirstLeaderInRange(originToken, 4);
     var isGetsBonus = (tokenList.length !== 0);
     /*
     if (isGetsBonus) { log("gets morale bonus.");}
@@ -21,18 +21,18 @@ function isGetsLeadershipMoraleBonus(originToken) {
 }
 
 function isGetsLeadershipCombatBonus(originToken) {
-    var tokenList = getFirstCommanderInRange(originToken, 6);
+    var tokenList = getFirstCommanderInRange(originToken, 4);
     var isGetsBonus = (tokenList.length !== 0);
     return isGetsBonus;
 }
 
 function getLeaderName(originToken) {
-    var tokenList = getFirstLeaderInRange(originToken, 12);
+    var tokenList = getFirstLeaderInRange(originToken, 4);
     return getPropertyValue(tokenList[0], "name");
 }
 
 function getCommanderName(originToken) {
-    var tokenList = getFirstCommanderInRange(originToken, 6);
+    var tokenList = getFirstCommanderInRange(originToken, 4);
     return getPropertyValue(tokenList[0], "name");
 }
 

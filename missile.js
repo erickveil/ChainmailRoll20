@@ -200,12 +200,21 @@ function calcMissileDamage(numTroops, msg, targetArmor, unitNum, targetToken) {
     var roll = randomInteger(6);
     var selectedName = getPropertyValue(selectedObj, "name");
     var rollMod = 0;
-    var modStr = "";
+
     if (isDaylight() && isUnitLightSensitive(selectedObj)) {
         sendChat(msg.who, css.warning + selectedName + " is hindered by the light!" + css.spanEnd);
         --rollMod;
-        modStr = (rollMod < 0) ? rollMod : (rollMod > 0) ? "+" + rollMod : "";
     }
+    if (isGetsLeadershipCombatBonus(selectedObj)) {
+        sendChat(msg.who, css.missile + selectedName 
+            + " gets an **attack bonus** from " 
+            + getLeaderName(selectedObj) 
+            + "!"
+            + css.spanEnd);
+        ++rollMod;
+    }
+    var modStr = (rollMod < 0) ? rollMod : (rollMod > 0) ? "+" + rollMod : "";
+
     sendChat(msg.who, css.missile
         + "Rolling 1d6: "
         + css.rollValue
@@ -239,13 +248,22 @@ function calcIndirectMissileDamage(numTroops, msg, targetArmor, unitNum, targetT
     var roll = randomInteger(6);
     var selectedName = getPropertyValue(selectedObj, "name");
     var rollMod = 0;
-    var modStr = "";
 
     if (isDaylight() && isUnitLightSensitive(selectedObj)) {
         sendChat(msg.who, css.warning + selectedName + " is hindered by the light!" + css.spanEnd);
         --rollMod;
-        modStr = (rollMod < 0) ? rollMod : (rollMod > 0) ? "+" + rollMod : "";
     }
+    if (isGetsLeadershipCombatBonus(selectedObj)) {
+        sendChat(msg.who, css.indirectMissile+ selectedName 
+            + " gets an **attack bonus** from " 
+            + getLeaderName(selectedObj) 
+            + "!"
+            + css.spanEnd);
+        ++rollMod;
+    }
+    var modStr = (rollMod < 0) ? rollMod : (rollMod > 0) ? "+" + rollMod : "";
+
+
 
     sendChat(msg.who, css.indirectMissile
         + "Rolling 1d6: "

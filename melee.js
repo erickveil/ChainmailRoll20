@@ -313,7 +313,6 @@ function polearmAdvantageAttack(selectedTroops, msg) {
     var targetSheetId = getPropertyValue(targetObj, "represents");
     var selectedUnitType = getAttacksAs(selectedSheetId);
     var targetUnitType = getAttacksAs(targetSheetId);
-    sendChat(msg.who, "B");
     var attackDiceFactor = getAttackDiceFactor(selectedUnitType, targetUnitType);
     var selectedName = getPropertyValue(selectedObj, "name");
     var pikeMod = 1;

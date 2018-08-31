@@ -52,6 +52,8 @@ function incrementArmyFigureCount(addedObj) {
     // No army, no need.
     if (armyName === "") { return; }
     var armySheetId = getArmySheetId(armyName);
+    // We didn't bother to put a counter out, and that's okay.
+    if (armySheetId === "") { return; }
     var currentFiguresValue = getAttributeWithError(armySheetId, "Figures");
     if (currentFiguresValue === "") { currentFiguresValue = 0; }
     setAttributeWithError(armySheetId, "Figures", parseInt(currentFiguresValue) + 1);
@@ -63,6 +65,8 @@ var sheetId = getPropertyValue(deletedObj, "represents");
     // No army, no need.
     if (armyName === "") { return; }
     var armySheetId = getArmySheetId(armyName);
+    // We didn't bother to put a counter out, and that's okay.
+    if (armySheetId === "") { return; }
     var currentFiguresValue = getAttributeWithError(armySheetId, "Figures");
     if (currentFiguresValue === "") { currentFiguresValue = 0; }
     setAttributeWithError(armySheetId, "Figures", parseInt(currentFiguresValue) - 1);
@@ -77,6 +81,8 @@ function incrementArmyPointCount(addedObj) {
     // No army, no need.
     if (armyName === "") { return; }
     var armySheetId = getArmySheetId(armyName);
+    // We didn't bother to put a counter out, and that's okay.
+    if (armySheetId === "") { return; }
     var currentFiguresValue = getAttributeWithError(armySheetId, "Points");
     if (currentFiguresValue === "") { currentFiguresValue = 0; }
     setAttributeWithError(armySheetId, "Points", parseInt(currentFiguresValue) + parseFloat(pointValue));
@@ -91,6 +97,8 @@ function decrementArmyPointCount(deletedObj) {
     // No army, no need.
     if (armyName === "") { return; }
     var armySheetId = getArmySheetId(armyName);
+    // We didn't bother to put a counter out, and that's okay.
+    if (armySheetId === "") { return; }
     var currentFiguresValue = getAttributeWithError(armySheetId, "Points");
     if (currentFiguresValue === "") { currentFiguresValue = 0; }
     setAttributeWithError(armySheetId, "Points", parseInt(currentFiguresValue) - parseFloat(pointValue));

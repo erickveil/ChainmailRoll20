@@ -62,7 +62,7 @@ function eventPolarmAdvantageAttack(msg) {
     var argList = argStr.split(",");
     if (argList.length !== 2) {
         var logMsg = "Not enough arguments in !melee command: " + msg.content;
-        var chatMsg = css.error + "The !melee macro is set up incorrectly." + css.spanEnd;
+        var chatMsg = css.error + "The !pole macro is set up incorrectly." + css.spanEnd;
         throw new roll20Exception(logMsg, chatMsg);
     }
     var selectedId = argList[0];
@@ -167,6 +167,77 @@ function isHasMeleeImmunity(sheetId) {
 
 // ---------------------------------------------------------------
 
+// This is an attempt to refactor a lot of this duplicate code into a single
+// method
+function executeAttack(attackerObj, defenderObj, msg) {
+    var attackerSheetId = getPropertyValue(attackerObj, "represents");
+    var defenderSheetId = getPropertyValue(defenderObj, "represents");
+    var attackerUnitType = getAttributeWithError(attackerSheetId, "Unit Type");
+    var defenderUnitType = getAttributeWithError(defenderSheetId, "Unit Type");
+    var attackerName = getPropertyValue(attackerObj, "name");
+    var defenderName = getPropertyValue(defenderObj, "name");
+
+    // Handle elemental vs elemental fight (should this be fantasy vs fantasy fight?)
+    if (isElementalVsElementalMelee(attackerUnitType, defenderUnitType)) {
+        log("elemental vs elemental combat needs attention");
+    }
+
+    // skip this attack if the defender is immunie to nonmagical damage, and the 
+    // attacker does not have a magical weapon
+    if (isHasMeleeImmunity(defenderSheetId) 
+        && !isHasMagicSword(attackerSheetId)
+        && !isElementalVsElementalMelee(attackerUnitType, defenderUnitType)
+    ) {
+        sendChat(msg.who, css.warning + defenderName 
+            + " cannot be affected by nonmagical attacks.");
+        return;
+    }
+
+    // isAtattackerImmune is a global defined in chatListener
+    if (isHasMeleeImmunity(defenderSheetId)) { isAttackerImmune = true; }
+
+    // handle light senesitivity, darkvision, light and darkness
+    if (isDaylight() && isUnitLightSensitive(attackerObj)) {
+        sendChat(msg.who, css.attack + attackerName + " does not like the light!" 
+            + css.spanEnd);
+        ++targetNumber;
+    }
+    else if (isDarkness()
+        && !isUnitLightSensitive(attackerObj)
+        && !isInSwordLight(attackerObj)
+        && !isNearLightSpell(attackerObj)
+        && !isHasDarkvision(attackerObj)
+        ) {
+        sendChat(msg.who, css.warning + attackerName + " cannot attack in the dark!" 
+            + css.spanEnd);
+        // global defined in chatListener.js
+        isForceCheck = true;
+        return;
+    }
+    if (isInSwordLight(attackerObj) && isDarkness()) {
+        sendChat(msg.who, css.magicItem + attackerName 
+            + " is bathed in the light of a magic sword." + css.spanEnd);
+    }
+    sayLightEffect(attackerObj, msg.who);
+
+    // handle water creatures in water bonuses
+    /* TODO: before we continue, we need to restructure things.
+     * "Water Elemental" type detection needs to be replaced with 
+     * "Waterborne" attribute flag.
+     * "attackerUnitType" type detection needs to be replaced with
+     * "Attacks As" and "Defends As" attribute values.
+     * "Unit Type" is not sufficient for determining abilities and stats,
+     * as it requires a lot of internal conditions and goofy code.
+    */
+    if (attackerUnitType === "Water Elemental" && isInWater(selectedObj)) {
+        attackerUnitType = "Heavy Horse";
+
+    }
+
+    // TODO: This method is unfinished
+
+}
+
 function frontalAttack(selectedTroops, targetTroops, msg) {
     var selectedSheetId = getPropertyValue(selectedObj, "represents");
     var targetSheetId = getPropertyValue(targetObj, "represents");
@@ -202,6 +273,7 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
     var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
     var targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
 
+    // ---
     if (isDaylight() && isUnitLightSensitive(selectedObj)) {
         sendChat(msg.who, css.attack + selectedName + " does not like the light!" + css.spanEnd);
         ++targetNumber;

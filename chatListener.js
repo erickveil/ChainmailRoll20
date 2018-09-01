@@ -206,23 +206,22 @@ function eventMeleeDiceRolled(msg) {
                 }
             }
 
-            // apply kills 1 to attacker side
-            applyCasualties(attackerObj, gNumKills1);
-            // Names don't matter here, all the same
-            sendChat(msg.who, css.attack
-                + "**"
-                + selectedName
-                + "** attacks "
-                + selectedName
-                + " and kills "
-                + css.killValue + "**" + gNumKills1 + "**" + css.endValue
-                + " troops." + css.spanEnd);
-            survived = calculateTroopLoss(msg, attackerObj);
-            if (survived) { heavyLossMoraleCheck(msg, attackerObj); }
+            // Heroes handle damage differently
+            if (isTokenHero(victimObj)) {
+                var maxTroops = getTokenBarMax(victimObj, 1);
+                if (isHeroDefeated(maxTroops, gNumKills1)) {
+                    handleHeroDefeat(msg.who, victimObj);
+                }
+                else {
+                    var victimName = getPropertyValue(victimObj, "name");
+                    handleHeroSave(msg.who, victimName);
+                }
+            }
 
-            // apply kills 2 to victim side
-            if (!isOneSidedAttack) {
-                applyCasualties(victimObj, gNumKills2);
+            // Everybody else who is not a hero caculates damage
+            else {
+                // apply kills 1 to attacker side
+                applyCasualties(attackerObj, gNumKills1);
                 // Names don't matter here, all the same
                 sendChat(msg.who, css.attack
                     + "**"
@@ -230,10 +229,26 @@ function eventMeleeDiceRolled(msg) {
                     + "** attacks "
                     + selectedName
                     + " and kills "
-                    + css.killValue + "**" + gNumKills2 + "**" + css.endValue
+                    + css.killValue + "**" + gNumKills1 + "**" + css.endValue
                     + " troops." + css.spanEnd);
-                survived = calculateTroopLoss(msg, victimObj);
-                if (survived) { heavyLossMoraleCheck(msg, victimObj); }
+                survived = calculateTroopLoss(msg, attackerObj);
+                if (survived) { heavyLossMoraleCheck(msg, attackerObj); }
+
+                // apply kills 2 to victim side
+                if (!isOneSidedAttack) {
+                    applyCasualties(victimObj, gNumKills2);
+                    // Names don't matter here, all the same
+                    sendChat(msg.who, css.attack
+                        + "**"
+                        + selectedName
+                        + "** attacks "
+                        + selectedName
+                        + " and kills "
+                        + css.killValue + "**" + gNumKills2 + "**" + css.endValue
+                        + " troops." + css.spanEnd);
+                    survived = calculateTroopLoss(msg, victimObj);
+                    if (survived) { heavyLossMoraleCheck(msg, victimObj); }
+                }
             }
 
             // cleanup
@@ -257,22 +272,37 @@ function eventMeleeDiceRolled(msg) {
         && isMyMeleeRollResult(rollData, selectedObj)) {
         //log("melee dice rolled: selected");
 
-        kills = (rollData.total)*1;
-        applyCasualties(targetObj, kills);
+        // Heroes handle damage differently
+        if (isTokenHero(targetObj)) {
+            var maxTroops = getTokenBarMax(targetObj, 1);
+            if (isHeroDefeated(maxTroops, gNumKills1)) {
+                handleHeroDefeat(msg.who, targetObj);
+            }
+            else {
+                var victimName = getPropertyValue(targetObj, "name");
+                handleHeroSave(msg.who, victimName);
+            }
+        }
 
-        // announce casualties
-        sendChat(msg.who, css.attack
-            + "**"
-            + selectedName
-            + "** attacks "
-            + targetName
-            + " and kills "
-            + css.killValue + "**" + kills + "**" + css.endValue
-            + " troops." + css.spanEnd);
+        // Everybody else who is not a hero caculates damage
+        else {
+            kills = (rollData.total)*1;
+            applyCasualties(targetObj, kills);
 
-        survived = calculateTroopLoss(msg, targetObj);
+            // announce casualties
+            sendChat(msg.who, css.attack
+                + "**"
+                + selectedName
+                + "** attacks "
+                + targetName
+                + " and kills "
+                + css.killValue + "**" + kills + "**" + css.endValue
+                + " troops." + css.spanEnd);
 
-        if (survived) { heavyLossMoraleCheck(msg, targetObj); }
+            survived = calculateTroopLoss(msg, targetObj);
+
+            if (survived) { heavyLossMoraleCheck(msg, targetObj); }
+        }
 
         isSelectedDone = true;
         if (isTargetDone || isRearAttack || isAttackerImmune || isForceCheck) {
@@ -288,23 +318,39 @@ function eventMeleeDiceRolled(msg) {
         && isMyMeleeRollResult(rollData, targetObj)) {
         //log("melee dice rolled: target");
 
-        kills = (rollData.total)*1;
+        // Heroes handle damage differently
+        if (isTokenHero(selectedObj)) {
+            var maxTroops = getTokenBarMax(selectedObj, 1);
+            if (isHeroDefeated(maxTroops, gNumKills1)) {
+                handleHeroDefeat(msg.who, selectedObj);
+            }
+            else {
+                var victimName = getPropertyValue(selectedObj, "name");
+                handleHeroSave(msg.who, victimName);
+            }
+        }
 
-        // add casualties to defender
-        applyCasualties(selectedObj, kills);
+        // Everybody else who is not a hero caculates damage
+        else {
 
-        // announce casualties
-        sendChat(msg.who, css.counterAttack
-            + "**"
-            + targetName
-            + "** counterattacks "
-            + selectedName + " and kills "
-            + css.killValue + "**" + kills + "**" + css.endValue
-            + " troops." + css.spanEnd);
+            kills = (rollData.total)*1;
 
-        // check for dead unit before heavy loss
-        survived = calculateTroopLoss(msg, selectedObj);
-        if (survived) { heavyLossMoraleCheck(msg, selectedObj); }
+            // add casualties to defender
+            applyCasualties(selectedObj, kills);
+
+            // announce casualties
+            sendChat(msg.who, css.counterAttack
+                + "**"
+                + targetName
+                + "** counterattacks "
+                + selectedName + " and kills "
+                + css.killValue + "**" + kills + "**" + css.endValue
+                + " troops." + css.spanEnd);
+
+            // check for dead unit before heavy loss
+            survived = calculateTroopLoss(msg, selectedObj);
+            if (survived) { heavyLossMoraleCheck(msg, selectedObj); }
+        }
 
         // apply casualties
         // resolve melee morale

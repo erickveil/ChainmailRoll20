@@ -11,7 +11,7 @@
  * Determines if a leader type unit is nearby and returns true if they are.
  */
 function isGetsLeadershipMoraleBonus(originToken) {
-    var tokenList = getFirstLeaderInRange(originToken, 4);
+    var tokenList = getFirstLeaderInRange(originToken, 12);
     var isGetsBonus = (tokenList.length !== 0);
     /*
     if (isGetsBonus) { log("gets morale bonus.");}
@@ -21,18 +21,18 @@ function isGetsLeadershipMoraleBonus(originToken) {
 }
 
 function isGetsLeadershipCombatBonus(originToken) {
-    var tokenList = getFirstCommanderInRange(originToken, 4);
+    var tokenList = getFirstCommanderInRange(originToken, 12);
     var isGetsBonus = (tokenList.length !== 0);
     return isGetsBonus;
 }
 
 function getLeaderName(originToken) {
-    var tokenList = getFirstLeaderInRange(originToken, 4);
+    var tokenList = getFirstLeaderInRange(originToken, 12);
     return getPropertyValue(tokenList[0], "name");
 }
 
 function getCommanderName(originToken) {
-    var tokenList = getFirstCommanderInRange(originToken, 4);
+    var tokenList = getFirstCommanderInRange(originToken, 12);
     return getPropertyValue(tokenList[0], "name");
 }
 
@@ -42,7 +42,9 @@ function getFirstCommanderInRange(originToken, range) {
 
         var isMyCommanderNear = (isObjectCommander(obj)
             && isObjectInRange(originToken, obj, range)
-            && isObjectOnMyTeam(originToken, obj));
+            && isObjectOnMyTeam(originToken, obj)
+            && originToken !== obj
+        );
             
         return isMyCommanderNear;
     });
@@ -55,10 +57,14 @@ function getFirstLeaderInRange(originToken, range) {
 
         var isMyWizardNear = (isObjectWizard(obj)
             && isObjectInRange(originToken, obj, range)
-            && isObjectOnMyTeam(originToken, obj));
+            && isObjectOnMyTeam(originToken, obj)
+            && originToken != obj
+        );
         var isMyCommanderNear = (isObjectCommander(obj)
             && isObjectInRange(originToken, obj, range)
-            && isObjectOnMyTeam(originToken, obj));
+            && isObjectOnMyTeam(originToken, obj)
+            && originToken != obj
+        );
             
         return isMyWizardNear || isMyCommanderNear;
     });

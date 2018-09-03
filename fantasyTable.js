@@ -61,7 +61,9 @@ function doFantasyBattle(chatTarget, attackerToken, defenderToken, isRanged)
     if (isRanged) {
         // magic missile bonus
         if (isHasAttribute(attackSheetId, "Magic Missiles")) {
-            rollMod += parseInt(getAttribute(attackSheetId, "Magic Missiles"));
+            var missileBonus = getAttribute(attackSheetId, "Magic Missiles");
+            missileBonus = missileBonus === "" ? 0 : parseInt(missileBonus);
+            rollMod += missileBonus;
             sendChat(chatTarget, css.magicItem + attackName 
                 + " fires a magic missile!" + css.spanEnd);
         }
@@ -87,8 +89,12 @@ function doFantasyBattle(chatTarget, attackerToken, defenderToken, isRanged)
     if (isSunSicknessApplies(chatTarget, attackerToken)) { --rollMod; }
 
     // wizards of lesser types get their tohit altered
-    toHit += parseInt(getAttribute(defendSheetId, "Armor Mod"));
-    rollMod += parseInt(getAttribute(attackSheetId, "Attack Mod"));
+    var armorMod = getAttribute(defendSheetId, "Armor Mod");
+    armorMod = armorMod === "" ? 0 : armorMod;
+    toHit += parseInt(armorMod);
+    var attackMod = getAttribute(attackSheetId, "Attack Mod");
+    attackMod = attackMod === "" ? 0 : attackMod;
+    rollMod += parseInt(attackMod);
 
     // Note: fantasy types are not affected by commanders.
 
@@ -98,16 +104,13 @@ function doFantasyBattle(chatTarget, attackerToken, defenderToken, isRanged)
     var roll1 = randomInteger(6);
     var roll2 = randomInteger(6);
     var rollTotal = roll1 + roll2;
+    rollTotal += parseInt(rollMod);
 
     sendChat(chatTarget, css.meleeResult 
         + "Rolling 2d6: " 
-        + css.rollValue
         + roll1 
-        + css.endValue
         + " + " 
-        + css.rollValue
         + roll2 
-        + css.endValue
         + modStr 
         + " = " 
         + css.rollValue
@@ -118,9 +121,7 @@ function doFantasyBattle(chatTarget, attackerToken, defenderToken, isRanged)
         + css.spanEnd
     );
 
-    rollTotal += rollMod;
-
-    if (rollTotal < toHit) {
+    if (parseInt(rollTotal) < parseInt(toHit)) {
         var result = [];
         result[1] = attackName + " has missed " + defendName + "!";
         result[2] = attackName + " has failed to defeat " + defendName + "!";
@@ -128,7 +129,7 @@ function doFantasyBattle(chatTarget, attackerToken, defenderToken, isRanged)
         result[4] = defendName + " has parried the blow of " + attackName + "!";
         var i = randomInteger(4);
         sendChat(chatTarget, css.meleeResult + result[i] + css.spanEnd);
-        if (attackType.toLowerCase === "hero" 
+        if (attackType.toLowerCase() === "hero" 
             || attackType.toLowerCase === "super hero"
             || attackType.toLowerCase === "wizard"
             || attackType.toLowerCase === "wraith"
@@ -136,7 +137,7 @@ function doFantasyBattle(chatTarget, attackerToken, defenderToken, isRanged)
             sendChat(chatTarget, css.meleeResult + attackName 
                 + " may withdraw from combat if they choose." + css.spanEnd);
         }
-        if (defendType.toLowerCase === "hero" 
+        if (defendType.toLowerCase() === "hero" 
             || defendType.toLowerCase === "super hero"
             || defendType.toLowerCase === "wizard"
             || defendType.toLowerCase === "wraith"
@@ -145,14 +146,14 @@ function doFantasyBattle(chatTarget, attackerToken, defenderToken, isRanged)
                 + " may withdraw from combat if they choose." + css.spanEnd);
         }
     }
-    else if (rollTotal === toHit) {
+    else if (parseInt(rollTotal) === parseInt(toHit)) {
         sendChat(chatTarget, css.meleeResult + defendName 
             + " must fall back 1 move!" + css.spanEnd);
         var iconFallback = "screaming";
         defenderToken.set("status_" + iconFallback, "1");
     }
     else {
-        var reslult = [];
+        var result = [];
         result[1] = " has been slaughtered!";
         result[2] = " has been annihilated!";
         result[3] = " has been erased!";
@@ -166,7 +167,7 @@ function doFantasyBattle(chatTarget, attackerToken, defenderToken, isRanged)
         result[11] = " is dead!";
         result[12] = " has been slain!";
         var i = randomInteger(12);
-        sendChat(chatTarget, css.meleeResult + attackName
+        sendChat(chatTarget, css.meleeResult + defendName 
             + result[i] + css.spanEnd);
         defenderToken.set("status_dead", true);
     }

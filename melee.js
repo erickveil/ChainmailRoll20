@@ -242,7 +242,7 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
     var selectedSheetId = getPropertyValue(selectedObj, "represents");
     var targetSheetId = getPropertyValue(targetObj, "represents");
     var selectedUnitType = getAttacksAs(selectedSheetId);
-    var targetUnitType = getAttacksAs(targetSheetId);
+    var targetUnitType = getDefendsAs(targetSheetId);
     var attackDiceFactor = getAttackDiceFactor(selectedUnitType, targetUnitType);
     var selectedName = getPropertyValue(selectedObj, "name");
     var targetName = getPropertyValue(targetObj, "name");
@@ -337,10 +337,10 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
         sendChat(msg.who, css.attack + selectedName + " gets an attack bonus from " + commanderName);
     }
 
-
-
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
-    counterAttack(targetUnitType, selectedUnitType, targetSheetId, selectedSheetId, weaponAttribute, targetTroops, msg);
+    var targetAttacksAs = getAttacksAs(targetSheetId);
+    var selectedDefendsAs = getDefendsAs(selectedSheetId);
+    counterAttack(targetAttacksAs, selectedDefendsAs, targetSheetId, selectedSheetId, weaponAttribute, targetTroops, msg);
 }
 
 function isElementalVsElementalMelee(selectedActualType, targetActualType) {
@@ -384,7 +384,7 @@ function polearmAdvantageAttack(selectedTroops, msg) {
     var selectedSheetId = getPropertyValue(selectedObj, "represents");
     var targetSheetId = getPropertyValue(targetObj, "represents");
     var selectedUnitType = getAttacksAs(selectedSheetId);
-    var targetUnitType = getAttacksAs(targetSheetId);
+    var targetUnitType = getDefendsAs(targetSheetId);
     var attackDiceFactor = getAttackDiceFactor(selectedUnitType, targetUnitType);
     var selectedName = getPropertyValue(selectedObj, "name");
     var pikeMod = 1;
@@ -472,6 +472,7 @@ function polearmAdvantageAttack(selectedTroops, msg) {
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
 }
 
+/*
 function getAttacksAs(sheetId) {
     if (isHasAttribute(sheetId, "Fights As")) {
         var fightsAs = getAttribute(sheetId, "Fights As");
@@ -479,12 +480,13 @@ function getAttacksAs(sheetId) {
     }
     return getAttributeWithError(sheetId, "Unit Type");
 }
+*/
 
 function flankAttack(selectedTroops, targetTroops, msg) {
     var selectedSheetId = getPropertyValue(selectedObj, "represents");
     var targetSheetId = getPropertyValue(targetObj, "represents");
     var selectedUnitType = getAttacksAs(selectedSheetId);
-    var targetUnitType = getAttacksAs(targetSheetId);
+    var targetUnitType = getDefendsAs(targetSheetId);
     var attackDiceFactor = getFlankerDiceFactor(selectedUnitType, targetUnitType);
     var selectedName = getPropertyValue(selectedObj, "name");
     var weaponAttribute = "Weapon";
@@ -578,14 +580,16 @@ function flankAttack(selectedTroops, targetTroops, msg) {
 
 
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
-    counterAttack(targetUnitType, selectedUnitType, targetSheetId, selectedSheetId, weaponAttribute, targetTroops, msg);
+    var targetAttacksAs = getAttacksAs(targetSheetId);
+    var selectedAttacksAs = getDefendsAs(selectedSheetId);
+    counterAttack(targetAttacksAs, selectedAttacksAs, targetSheetId, selectedSheetId, weaponAttribute, targetTroops, msg);
 }
 
 function rearAttack(selectedTroops, msg) {
     var selectedSheetId = getPropertyValue(selectedObj, "represents");
     var targetSheetId = getPropertyValue(targetObj, "represents");
     var selectedUnitType = getAttacksAs(selectedSheetId);
-    var targetUnitType = getAttacksAs(targetSheetId);
+    var targetUnitType = getDefendsAs(targetSheetId);
     var attackDiceFactor = getFlankerDiceFactor(selectedUnitType, targetUnitType);
     var selectedName = getPropertyValue(selectedObj, "name");
     var weaponAttribute = "Weapon";

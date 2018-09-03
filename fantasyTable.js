@@ -74,32 +74,17 @@ function doFantasyBattle(chatTarget, attackerToken, defenderToken, isRanged)
     }
     else {
         // magic sword bonus
-        if (isHasAttribute(attackSheetId, "Magic Sword")) {
-            rollMod += parseInt(getAttribute(attackSheetId, "Magic Sword"));
-            sendChat(chatTarget, css.magicItem + attackName 
-                + " gets an attack bonus from " + getMagicSwordName(attackSheetId)
-                + "!" + css.spanEnd);
-        }
-        else if (isHasMeleeImmunity(defendSheetId)) {
-            // normal attack melee immunity
-            sendChat(chatTarget, css.warning + defendName 
-                + " is immune to nonmagical attacks!");
-            return;
+        rollMod += getMagicSwordBonus(chatTarget, attackSheetId, attackName);
+        if (isHasMeleeImmunity(chatTarget, attackSheetId, defendSheetId, defendName)){ 
+            return; 
         }
     }
 
     // magic armor 
-    if (isHasAttribute(defendSheetId, "Magic Armor")) {
-        toHit += parseInt(getAttribute(defendSheetId, "Magic Armor"));
-        sendChat(chatTarget, css.magicItem + defendName 
-            + " is protected by magic armor!");
-    }
+    toHit += getMagicArmorBonus(chatTarget, defendSheetId, defendName);
 
     // sunlight sickness 
-    if (isDaylight() && isUnitLightSensitive(attackerToken)) {
-        lightSensitivityEffect(chatTarget, attackName);
-        --rollMod;
-    }
+    if (isSunSicknessApplies(chatTarget, attackerToken)) { --rollMod; }
 
     // wizards of lesser types get their tohit altered
     toHit += parseInt(getAttribute(defendSheetId, "Armor Mod"));

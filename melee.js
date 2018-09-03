@@ -161,81 +161,120 @@ function eventRearAttack(msg) {
     rearAttack(selectedTroops, msg);
 }
 
-function isHasMeleeImmunity(sheetId) {
-    return (isHasAttribute(sheetId, "Normal Attack Immunity"));
-}
+
 
 // ---------------------------------------------------------------
 
 // This is an attempt to refactor a lot of this duplicate code into a single
 // method
-function executeAttack(attackerObj, defenderObj, msg) {
-    var attackerSheetId = getPropertyValue(attackerObj, "represents");
-    var defenderSheetId = getPropertyValue(defenderObj, "represents");
-    var attackerUnitType = getAttributeWithError(attackerSheetId, "Unit Type");
-    var defenderUnitType = getAttributeWithError(defenderSheetId, "Unit Type");
-    var attackerName = getPropertyValue(attackerObj, "name");
-    var defenderName = getPropertyValue(defenderObj, "name");
-
-    // Handle elemental vs elemental fight (should this be fantasy vs fantasy fight?)
-    if (isElementalVsElementalMelee(attackerUnitType, defenderUnitType)) {
-        log("elemental vs elemental combat needs attention");
-    }
-
-    // skip this attack if the defender is immunie to nonmagical damage, and the 
-    // attacker does not have a magical weapon
-    if (isHasMeleeImmunity(defenderSheetId) 
-        && !isHasMagicSword(attackerSheetId)
-        && !isElementalVsElementalMelee(attackerUnitType, defenderUnitType)
+function executeAttack(
+    msg, 
+    attackerToken, 
+    defenderToken, 
+    isCounterAttack,
+    isFlankAttack
     ) {
-        sendChat(msg.who, css.warning + defenderName 
-            + " cannot be affected by nonmagical attacks.");
+    var attackSheetId = getPropertyValue(attackerToken, "represents");
+    var defendSheetId = getPropertyValue(defenderToken, "represents");
+    var attackerName = getPropertyValue(attackerToken, "name");
+    var defenderName = getPropertyValue(defenderToken, "name");
+    var chatTarget = msg.who;
+
+    // fantasy opponents use fantasy table
+    if (isFantasyToken(attackSheetId) && isFantasyToken(defendSheetId)) {
+        var NOT_RANGED = false;
+        doFantasyBattle(chatTarget, attackerToken, defenderToken, NOT_RANGED);
         return;
     }
 
-    // isAtattackerImmune is a global defined in chatListener
-    if (isHasMeleeImmunity(defenderSheetId)) { isAttackerImmune = true; }
-
-    // handle light senesitivity, darkvision, light and darkness
-    if (isDaylight() && isUnitLightSensitive(attackerObj)) {
-        sendChat(msg.who, css.attack + attackerName + " does not like the light!" 
-            + css.spanEnd);
-        ++targetNumber;
-    }
-    else if (isDarkness()
-        && !isUnitLightSensitive(attackerObj)
-        && !isInSwordLight(attackerObj)
-        && !isNearLightSpell(attackerObj)
-        && !isHasDarkvision(attackerObj)
-        ) {
-        sendChat(msg.who, css.warning + attackerName + " cannot attack in the dark!" 
-            + css.spanEnd);
-        // global defined in chatListener.js
-        isForceCheck = true;
+    // darkness effects
+    if (isCombatAffectedByDarkness(attackerToken, defenderToken)) {
+        doDarknessEffect(chatTarget, attackerToken, defenderToken);
         return;
     }
-    if (isInSwordLight(attackerObj) && isDarkness()) {
-        sendChat(msg.who, css.magicItem + attackerName 
-            + " is bathed in the light of a magic sword." + css.spanEnd);
+    doDarknessEffect(chatTarget, attackerToken, defenderToken);
+    // end darkness effects
+
+    var attacksAs = getAttacksAs(attackSheetId);
+    var defendsAs = getDefendsAs(defendSheetId);
+
+    // calculate base to hit
+    var toHit;  
+    if (isFlankAttack) {
+        toHit = getFlankerTargetNumber(attacksAs, defendsAs);
     }
-    sayLightEffect(attackerObj, msg.who);
-
-    // handle water creatures in water bonuses
-    /* TODO: before we continue, we need to restructure things.
-     * "Water Elemental" type detection needs to be replaced with 
-     * "Waterborne" attribute flag.
-     * "attackerUnitType" type detection needs to be replaced with
-     * "Attacks As" and "Defends As" attribute values.
-     * "Unit Type" is not sufficient for determining abilities and stats,
-     * as it requires a lot of internal conditions and goofy code.
-    */
-    if (attackerUnitType === "Water Elemental" && isInWater(selectedObj)) {
-        attackerUnitType = "Heavy Horse";
-
+    else if (isWaterborn(attackSheetId) && isInWater(defenderToken)) {
+        toHit = getWaterbornToHit(chatTarget, attackerToken, toHit, defendsAs);
+    }
+    else {
+        toHit = getAttackerTargetNumber(attacksAs, defendsAs);
     }
 
-    // TODO: This method is unfinished
 
+    var rollMod = 0;
+    rollMod += getRangerBonus(attackSheetId);
+
+    // Water elemental attack as heavy horse in water only
+    if (isWaterborn(attackSheetId) && isInWater(attackerToken)) { 
+        attacksAs = "Heavy Horse"; 
+    }
+
+    // Air elements attack bonus to flying
+    toHit += getAirbornToHitMod(chatTarget, attackerToken, defenderToken);
+
+    // Earth elemental attack bonus to ground units
+    toHit += getEarthbornToHitMod(chatTarget, attackerToken, defenderToken);
+
+    // magic sword bonus
+    var magicSwordBonus = getMagicSwordBonus(chatTarget, attackSheetId, attackerName);
+    rollMod += magicSwordBonus;
+
+    // immune to normal attacks
+    if (isHasMeleeImmunity(chatTarget, attackSheetId, defendSheetId, defenderName)) {
+        return;
+    }
+
+    // magic armor
+    toHit += getMagicArmorBonus(chatTarget, defendSheetId, defenderName);
+
+    // sunlight sickness
+    if (isSunSicknessApplies(chatTarget, attackerToken)) { --rollMod; }
+
+    // wizards of lesser type and other misc mods
+    toHit += parseInt(getAttribute(defendSheetId, "Armor Mod"));
+    rollMod += parseInt(getAttribute(attackSheetId, "Attack Mod"));
+
+    // commander inspiration
+    if (isGetsLeadershipCombatBonus(attackerToken)) {
+        ++toHit;
+        var commanderName = getCommanderName(attackerToken);
+        sendChat(chatTarget, css.attack + selectedName 
+            + " gets an attack bonus from " + commanderName);
+    }
+
+    var targetNumber = toHit - rollMod;
+    if (targetNumber < 0) { targetNumber = 0; }
+
+    // calculate number of dice to roll
+    var attackerTroops = getTokenBarValue(attackerToken, 1);
+    var attackDiceFactor = getAttackDiceFactor(attacksAs, defendsAs);
+    var attackWeapon = getAttribute(attackSheetId, "Weapon");
+    var pikeMod = (attackWeapon.toLowerCase() === "pike"
+        || attackWeapon.toLowerCase() === "halbard"
+        || attackWeapon.toLowerCase() === "pole"
+        ) ? 1 : 0;
+    var numberOfDice = Math.ceil(attackerTroops * attackDiceFactor) 
+        + pikeMod + magicSwordBonus;
+
+    // do the roll
+    sendChat(chatTarget,  "/r " + numberOfDice + "d6>" + targetNumber 
+        + " " + attackerName);
+
+    // counter attack required unless this is the counter attack
+    if (!isCounterAttack) {
+        var DO_COUNTER_ATTACK = true;
+        executeAttack(defenderToken, attackerToken, msg, DO_COUNTER_ATTACK);
+    }
 }
 
 function frontalAttack(selectedTroops, targetTroops, msg) {

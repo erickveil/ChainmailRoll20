@@ -132,20 +132,13 @@ function missileAttack(selectedId, targetId, msg, isIndirect) {
     var selectedName = getPropertyValue(selectedObj, "name");
     var selectedSheetId = getPropertyValue(selectedObj, "represents");
 
-    if (isDarkness()
-        && !isUnitLightSensitive(selectedObj)
-        && !isInSwordLight(targetToken)
-        && !isNearLightSpell(targetToken)
-        && !isHasDarkvision(selectedSheetId)
-    ) {
-        sendChat(msg.who, css.warning + selectedName + " cannot aim in the dark!" + css.spanEnd);
+    // darkness effects
+    if (isCombatAffectedByDarkness(selectedObj, targetToken)) {
+        doDarknessEffect(msg.who, selectedObj, targetToken);
         return;
     }
-    sayLightEffect(targetToken, msg.who);
-
-    if (isInSwordLight(targetToken) && isDarkness()) {
-        sendChat(msg.who, css.magicItem + "The target is illuminated by the light of a magic sword." + css.spanEnd);
-    }
+    doDarknessEffect(msg.who, selectedObj, targetToken);
+    // end darkness effects
 
     clearLocalCasualties(archerToken, targetToken);
     var archerTroops = getTokenBarValue(archerToken, 1);
@@ -203,9 +196,10 @@ function calcMissileDamage(numTroops, msg, targetArmor, unitNum, targetToken) {
     var rollMod = 0;
 
     if (isDaylight() && isUnitLightSensitive(selectedObj)) {
-        sendChat(msg.who, css.warning + selectedName + " is hindered by the light!" + css.spanEnd);
+        lightSensitivityEffect(msg.who, selectedName);
         --rollMod;
     }
+
     if (isGetsLeadershipCombatBonus(selectedObj)) {
         sendChat(msg.who, css.missile + selectedName 
             + " gets an **attack bonus** from " 

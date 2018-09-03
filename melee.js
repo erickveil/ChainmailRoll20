@@ -337,6 +337,10 @@ function frontalAttack(selectedTroops, targetTroops, msg) {
         sendChat(msg.who, css.attack + selectedName + " gets an attack bonus from " + commanderName);
     }
 
+    var rangerBonus = getRangerBonus(selectedSheetId);
+    targetNumber -= rangerBonus;
+    if (targetNumber < 0) { targetNumber = 0; }
+
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
     var targetAttacksAs = getAttacksAs(targetSheetId);
     var selectedDefendsAs = getDefendsAs(selectedSheetId);
@@ -467,7 +471,10 @@ function polearmAdvantageAttack(selectedTroops, msg) {
         sendChat(msg.who, css.attack + selectedName + " gets an attack bonus from " + commanderName);
     }
 
+    var rangerBonus = getRangerBonus(selectedSheetId);
+    targetNumber -= rangerBonus;
 
+    if (targetNumber < 0) { targetNumber = 0; }
 
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
 }
@@ -578,6 +585,10 @@ function flankAttack(selectedTroops, targetTroops, msg) {
         --targetNumber;
     }
 
+    var rangerBonus = getRangerBonus(selectedSheetId);
+    targetNumber -= rangerBonus;
+
+    if (targetNumber < 0) { targetNumber = 0; }
 
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
     var targetAttacksAs = getAttacksAs(targetSheetId);
@@ -680,6 +691,11 @@ function rearAttack(selectedTroops, msg) {
         --targetNumber;
     }
 
+    var rangerBonus = getRangerBonus(selectedSheetId);
+    targetNumber -= rangerBonus;
+
+    if (targetNumber < 0) { targetNumber = 0; }
+
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
 }
 
@@ -767,6 +783,11 @@ function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selected
         var commanderName = getCommanderName(targetObj);
         sendChat(msg.who, css.attack + targetName + " gets an attack bonus from " + commanderName);
     }
+
+    var rangerBonus = getRangerBonus(targetSheetId);
+    targetNumber -= rangerBonus;
+
+    if (targetNumber < 0) { targetNumber = 0; }
 
     sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + targetName);
 }

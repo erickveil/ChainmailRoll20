@@ -209,7 +209,6 @@ function eventMeleeDiceRolled(msg) {
             // Heroes handle damage differently
             if (isTokenHero(victimObj)) {
                 var maxTroops = getTokenBarMax(victimObj, 1);
-                log("same unit type, kills1: " + gNumKills1 + " kills2: " + gNumKills2);
                 if (isHeroDefeated(maxTroops, kills)) {
                     handleHeroDefeat(msg, victimObj);
                 }
@@ -277,7 +276,6 @@ function eventMeleeDiceRolled(msg) {
         // Heroes handle damage differently
         if (isTokenHero(targetObj)) {
             var maxTroops = getTokenBarMax(targetObj, 1);
-            log("selected unit calc, kills1: " + gNumKills1 + " kills2: " + gNumKills2 + " kills: " + kills);
             if (isHeroDefeated(maxTroops, kills)) {
                 handleHeroDefeat(msg, targetObj);
             }
@@ -320,10 +318,10 @@ function eventMeleeDiceRolled(msg) {
         && isMyMeleeRollResult(rollData, targetObj)) {
         //log("melee dice rolled: target");
 
+        kills = parseInt(rollData.total);
         // Heroes handle damage differently
         if (isTokenHero(selectedObj)) {
             var maxTroops = getTokenBarMax(selectedObj, 1);
-            log("target unit calc, kills1: " + gNumKills1 + " kills2: " + gNumKills2);
             if (isHeroDefeated(maxTroops, kills)) {
                 handleHeroDefeat(msg, selectedObj);
             }
@@ -335,8 +333,6 @@ function eventMeleeDiceRolled(msg) {
 
         // Everybody else who is not a hero caculates damage
         else {
-
-            kills = (rollData.total)*1;
 
             // add casualties to defender
             applyCasualties(selectedObj, kills);

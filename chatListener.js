@@ -209,8 +209,9 @@ function eventMeleeDiceRolled(msg) {
             // Heroes handle damage differently
             if (isTokenHero(victimObj)) {
                 var maxTroops = getTokenBarMax(victimObj, 1);
-                if (isHeroDefeated(maxTroops, gNumKills1)) {
-                    handleHeroDefeat(msg.who, victimObj);
+                log("same unit type, kills1: " + gNumKills1 + " kills2: " + gNumKills2);
+                if (isHeroDefeated(maxTroops, kills)) {
+                    handleHeroDefeat(msg, victimObj);
                 }
                 else {
                     var victimName = getPropertyValue(victimObj, "name");
@@ -272,11 +273,13 @@ function eventMeleeDiceRolled(msg) {
         && isMyMeleeRollResult(rollData, selectedObj)) {
         //log("melee dice rolled: selected");
 
+        kills = (rollData.total)*1;
         // Heroes handle damage differently
         if (isTokenHero(targetObj)) {
             var maxTroops = getTokenBarMax(targetObj, 1);
-            if (isHeroDefeated(maxTroops, gNumKills1)) {
-                handleHeroDefeat(msg.who, targetObj);
+            log("selected unit calc, kills1: " + gNumKills1 + " kills2: " + gNumKills2 + " kills: " + kills);
+            if (isHeroDefeated(maxTroops, kills)) {
+                handleHeroDefeat(msg, targetObj);
             }
             else {
                 var victimName = getPropertyValue(targetObj, "name");
@@ -286,7 +289,6 @@ function eventMeleeDiceRolled(msg) {
 
         // Everybody else who is not a hero caculates damage
         else {
-            kills = (rollData.total)*1;
             applyCasualties(targetObj, kills);
 
             // announce casualties
@@ -321,8 +323,9 @@ function eventMeleeDiceRolled(msg) {
         // Heroes handle damage differently
         if (isTokenHero(selectedObj)) {
             var maxTroops = getTokenBarMax(selectedObj, 1);
-            if (isHeroDefeated(maxTroops, gNumKills1)) {
-                handleHeroDefeat(msg.who, selectedObj);
+            log("target unit calc, kills1: " + gNumKills1 + " kills2: " + gNumKills2);
+            if (isHeroDefeated(maxTroops, kills)) {
+                handleHeroDefeat(msg, selectedObj);
             }
             else {
                 var victimName = getPropertyValue(selectedObj, "name");

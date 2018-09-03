@@ -27,10 +27,10 @@ function handleHeroSave(chatTarget, heroName) {
     + heroName + "!" + css.spanEnd);
 }
 
-function handleHeroDefeat(chatTarget, heroToken) {
+function handleHeroDefeat(chatMsg, heroToken) {
     var maxHeroTroops = getTokenBarMax(heroToken, 1);
     applyCasualties(heroToken, maxHeroTroops);
-    calculateTroopLoss(chatTarget, heroToken);
+    calculateTroopLoss(chatMsg, heroToken);
 }
 
 

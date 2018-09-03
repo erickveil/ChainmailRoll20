@@ -79,9 +79,7 @@ function isObjectCommander(obj) {
 }
 
 function isObjectOnMyTeam(myToken, targetToken) {
-    if (!isObjectToken(myToken)) {
-        return false;
-    }
+    if (!isObjectToken(myToken)) { return false; }
     try {
         var mySheet = getPropertyValue(myToken, "represents");
         var targetSheet = getPropertyValue(targetToken, "represents");

@@ -7,29 +7,57 @@
  */
 
 
- function isTokenHero(token) {
+// ============ Heroic =================
+
+function isTokenHero(token) {
     var sheetId = getPropertyValue(token, "represents");
     return isSheetHero(sheetId);
- }
+}
 
- function isSheetHero(sheetId) {
-     return isCharacterHasAbility(sheetId, "Heroic");
- }
+function isSheetHero(sheetId) {
+    return isCharacterHasAbility(sheetId, "Heroic");
+}
 
- function isHeroDefeated(maxHeroTroops, damageTaken) {
-     return damageTaken >= maxHeroTroops;
- }
+function isHeroDefeated(maxHeroTroops, damageTaken) {
+    return damageTaken >= maxHeroTroops;
+}
 
- function handleHeroSave(chatTarget, heroName) {
-     sendChat(chatTarget, css.meleeResult + "The attack is not enough to defeat " 
-      + heroName + "!" + css.spanEnd);
- }
+function handleHeroSave(chatTarget, heroName) {
+    sendChat(chatTarget, css.meleeResult + "The attack is not enough to defeat " 
+    + heroName + "!" + css.spanEnd);
+}
 
- function handleHeroDefeat(chatTarget, heroToken) {
-     var maxHeroTroops = getTokenBarMax(heroToken, 1);
-     applyCasualties(heroToken, maxHeroTroops);
-     calculateTroopLoss(chatTarget, heroToken);
- }
+function handleHeroDefeat(chatTarget, heroToken) {
+    var maxHeroTroops = getTokenBarMax(heroToken, 1);
+    applyCasualties(heroToken, maxHeroTroops);
+    calculateTroopLoss(chatTarget, heroToken);
+}
 
+
+// ============ Attacks/Defends/Fights As Unit Type =================
+
+function getFightsAs(sheetId) {
+    if (isHasAttribute(sheetId, "Fights As")) {
+        return getAttribute(sheetId, "Fights As");
+    }
+    if (isHasAttribute(sheetId, "Unit Type")) {
+        return getAttribute(sheetId, "Unit Type");
+    }
+    return "Light Foot";
+}
+
+function getAttacksAs(sheetId) {
+    if (isHasAttribute(sheetId, "Attacks As")) {
+        return getAttribute(sheetId, "Attacks As");
+    }
+    return getFightsAs(sheetId);
+}
+
+function getDefendsAs(sheetId) {
+    if (isHasAttribute(sheetId, "Defends As")) {
+        return getAttribute(sheetId, "Defends As");
+    }
+    return getFightsAs(sheetId);
+}
 
 

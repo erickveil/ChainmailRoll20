@@ -167,7 +167,9 @@ function isHasAttribute(sheetId, attributeName) {
 function isCharacterHasAbility(sheetId, abilityName) {
     if (!isHasAttribute(sheetId, abilityName)) { return false; }
     var isAbilityOn = getAttribute(sheetId, abilityName);
-    return parseInt(isAbilityOn) === 1 || isAbilityOn.toLowerCase() === "true";
+    return parseInt(isAbilityOn) !== 0 
+        && isAbilityOn.toLowerCase() !== "false"
+        && isAbilityOn !== "";
 }
 
 /**

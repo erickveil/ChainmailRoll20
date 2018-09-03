@@ -214,6 +214,10 @@ function calcMissileDamage(numTroops, msg, targetArmor, unitNum, targetToken) {
             + css.spanEnd);
         ++rollMod;
     }
+
+    var selectedSheetId = getPropertyValue(selectedObj, "represents");
+    rollMod += getRangerBonus(selectedSheetId);
+
     var modStr = (rollMod < 0) ? rollMod : (rollMod > 0) ? "+" + rollMod : "";
 
     sendChat(msg.who, css.missile
@@ -276,9 +280,11 @@ function calcIndirectMissileDamage(numTroops, msg, targetArmor, unitNum, targetT
             + css.spanEnd);
         ++rollMod;
     }
+
+    var selectedSheetId = getPropertyValue(selectedObj, "represents");
+    rollMod += getRangerBonus(selectedSheetId);
+
     var modStr = (rollMod < 0) ? rollMod : (rollMod > 0) ? "+" + rollMod : "";
-
-
 
     sendChat(msg.who, css.indirectMissile
         + "Rolling 1d6: "

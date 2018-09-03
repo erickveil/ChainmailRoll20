@@ -179,6 +179,7 @@ function missileAttack(selectedId, targetId, msg, isIndirect) {
             damage += calcMissileDamage(firingUnits[i], msg, targetArmor, i + 1, targetToken);
         }
     }
+
     sendChat(msg.who, css.missileDamage
         + "**Total missile damage: "
         + css.killValue
@@ -238,6 +239,20 @@ function calcMissileDamage(numTroops, msg, targetArmor, unitNum, targetToken) {
     sendChat(msg.who, css.missile + "Firing unit " + unitNum
         + " (" + numTroops + " troops)"
         + " does " + unitDamage + " damage." + css.spanEnd);
+    
+    if (isTokenHero(targetToken)) {
+        var heroTroops = getTokenBarMax(targetToken, 1);
+        var targetName = getPropertyValue(targetToken, "name");
+        if (!isHeroDefeated(heroTroops, unitDamage)) {
+            handleHeroSave(msg.who, targetName);
+            return 0;
+        }
+        else {
+            handleHeroDefeat(msg.who, targetToken);
+            return unitDamage;
+        }
+    }
+
     applyCasualties(targetToken, unitDamage);
     calculateTroopLoss(msg, targetToken);
     heavyLossMoraleCheck(msg, targetToken);
@@ -288,6 +303,20 @@ function calcIndirectMissileDamage(numTroops, msg, targetArmor, unitNum, targetT
     sendChat(msg.who, css.indirectMissile + "Firing unit " + unitNum
         + " (" + numTroops + " troops)"
         + " does " + unitDamage + " damage." + css.spanEnd);
+
+    if (isTokenHero(targetToken)) {
+        var heroTroops = getTokenBarMax(targetToken, 1);
+        var targetName = getPropertyValue(targetToken, "name");
+        if (!isHeroDefeated(heroTroops, unitDamage)) {
+            handleHeroSave(msg.who, targetName);
+            return 0;
+        }
+        else {
+            handleHeroDefeat(msg.who, targetToken);
+            return unitDamage;
+        }
+    }
+
     applyCasualties(targetToken, unitDamage);
     calculateTroopLoss(msg, targetToken);
     heavyLossMoraleCheck(msg, targetToken);

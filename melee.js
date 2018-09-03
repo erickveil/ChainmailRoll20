@@ -248,8 +248,12 @@ function executeAttack(
     if (isSunSicknessApplies(chatTarget, attackerToken)) { --rollMod; }
 
     // wizards of lesser type and other misc mods
-    toHit += parseInt(getAttribute(defendSheetId, "Armor Mod"));
-    rollMod += parseInt(getAttribute(attackSheetId, "Attack Mod"));
+    var armorMod = getAttribute(defendSheetId, "Armor Mod");
+    armorMod = armorMod === "" ? 0 : parseInt(armorMod);
+    toHit += armorMod;
+    var attackMod = getAttribute(attackSheetId, "Attack Mod");
+    attackMod = attackMod === "" ? 0 : parseInt(attackMod);
+    rollMod += attackMod;
 
     // commander inspiration
     if (isGetsLeadershipCombatBonus(attackerToken)) {
@@ -282,7 +286,8 @@ function executeAttack(
     // counter attack required unless this is the counter attack
     if (!isCounterAttack) {
         var DO_COUNTER_ATTACK = true;
-        executeAttack(defenderToken, attackerToken, msg, DO_COUNTER_ATTACK);
+        var NOT_FLANK = false;
+        executeAttack(msg, defenderToken, attackerToken, DO_COUNTER_ATTACK, NOT_FLANK);
     }
 }
 

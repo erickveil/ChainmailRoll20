@@ -161,7 +161,7 @@ function isEarthborn(sheetId) {
 
 function getEarthbornToHitMod(chatTarget, attackerToken, defenderToken) {
     var attackSheetId = getPropertyValue(attackerToken, "represents");
-    var attackerName = getPropertyValue(atackerToken, "name");
+    var attackerName = getPropertyValue(attackerToken, "name");
     if (!isEarthborn(attackSheetId)) { return 0; }
     if (isFlying(defenderToken)) { return 0; }
     sendChat(chatTarget, css.attack + attackerName 

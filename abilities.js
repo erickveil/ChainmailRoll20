@@ -61,3 +61,16 @@ function getDefendsAs(sheetId) {
 }
 
 
+// ============ Ranger Bonus =================
+
+function isGetsRangerBonus(sheetId) {
+    return isHasAttribute(sheetId, "Attack Bonus");
+}
+
+function getRangerBonus(sheetId) {
+    if (!isGetsRangerBonus(sheetId)) { return 0; }
+    return parseInt(getAttribute(sheetId, "Attack Bonus"));
+}
+
+
+

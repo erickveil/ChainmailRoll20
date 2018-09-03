@@ -165,8 +165,15 @@ function eventRearAttack(msg) {
 
 // ---------------------------------------------------------------
 
-// This is an attempt to refactor a lot of this duplicate code into a single
-// method
+/**
+ * Performs the actual melee attack.
+ * 
+ * @param {*} msg 
+ * @param {*} attackerToken 
+ * @param {*} defenderToken 
+ * @param {*} isCounterAttack if true will not recursively call a counter
+ * @param {*} isFlankAttack if true will apply flanking bonuses
+ */
 function executeAttack(
     msg, 
     attackerToken, 
@@ -256,8 +263,10 @@ function executeAttack(
     if (targetNumber < 0) { targetNumber = 0; }
 
     // calculate number of dice to roll
+    var attackDiceFactor = (isFlankAttack)
+        ? getFlankerDiceFactor(attacksAs, defendsAs)
+        : getAttackDiceFactor(attacksAs, defendsAs);
     var attackerTroops = getTokenBarValue(attackerToken, 1);
-    var attackDiceFactor = getAttackDiceFactor(attacksAs, defendsAs);
     var attackWeapon = getAttribute(attackSheetId, "Weapon");
     var pikeMod = (attackWeapon.toLowerCase() === "pike"
         || attackWeapon.toLowerCase() === "halbard"
@@ -277,132 +286,6 @@ function executeAttack(
     }
 }
 
-function frontalAttack(selectedTroops, targetTroops, msg) {
-    var selectedSheetId = getPropertyValue(selectedObj, "represents");
-    var targetSheetId = getPropertyValue(targetObj, "represents");
-    var selectedUnitType = getAttacksAs(selectedSheetId);
-    var targetUnitType = getDefendsAs(targetSheetId);
-    var attackDiceFactor = getAttackDiceFactor(selectedUnitType, targetUnitType);
-    var selectedName = getPropertyValue(selectedObj, "name");
-    var targetName = getPropertyValue(targetObj, "name");
-    var weaponAttribute = "Weapon";
-    var selectedWeapon = getAttributeWithError(selectedSheetId, weaponAttribute);
-    var pikeMod = (selectedWeapon === "Pike"
-        || selectedWeapon === "Halbard"
-        || selectedWeapon === "Pole"
-        ) ? 1 : 0;
-
-    var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
-    var actualTargetType = getAttributeWithError(targetSheetId, "Unit Type");
-
-    if (isElementalVsElementalMelee(actualSelectedType, actualTargetType)) {
-        log("elemental vs elemental combat needs attention");
-    }
-    else {
-        // log("invalid for ele");
-    }
-
-    if (isHasMeleeImmunity(targetSheetId) && !isHasMagicSword(selectedSheetId)
-        && !isElementalVsElementalMelee(actualSelectedType, actualTargetType)) {
-        sendChat(msg.who, css.warning + targetName + " cannot be affected by nonmagical attacks.");
-        return;
-    }
-    if (isHasMeleeImmunity(selectedSheetId)) { isAttackerImmune = true; }
-
-    var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
-    var targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
-
-    // ---
-    if (isDaylight() && isUnitLightSensitive(selectedObj)) {
-        sendChat(msg.who, css.attack + selectedName + " does not like the light!" + css.spanEnd);
-        ++targetNumber;
-    }
-    else if (isDarkness()
-        && !isUnitLightSensitive(selectedObj)
-        && !isInSwordLight(selectedObj)
-        && !isNearLightSpell(selectedObj)
-        && !isHasDarkvision(selectedSheetId)
-    ) {
-
-        sendChat(msg.who, css.warning + selectedName + " cannot attack in the dark!" + css.spanEnd);
-        isForceCheck = true;
-        return;
-    }
-
-    if (isInSwordLight(selectedObj) && isDarkness()) {
-        sendChat(msg.who, css.magicItem + selectedName + " is bathed in the light of a magic sword." + css.spanEnd);
-    }
-    sayLightEffect(selectedObj, msg.who);
-
-    if (actualSelectedType === "Water Elemental" && isInWater(selectedObj)) {
-        selectedUnitType = "Heavy Horse";
-        targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
-        targetNumber -= 2;
-        sendChat(msg.who, css.attack + selectedName + " is more powerful while in water." + css.spanEnd);
-    }
-    if (actualTargetType === "Water Elemental" && isInWater(targetObj)) { targetUnitType = "Heavy Horse"; }
-
-    if (actualSelectedType === "Air Elemental" && isFlying(targetObj)) {
-        targetNumber -= 2;
-        sendChat(msg.who, css.attack + selectedName + " gets a bonus to hit flying units." + css.spanEnd);
-    }
-    else if (actualSelectedType === "Earth Elemental" && !isFlying(targetObj)) {
-        targetNumber -= 1;
-        sendChat(msg.who, css.attack + selectedName + " gets a bonus to hit earth-bound units." + css.spanEnd);
-    }
-
-    if (isHasMagicSword(selectedSheetId)) {
-        numberOfDice++;
-        if (isFantasyTarget(actualTargetType)) {
-            targetNumber -= getMagicSwordBonus(selectedSheetId);
-            sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die and a hit bonus from "
-                + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
-        }
-        else {
-            sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die from "
-                + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
-        }
-    }
-    else if (isHasMeleeImmunity(targetSheetId) && !isElementalVsElementalMelee(actualSelectedType, actualTargetType)) {
-        sendChat(msg.who, css.warning + targetName + " is immune to normal attacks!");
-        return;
-    }
-
-    if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
-
-    if (isGetsLeadershipCombatBonus(selectedObj)) {
-        --targetNumber;
-        var commanderName = getCommanderName(selectedObj);
-        sendChat(msg.who, css.attack + selectedName + " gets an attack bonus from " + commanderName);
-    }
-
-    var rangerBonus = getRangerBonus(selectedSheetId);
-    targetNumber -= rangerBonus;
-    if (targetNumber < 0) { targetNumber = 0; }
-
-    sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
-    var targetAttacksAs = getAttacksAs(targetSheetId);
-    var selectedDefendsAs = getDefendsAs(selectedSheetId);
-    counterAttack(targetAttacksAs, selectedDefendsAs, targetSheetId, selectedSheetId, weaponAttribute, targetTroops, msg);
-}
-
-function isElementalVsElementalMelee(selectedActualType, targetActualType) {
-    //log ("selected: " + selectedActualType + " vs " + targetActualType);
-    if (selectedActualType === "Earth Elemental") {
-        return targetActualType === "Air Elemental";
-    }
-    if (selectedActualType === "Air Elemental") {
-        return targetActualType === "Earth Elemental";
-    }
-    if (selectedActualType === "Fire Elemental") {
-        return targetActualType === "Water Elemental";
-    }
-    if (selectedActualType === "Water Elemental") {
-        return targetActualType === "Fire Elemental";
-    }
-    return false;
-}
-
 function isFantasyTarget(targetUnitType, sheetId) {
     if (
            targetUnitType === "Wizard"
@@ -414,421 +297,52 @@ function isFantasyTarget(targetUnitType, sheetId) {
     return isAttrSetTrue(sheetId, "Fantasy");
 }
 
+function frontalAttack(selectedTroops, targetTroops, msg) {
+    // from global value
+    var attackerToken = selectedObj;
+    // from global value
+    var defenderToken = targetObj;
+    var NOT_COUNTER = false;
+    var NOT_FLANK = false;
+    executeAttack(msg, attackerToken, defenderToken, NOT_COUNTER, NOT_FLANK);
+}
+
 /**
- * All troops formed in close order with pole arms can ony take frontal melee damage from like-armed troops.
+ * All troops formed in close order with pole arms can ony take frontal melee 
+ * damage from like-armed troops.
  * @param selectedTroops
  * @param msg
  */
 function polearmAdvantageAttack(selectedTroops, msg) {
-
     // though not rear, this triggers a morale check without a counter attack
     isRearAttack = true;
-
-    var selectedSheetId = getPropertyValue(selectedObj, "represents");
-    var targetSheetId = getPropertyValue(targetObj, "represents");
-    var selectedUnitType = getAttacksAs(selectedSheetId);
-    var targetUnitType = getDefendsAs(targetSheetId);
-    var attackDiceFactor = getAttackDiceFactor(selectedUnitType, targetUnitType);
-    var selectedName = getPropertyValue(selectedObj, "name");
-    var pikeMod = 1;
-
-    var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
-    var actualTargetType = getAttributeWithError(targetSheetId, "Unit Type");
-
-    var targetName = getPropertyValue(targetObj, "name");
-    if (isHasMeleeImmunity(targetSheetId) && !isHasMagicSword(selectedSheetId)
-        && !isElementalVsElementalMelee(actualSelectedType, actualTargetType)) {
-        sendChat(msg.who, css.warning + targetName + " cannot be affected by nonmagical attacks.");
-        return;
-    }
-    if (isHasMeleeImmunity(selectedSheetId)) { isAttackerImmune = true; }
-
-    var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
-    var targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
-
-    if (isDaylight() && isUnitLightSensitive(selectedObj)) {
-        sendChat(msg.who, css.attack + selectedName + " does not like the light!" + css.spanEnd);
-        ++targetNumber;
-    }
-    else if (isDarkness()
-        && !isUnitLightSensitive(selectedObj)
-        && !isInSwordLight(selectedObj)
-        && !isNearLightSpell(selectedObj)
-        && !isHasDarkvision(selectedSheetId)
-    ) {
-
-        sendChat(msg.who, css.warning + selectedName + " cannot attack in the dark!" + css.spanEnd);
-        isForceCheck = true;
-        return;
-    }
-
-    if (isInSwordLight(selectedObj) && isDarkness()) {
-        sendChat(msg.who, css.magicItem + selectedName + " is bathed in the light of a magic sword." + css.spanEnd);
-    }
-    sayLightEffect(selectedObj, msg.who);
-
-
-    if (actualSelectedType === "Water Elemental" && isInWater(selectedObj)) {
-        selectedUnitType = "Heavy Horse";
-        targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
-        targetNumber -= 2;
-        sendChat(msg.who, css.attack + selectedName + " is more powerful while in water." + css.spanEnd);
-    }
-
-    if (actualSelectedType === "Air Elemental" && isFlying(targetObj)) {
-        targetNumber -= 2;
-        sendChat(msg.who, css.attack + selectedName + " gets a bonus to hit flying units." + css.spanEnd);
-    }
-    else if (actualSelectedType === "Earth Elemental" && !isFlying(targetObj)) {
-        targetNumber -= 1;
-        sendChat(msg.who, css.attack + selectedName + " gets a bonus to hit earth-bound units." + css.spanEnd);
-    }
-
-    if (isHasMagicSword(selectedSheetId)) {
-        numberOfDice++;
-        if (isFantasyTarget(actualTargetType)) {
-            targetNumber -= getMagicSwordBonus(selectedSheetId);
-            sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die and a hit bonus from "
-                + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
-        }
-        else {
-            sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die from "
-                + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
-        }
-    }
-    else if (isHasMeleeImmunity(targetSheetId) && !isElementalVsElementalMelee(actualSelectedType, actualTargetType)) {
-        sendChat(msg.who, css.warning + targetName + " is immune to normal attacks!");
-        isAttackerImmune = true;
-        return;
-    }
-
-    if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
-
-    if (isGetsLeadershipCombatBonus(selectedObj)) {
-        --targetNumber;
-        var commanderName = getCommanderName(selectedObj);
-        sendChat(msg.who, css.attack + selectedName + " gets an attack bonus from " + commanderName);
-    }
-
-    var rangerBonus = getRangerBonus(selectedSheetId);
-    targetNumber -= rangerBonus;
-
-    if (targetNumber < 0) { targetNumber = 0; }
-
-    sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
+    // from global value
+    var attackerToken = selectedObj;
+    // from global value
+    var defenderToken = targetObj;
+    var NO_COUNTER_ALLOWED = true;
+    var NOT_FLANK = false;
+    executeAttack(msg, attackerToken, defenderToken, NO_COUNTER_ALLOWED, NOT_FLANK);
 }
-
-/*
-function getAttacksAs(sheetId) {
-    if (isHasAttribute(sheetId, "Fights As")) {
-        var fightsAs = getAttribute(sheetId, "Fights As");
-        if (fightsAs !== "") { return fightsAs; }
-    }
-    return getAttributeWithError(sheetId, "Unit Type");
-}
-*/
 
 function flankAttack(selectedTroops, targetTroops, msg) {
-    var selectedSheetId = getPropertyValue(selectedObj, "represents");
-    var targetSheetId = getPropertyValue(targetObj, "represents");
-    var selectedUnitType = getAttacksAs(selectedSheetId);
-    var targetUnitType = getDefendsAs(targetSheetId);
-    var attackDiceFactor = getFlankerDiceFactor(selectedUnitType, targetUnitType);
-    var selectedName = getPropertyValue(selectedObj, "name");
-    var weaponAttribute = "Weapon";
-    var selectedWeapon = getAttributeWithError(selectedSheetId, weaponAttribute);
-    var pikeMod = (selectedWeapon === "Pike"
-        || selectedWeapon === "Halbard"
-        || selectedWeapon === "Pole"
-        ) ? 1 : 0;
-    var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
-    var actualTargetType = getAttributeWithError(targetSheetId, "Unit Type");
-
-    var targetName = getPropertyValue(targetObj, "name");
-    if (isHasMeleeImmunity(targetSheetId) && !isHasMagicSword(selectedSheetId)
-        && !isElementalVsElementalMelee(actualSelectedType, actualTargetType)) {
-        sendChat(msg.who, css.warning + targetName + " cannot be affected by nonmagical attacks.");
-        return;
-    }
-
-    if (isHasMeleeImmunity(selectedSheetId)) { isAttackerImmune = true; }
-
-    var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
-    var targetNumber = getFlankerTargetNumber(selectedUnitType, targetUnitType);
-
-    if (isDaylight() && isUnitLightSensitive(selectedObj)) {
-        sendChat(msg.who, css.attack + selectedName + " does not like the light!" + css.spanEnd);
-        ++targetNumber;
-    }
-    else if (isDarkness()
-        && !isUnitLightSensitive(selectedObj)
-        && !isInSwordLight(selectedObj)
-        && !isNearLightSpell(selectedObj)
-        && !isHasDarkvision(selectedSheetId)
-    ) {
-
-        sendChat(msg.who, css.warning + selectedName + " cannot attack in the dark!" + css.spanEnd);
-        isForceCheck = true;
-        return;
-    }
-
-    if (isInSwordLight(selectedObj) && isDarkness()) {
-        sendChat(msg.who, css.magicItem + selectedName + " is bathed in the light of a magic sword." + css.spanEnd);
-    }
-    sayLightEffect(selectedObj, msg.who);
-
-    if (actualSelectedType === "Water Elemental" && isInWater(selectedObj)) {
-        selectedUnitType = "Heavy Horse";
-        targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
-        targetNumber -= 2;
-        sendChat(msg.who, css.attack + selectedName + " is more powerful while in water." + css.spanEnd);
-    }
-    if (actualTargetType === "Water Elemental" && isInWater(targetObj)) { targetUnitType = "Heavy Horse"; }
-
-    if (actualSelectedType === "Air Elemental" && isFlying(targetObj)) {
-        targetNumber -= 2;
-        sendChat(msg.who, css.attack + selectedName + " gets a bonus to hit flying units." + css.spanEnd);
-    }
-    else if (actualSelectedType === "Earth Elemental" && !isFlying(targetObj)) {
-        targetNumber -= 1;
-        sendChat(msg.who, css.attack + selectedName + " gets a bonus to hit earth-bound units." + css.spanEnd);
-    }
-
-    if (isHasMagicSword(selectedSheetId)) {
-        numberOfDice++;
-        if (isFantasyTarget(actualTargetType)) {
-            targetNumber -= getMagicSwordBonus(selectedSheetId);
-            sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die and a hit bonus from "
-                + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
-        }
-        else {
-            sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die from "
-                + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
-        }
-    }
-    else if (isHasMeleeImmunity(targetSheetId) && !isElementalVsElementalMelee(actualSelectedType, actualTargetType)) {
-        sendChat(msg.who, css.warning + targetName + " is immune to normal attacks!");
-        isAttackerImmune = true;
-        return;
-    }
-
-    if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
-
-    if (isGetsLeadershipCombatBonus(selectedObj)) {
-        --targetNumber;
-        var commanderName = getCommanderName(selectedObj);
-        sendChat(msg.who, css.attack + selectedName + " gets an attack bonus from " + commanderName);
-    }
-
-    if (selectedUnitType === "Armored Foot" || selectedUnitType === "Heavy Horse") {
-        --targetNumber;
-    }
-
-    var rangerBonus = getRangerBonus(selectedSheetId);
-    targetNumber -= rangerBonus;
-
-    if (targetNumber < 0) { targetNumber = 0; }
-
-    sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
-    var targetAttacksAs = getAttacksAs(targetSheetId);
-    var selectedAttacksAs = getDefendsAs(selectedSheetId);
-    counterAttack(targetAttacksAs, selectedAttacksAs, targetSheetId, selectedSheetId, weaponAttribute, targetTroops, msg);
+    // from global value
+    var attackerToken = selectedObj;
+    // from global value
+    var defenderToken = targetObj;
+    var NOT_COUNTER = false;
+    var IS_FLANK = false;
+    executeAttack(msg, attackerToken, defenderToken, NOT_COUNTER, IS_FLANK);
 }
 
 function rearAttack(selectedTroops, msg) {
-    var selectedSheetId = getPropertyValue(selectedObj, "represents");
-    var targetSheetId = getPropertyValue(targetObj, "represents");
-    var selectedUnitType = getAttacksAs(selectedSheetId);
-    var targetUnitType = getDefendsAs(targetSheetId);
-    var attackDiceFactor = getFlankerDiceFactor(selectedUnitType, targetUnitType);
-    var selectedName = getPropertyValue(selectedObj, "name");
-    var weaponAttribute = "Weapon";
-    var selectedWeapon = getAttributeWithError(selectedSheetId, weaponAttribute);
-    var pikeMod = (selectedWeapon === "Pike"
-        || selectedWeapon === "Halbard"
-        || selectedWeapon === "Pole"
-        ) ? 1 : 0;
-
-    var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
-    var actualTargetType = getAttributeWithError(targetSheetId, "Unit Type");
-
-    var targetName = getPropertyValue(targetObj, "name");
-    if (isHasMeleeImmunity(targetSheetId) && !isHasMagicSword(selectedSheetId)
-        && !isElementalVsElementalMelee(actualSelectedType, actualTargetType)) {
-        sendChat(msg.who, css.warning + targetName + " cannot be affected by nonmagical attacks.");
-        return;
-    }
-    if (isHasMeleeImmunity(selectedSheetId)) { isAttackerImmune = true; }
-
-    var numberOfDice = Math.ceil(selectedTroops * attackDiceFactor) + pikeMod;
-    var targetNumber = getFlankerTargetNumber(selectedUnitType, targetUnitType);
-
-    if (isDaylight() && isUnitLightSensitive(selectedObj)) {
-        sendChat(msg.who, css.attack + selectedName + " does not like the light!" + css.spanEnd);
-        ++targetNumber;
-    }
-    else if (isDarkness()
-        && !isUnitLightSensitive(selectedObj)
-        && !isInSwordLight(selectedObj)
-        && !isNearLightSpell(selectedObj)
-        && !isHasDarkvision(selectedSheetId)
-    ) {
-
-        sendChat(msg.who, css.warning + selectedName + " cannot attack in the dark!" + css.spanEnd);
-        isForceCheck = true;
-        return;
-    }
-
-    if (isInSwordLight(selectedObj) && isDarkness()) {
-        sendChat(msg.who, css.magicItem + selectedName + " is bathed in the light of a magic sword." + css.spanEnd);
-    }
-    sayLightEffect(selectedObj, msg.who);
-
-    if (actualSelectedType === "Water Elemental" && isInWater(selectedObj)) {
-        selectedUnitType = "Heavy Horse";
-        targetNumber = getAttackerTargetNumber(selectedUnitType, targetUnitType);
-        targetNumber -= 2;
-        sendChat(msg.who, css.attack + selectedName + " is more powerful while in water." + css.spanEnd);
-    }
-
-    if (actualSelectedType === "Air Elemental" && isFlying(targetObj)) {
-        targetNumber -= 2;
-        sendChat(msg.who, css.attack + selectedName + " gets a bonus to hit flying units." + css.spanEnd);
-    }
-    else if (actualSelectedType === "Earth Elemental" && !isFlying(targetObj)) {
-        targetNumber -= 1;
-        sendChat(msg.who, css.attack + selectedName + " gets a bonus to hit earth-bound units." + css.spanEnd);
-    }
-
-    if (isHasMagicSword(selectedSheetId)) {
-        numberOfDice++;
-        if (isFantasyTarget(actualTargetType)) {
-            targetNumber -= getMagicSwordBonus(selectedSheetId);
-            sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die and a hit bonus from "
-                + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
-        }
-        else {
-            sendChat(msg.who, css.magicItem + selectedName + " gets a bonus attack die from "
-                + getMagicSwordName(selectedSheetId) + "!" + css.spanEnd);
-        }
-    }
-    else if (isHasMeleeImmunity(targetSheetId) && !isElementalVsElementalMelee(actualSelectedType, actualTargetType)) {
-        sendChat(msg.who, css.warning + targetName + " is immune to normal attacks!");
-        isAttackerImmune = true;
-        return;
-    }
-
-    if (isHasMagicArmor(targetSheetId)) { ++targetNumber; }
-
-    if (isGetsLeadershipCombatBonus(selectedObj)) {
-        --targetNumber;
-        var commanderName = getCommanderName(selectedObj);
-        sendChat(msg.who, css.attack + selectedName + " gets an attack bonus from " + commanderName);
-    }
-
-    if (selectedUnitType === "Armored Foot" || selectedUnitType === "Heavy Horse") {
-        --targetNumber;
-    }
-
-    var rangerBonus = getRangerBonus(selectedSheetId);
-    targetNumber -= rangerBonus;
-
-    if (targetNumber < 0) { targetNumber = 0; }
-
-    sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + selectedName);
-}
-
-function counterAttack(targetUnitType, selectedUnitType, targetSheetId, selectedSheetId, weaponAttribute, targetTroops, msg) {
-
-    var attackDiceFactor = getAttackDiceFactor(targetUnitType, selectedUnitType);
-    var targetWeapon = getAttributeWithError(targetSheetId, weaponAttribute);
-    var pikeMod = (targetWeapon === "Pike"
-        || targetWeapon === "Halbard"
-        || targetWeapon === "Pole"
-        ) ? 1 : 0;
-    var targetName = getPropertyValue(targetObj, "name");
-    var selectedName = getPropertyValue(selectedObj, "name");
-
-    var actualTargetType = getAttributeWithError(targetSheetId, "Unit Type");
-    var actualSelectedType = getAttributeWithError(selectedSheetId, "Unit Type");
-
-    if (isHasMeleeImmunity(selectedSheetId) && !isHasMagicSword(targetSheetId)
-        && !isElementalVsElementalMelee(actualTargetType, actualSelectedType)) {
-        sendChat(msg.who, css.warning + selectedName + " cannot be affected by nonmagical attacks.");
-        return;
-    }
-
-    var numberOfDice = Math.ceil(targetTroops * attackDiceFactor) + pikeMod;
-
-    var targetNumber = getAttackerTargetNumber(targetUnitType, selectedUnitType);
-
-    if (isDaylight() && isUnitLightSensitive(targetObj)) {
-        sendChat(msg.who, css.counterAttack + targetName + " do not like the light!" + css.spanEnd);
-        ++targetNumber;
-    }
-    else if (isDarkness()
-        && !isUnitLightSensitive(targetObj)
-        && !isInSwordLight(targetObj)
-        && !isNearLightSpell(targetObj)
-        && !isHasDarkvision(targetSheetId)
-    ) {
-
-        sendChat(msg.who, css.warning + targetName + " cannot attack in the dark!");
-        isForceCheck = true;
-        return;
-    }
-    if (isInSwordLight(targetObj) && isDarkness()) {
-        sendChat(msg.who, css.magicItem + targetName + " are bathed in the light of a magic sword." + css.spanEnd);
-    }
-    sayLightEffect(targetObj, msg.who);
-
-    if (actualTargetType === "Water Elemental" && isInWater(targetObj)) {
-        selectedUnitType = "Heavy Horse";
-        targetNumber = getAttackerTargetNumber(targetUnitType, selectedUnitType);
-        targetNumber -= 2;
-        sendChat(msg.who, css.attack + targetName + " is more powerful while in water." + css.spanEnd);
-    }
-
-    if (actualTargetType === "Air Elemental" && isFlying(selectedObj)) {
-        targetNumber -= 2;
-        sendChat(msg.who, css.counterAttack + targetName + " gets a bonus to hit flying units." + css.spanEnd);
-    }
-    else if (actualTargetType === "Earth Elemental" && !isFlying(selectedObj)) {
-        targetNumber -= 1;
-        sendChat(msg.who, css.counterAttack + targetName + " gets a bonus to hit earth-bound units." + css.spanEnd);
-    }
-
-    if (isHasMagicSword(targetSheetId)) {
-        numberOfDice++;
-        if (isFantasyTarget(actualSelectedType)) {
-            targetNumber -= getMagicSwordBonus(targetSheetId);
-            sendChat(msg.who, css.magicItem + targetName + " gets a bonus attack die and a hit bonus from "
-                + getMagicSwordName(targetSheetId) + "!" + css.spanEnd);
-        }
-        else {
-            sendChat(msg.who, css.magicItem + targetName + " gets a bonus attack die from "
-                + getMagicSwordName(targetSheetId) + "!" + css.spanEnd);
-        }
-    }
-    else if (isHasMeleeImmunity(selectedSheetId) && !isElementalVsElementalMelee(actualTargetType, actualSelectedType)) {
-        sendChat(msg.who, css.warning + selectedName + " is immune to normal attacks!");
-        return;
-    }
-
-    if (isHasMagicArmor(selectedSheetId)) { ++targetNumber; }
-
-    if (isGetsLeadershipCombatBonus(targetObj)) {
-        --targetNumber;
-        var commanderName = getCommanderName(targetObj);
-        sendChat(msg.who, css.attack + targetName + " gets an attack bonus from " + commanderName);
-    }
-
-    var rangerBonus = getRangerBonus(targetSheetId);
-    targetNumber -= rangerBonus;
-
-    if (targetNumber < 0) { targetNumber = 0; }
-
-    sendChat(msg.who, "/r " + numberOfDice + "d6>" + targetNumber + " " + targetName);
+    // from global value
+    var attackerToken = selectedObj;
+    // from global value
+    var defenderToken = targetObj;
+    var NO_COUNTER_ALLOWED = true;
+    var IS_FLANK = false;
+    executeAttack(msg, attackerToken, defenderToken, NO_COUNTER_ALLOWED, IS_FLANK);
 }
 
 // ---------------------------------------------------------------

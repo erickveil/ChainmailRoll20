@@ -37,24 +37,24 @@ function handleHeroDefeat(chatMsg, heroToken) {
 // ============ Attacks/Defends/Fights As Unit Type =================
 
 function getFightsAs(sheetId) {
-    if (isHasAttribute(sheetId, "Fights As")) {
+    if (isCharacterHasAbility(sheetId, "Fights As")) {
         return getAttribute(sheetId, "Fights As");
     }
-    if (isHasAttribute(sheetId, "Unit Type")) {
+    if (isCharacterHasAbility(sheetId, "Unit Type")) {
         return getAttribute(sheetId, "Unit Type");
     }
     return "Light Foot";
 }
 
 function getAttacksAs(sheetId) {
-    if (isHasAttribute(sheetId, "Attacks As")) {
+    if (isCharacterHasAbility(sheetId, "Attacks As")) {
         return getAttribute(sheetId, "Attacks As");
     }
     return getFightsAs(sheetId);
 }
 
 function getDefendsAs(sheetId) {
-    if (isHasAttribute(sheetId, "Defends As")) {
+    if (isCharacterHasAbility(sheetId, "Defends As")) {
         return getAttribute(sheetId, "Defends As");
     }
     return getFightsAs(sheetId);
@@ -63,7 +63,7 @@ function getDefendsAs(sheetId) {
 // ============ Ranger Bonus =================
 
 function isGetsRangerBonus(sheetId) {
-    return isHasAttribute(sheetId, "Attack Bonus");
+    return isCharacterHasAbility(sheetId, "Attack Bonus");
 }
 
 function getRangerBonus(sheetId) {
@@ -74,7 +74,7 @@ function getRangerBonus(sheetId) {
 // ============ Magic Sword =================
 
 function isHasMagicSword(sheetId) {
-    return isHasAttribute(sheetId, "Magic Sword");
+    return isCharacterHasAbility(sheetId, "Magic Sword");
 }
 
 function getMagicSwordBonus(chatTarget, sheetId, attackerName) {
@@ -88,7 +88,7 @@ function getMagicSwordBonus(chatTarget, sheetId, attackerName) {
 // ============ Nonmagic Melee Immunity =================
 
 function isHasMeleeImmunity(chatTarget, attackSheetId, defendSheetId, defendName) {
-    if (isHasAttribute(defendSheetId, "Normal Attack Immunity")
+    if (isCharacterHasAbility(defendSheetId, "Normal Attack Immunity")
         && !isHasMagicSword(attackSheetId)) {
             sendChat(chatTarget, css.warning + defendName 
                 + " is immune to nonmagical attacks!");
@@ -100,7 +100,7 @@ function isHasMeleeImmunity(chatTarget, attackSheetId, defendSheetId, defendName
 // ============ Magic Armor =================
 
 function getMagicArmorBonus(chatTarget, defendSheetId, defendName) {
-    if (isHasAttribute(defendSheetId, "Magic Armor")) {
+    if (isCharacterHasAbility(defendSheetId, "Magic Armor")) {
         sendChat(chatTarget, css.magicItem + defendName 
             + " is protected by magic armor!");
         return parseInt(getAttribute(defendSheetId, "Magic Armor"));
@@ -122,7 +122,7 @@ function isSunSicknessApplies(chatTarget, attackerToken) {
 // ============ Waterborn =================
 
 function isWaterborn(sheetId) {
-    return isHasAttribute(sheetId, "Waterborn");
+    return isCharacterHasAbility(sheetId, "Waterborn");
 }
 
 function getWaterbornToHit(chatTarget, attackerToken, defaultToHit, defendsAs) {
@@ -140,7 +140,7 @@ function getWaterbornToHit(chatTarget, attackerToken, defaultToHit, defendsAs) {
 // ============ Airborn =================
 
 function isAirborn(sheetId) {
-    return isHasAttribute(sheetId, "Airborn");
+    return isCharacterHasAbility(sheetId, "Airborn");
 }
 
 function getAirbornToHitMod(chatTarget, attackerToken, defenderToken) {
@@ -156,7 +156,7 @@ function getAirbornToHitMod(chatTarget, attackerToken, defenderToken) {
 // ============ Earthborn =================
 
 function isEarthborn(sheetId) {
-    return isHasAttribute(sheetId, "Earthborn");
+    return isCharacterHasAbility(sheetId, "Earthborn");
 }
 
 function getEarthbornToHitMod(chatTarget, attackerToken, defenderToken) {

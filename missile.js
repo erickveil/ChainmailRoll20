@@ -150,7 +150,7 @@ function missileAttack(selectedId, targetId, msg, isIndirect) {
     clearLocalCasualties(archerToken, targetToken);
     var archerTroops = getTokenBarValue(archerToken, 1);
     var targetSheetId = getPropertyValue(targetToken, "represents");
-    var targetUnitType = getAttributeWithError(targetSheetId, "Unit Type");
+    var targetUnitType = getDefendsAs(targetSheetId);
     var targetArmor = getTargetMissileAC(targetUnitType);
 
     // split number of troops vs AC 0 and 1

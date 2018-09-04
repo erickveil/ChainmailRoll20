@@ -244,8 +244,9 @@ function isPeasantMove(chatTarget, peasantToken) {
     }
 }
 
-function isPeasantAttack(chatTarget, sheetId, defenderToken) {
-    if (!isPeasant(sheetId)) { return true; }
+function isPeasantAttack(chatTarget, peasantToken, defenderToken) {
+    var peasantSheetId = getPropertyValue(peasantToken, "represents");
+    if (!isPeasant(peasantSheetId)) { return true; }
     var defenderSheetId = getPropertyValue(defenderToken, "represents");
     var defenderType = getDefendsAs(defenderSheetId);
     var isDefenderPeasant = isPeasant(defenderSheetId);
@@ -285,8 +286,9 @@ function isPeasantAttack(chatTarget, sheetId, defenderToken) {
     }
 }
 
-function isPeasantDefend(chatTarget, sheetId, defenderToken) {
-    if (!isPeasant(sheetId)) { return true; }
+function isPeasantDefend(chatTarget, peasantToken, defenderToken) {
+    var peasantSheetId = getPropertyValue(peasantToken, "represents");
+    if (!isPeasant(peasantSheetId)) { return true; }
     var defenderSheetId = getPropertyValue(defenderToken, "represents");
     var defenderType = getDefendsAs(defenderSheetId);
     var isDefenderPeasant = isPeasant(defenderSheetId);

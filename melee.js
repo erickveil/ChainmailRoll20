@@ -187,6 +187,16 @@ function executeAttack(
     var defenderName = getPropertyValue(defenderToken, "name");
     var chatTarget = msg.who;
 
+    // peasants
+    if (!isCounterAttack 
+        && !isPeasantAttack(chatTarget, attackerToken, defenderToken)) {
+        return;
+    }
+    if (isCounterAttack
+        && !isPeasantDefend(chatTarget, attackerToken, defenderToken)) {
+        return;
+    }
+
     // fantasy opponents use fantasy table
     if (isFantasyToken(attackSheetId) && isFantasyToken(defendSheetId)) {
         var NOT_RANGED = false;

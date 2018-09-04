@@ -210,14 +210,14 @@ function isPeasantMove(chatTarget, peasantToken) {
     var roll2 = randomInteger(6);
     var rollTotal = roll1 + roll2;
     
-    var passFail = (rollTotal > DC) ? "PASS!" : "FAIL!";
+    var passFail = (rollTotal >= DC) ? "PASS!" : "FAIL!";
     var peasantName = getPropertyValue(peasantToken, "name");
     sendChat(chatTarget, css.morale + peasantName 
         + " gathers the courage to move. Roll: " + css.rollValue 
         + rollTotal + css.endValue + " vs. " + DC + ": " 
         + passFail + css.spanEnd);
 
-    if (rollTotal > DC) {
+    if (rollTotal >= DC) {
         var result = [];
         result[1] = " musters up the courage to move.";
         result[2] = " steps tenatiously forward.";
@@ -238,6 +238,7 @@ function isPeasantMove(chatTarget, peasantToken) {
         result[4] = " fall to thier knees in prayer for thier lives.";
         result[5] = " are held up by an argument with their neighbors.";
         result[6] = " are shaking so hard they didn't hear the order.";
+        var i = randomInteger(6);
         sendChat(chatTarget, css.morale + peasantName + result[i] 
             + css.spanEnd);
         return false;
@@ -251,15 +252,19 @@ function isPeasantAttack(chatTarget, peasantToken, defenderToken) {
     var defenderType = getDefendsAs(defenderSheetId);
     var isDefenderPeasant = isPeasant(defenderSheetId);
     var DC = getPeasantAttackDc(defenderType, isDefenderPeasant);
+ 
+    var roll1 = randomInteger(6);
+    var roll2 = randomInteger(6);
+    var rollTotal = roll1 + roll2;
     
-    var passFail = (rollTotal > DC) ? "PASS!" : "FAIL!";
+    var passFail = (rollTotal >= DC) ? "PASS!" : "FAIL!";
     var peasantName = getPropertyValue(peasantToken, "name");
     sendChat(chatTarget, css.morale + peasantName 
         + " attempts to resist throwing themselves into battle. Roll: " 
         + css.rollValue + rollTotal + css.endValue + " vs. " + DC + ": " 
         + passFail + css.spanEnd);
 
-    if (rollTotal > DC) {
+    if (rollTotal >= DC) {
         var result = [];
         result[1] = " throw themselves valiantly into battle!";
         result[2] = " shout a battle cry more in fear than anything and attacks!";
@@ -280,6 +285,7 @@ function isPeasantAttack(chatTarget, peasantToken, defenderToken) {
         result[4] = " are crying too hard to fight.";
         result[5] = " attempt to reason with the enemy!";
         result[6] = " have decided to become pacifists.";
+        var i = randomInteger(6);
         sendChat(chatTarget, css.morale + peasantName + result[i] 
             + css.spanEnd);
         return false;
@@ -292,16 +298,20 @@ function isPeasantDefend(chatTarget, peasantToken, defenderToken) {
     var defenderSheetId = getPropertyValue(defenderToken, "represents");
     var defenderType = getDefendsAs(defenderSheetId);
     var isDefenderPeasant = isPeasant(defenderSheetId);
-    var DC = getPeasantDefend(defenderType, isDefenderPeasant);
+    var DC = getPeasantDefendDc(defenderType, isDefenderPeasant);
     
-    var passFail = (rollTotal > DC) ? "PASS!" : "FAIL!";
+    var roll1 = randomInteger(6);
+    var roll2 = randomInteger(6);
+    var rollTotal = roll1 + roll2;
+ 
+    var passFail = (rollTotal >= DC) ? "PASS!" : "FAIL!";
     var peasantName = getPropertyValue(peasantToken, "name");
     sendChat(chatTarget, css.morale + peasantName 
         + " is unsure if they should fight back. Roll: " 
         + css.rollValue + rollTotal + css.endValue + " vs. " + DC + ": " 
         + passFail + css.spanEnd);
 
-    if (rollTotal > DC) {
+    if (rollTotal >= DC) {
         var result = [];
         result[1] = " hold up their tools in defense.";
         result[2] = " put up some sort of feeble resistance.";
@@ -322,6 +332,7 @@ function isPeasantDefend(chatTarget, peasantToken, defenderToken) {
         result[4] = " plead for their lives instead of fighting back.";
         result[5] = " stare in shock at the bodies around them.";
         result[6] = " aren't sure they're supposed to be here.";
+        var i = randomInteger(6);
         sendChat(chatTarget, css.morale + peasantName + result[i] 
             + css.spanEnd);
         return false;

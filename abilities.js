@@ -340,6 +340,7 @@ function getPeasantAttackDc(defenderType, isDefenderPeasant) {
     if (defenderType === "Light Horse") { return 10; }
     if (defenderType === "Medium Horse") { return 11; }
     if (defenderType === "Heavy Horse") { return 12; }
+    return 7;
 }
 
 function getPeasantDefendDc(attackerType, isAttackerPeasant) {
@@ -350,6 +351,7 @@ function getPeasantDefendDc(attackerType, isAttackerPeasant) {
     if (attackerType === "Light Horse") { return 9; }
     if (attackerType === "Medium Horse") { return 10; }
     if (attackerType === "Heavy Horse") { return 11; }
+    return 7;
 }
 
 

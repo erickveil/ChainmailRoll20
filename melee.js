@@ -269,7 +269,7 @@ function executeAttack(
     if (isGetsLeadershipCombatBonus(attackerToken)) {
         ++toHit;
         var commanderName = getCommanderName(attackerToken);
-        sendChat(chatTarget, css.attack + selectedName 
+        sendChat(chatTarget, css.attack + attackerName 
             + " gets an attack bonus from " + commanderName);
     }
 

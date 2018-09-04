@@ -260,14 +260,14 @@ function isPeasantAttack(chatTarget, peasantToken, defenderToken) {
     var passFail = (rollTotal >= DC) ? "PASS!" : "FAIL!";
     var peasantName = getPropertyValue(peasantToken, "name");
     sendChat(chatTarget, css.morale + peasantName 
-        + " attempts to resist throwing themselves into battle. Roll: " 
+        + " are reluctant to participate in battle. Roll: " 
         + css.rollValue + rollTotal + css.endValue + " vs. " + DC + ": " 
         + passFail + css.spanEnd);
 
     if (rollTotal >= DC) {
         var result = [];
         result[1] = " throw themselves valiantly into battle!";
-        result[2] = " shout a battle cry more in fear than anything and attacks!";
+        result[2] = " shout a battle cry more in fear than anything and attack!";
         result[3] = " reluctantly pretend to be enthusiastic about the order.";
         result[4] = " swing wildly at the enemey.";
         result[5] = " lunge like a wild animal at their foes!";
@@ -334,7 +334,9 @@ function isPeasantDefend(chatTarget, peasantToken, defenderToken) {
         result[6] = " aren't sure they're supposed to be here.";
         var i = randomInteger(6);
         sendChat(chatTarget, css.morale + peasantName + result[i] 
-            + css.spanEnd);
+            + " They route!" + css.spanEnd);
+        var icon_rout = "broken-heart";
+        peasantToken.set("status_" + icon_rout, "1");
         return false;
     }
 }

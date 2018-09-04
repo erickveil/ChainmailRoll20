@@ -195,5 +195,160 @@ function getEarthbornToHitMod(chatTarget, attackerToken, defenderToken) {
     return 1;
 }
 
+// ============ Peasant =================
+
+function isPeasant(sheetId) {
+    return isCharacterHasAbility(sheetId, "Peasant");
+}
+
+function isPeasantMove(chatTarget, peasantToken) {
+    var peasantSheetId = getPropertyValue(peasantToken, "represents");
+    if (!isPeasant(sheetId)) { return true; }
+    var DC = getPeasantMoveDc();
+
+    var roll1 = randomInteger(6);
+    var roll2 = randomInteger(6);
+    var rollTotal = roll1 + roll2;
+    
+    var passFail = (rollTotal > DC) ? "PASS!" : "FAIL!";
+    var peasantName = getPropertyValue(peasantToken, "name");
+    sendChat(chatTarget, css.morale + peasantName 
+        + " gathers the courage to move. Roll: " + css.rollValue 
+        + rollTotal + css.endValue + " vs. " + DC + ": " 
+        + passFail + css.spanEnd);
+
+    if (rollTotal > DC) {
+        var result = [];
+        result[1] = " musters up the courage to move.";
+        result[2] = " steps tenatiously forward.";
+        result[3] = " advances while praying for mercy.";
+        result[4] = " is pressed on unwillingly by those behind them.";
+        result[5] = " moves forward only after vomiting in fear.";
+        result[6] = " strides foolheartedly onword.";
+        var i = randomInteger(6);
+        sendChat(chatTarget, css.morale + peasantName + result[i] 
+            + css.spanEnd);
+        return true;
+    }
+    else {
+        var result = [];
+        result[1] = " are frozen in place with fear.";
+        result[2] = " curl up into a ball on the ground.";
+        result[3] = " stubbornly refuse to advance.";
+        result[4] = " fall to thier knees in prayer for thier lives.";
+        result[5] = " are held up by an argument with their neighbors.";
+        result[6] = " are shaking so hard they didn't hear the order.";
+        sendChat(chatTarget, css.morale + peasantName + result[i] 
+            + css.spanEnd);
+        return false;
+    }
+}
+
+function isPeasantAttack(chatTarget, sheetId, defenderToken) {
+    if (!isPeasant(sheetId)) { return true; }
+    var defenderSheetId = getPropertyValue(defenderToken, "represents");
+    var defenderType = getDefendsAs(defenderSheetId);
+    var isDefenderPeasant = isPeasant(defenderSheetId);
+    var DC = getPeasantAttackDc(defenderType, isDefenderPeasant);
+    
+    var passFail = (rollTotal > DC) ? "PASS!" : "FAIL!";
+    var peasantName = getPropertyValue(peasantToken, "name");
+    sendChat(chatTarget, css.morale + peasantName 
+        + " attempts to resist throwing themselves into battle. Roll: " 
+        + css.rollValue + rollTotal + css.endValue + " vs. " + DC + ": " 
+        + passFail + css.spanEnd);
+
+    if (rollTotal > DC) {
+        var result = [];
+        result[1] = " throw themselves valiantly into battle!";
+        result[2] = " shout a battle cry more in fear than anything and attacks!";
+        result[3] = " reluctantly pretend to be enthusiastic about the order.";
+        result[4] = " swing wildly at the enemey.";
+        result[5] = " lunge like a wild animal at their foes!";
+        result[6] = " fight for their very lives!";
+        var i = randomInteger(6);
+        sendChat(chatTarget, css.morale + peasantName + result[i] 
+            + css.spanEnd);
+        return true;
+    }
+    else {
+        var result = [];
+        result[1] = " put their heads between their legs.";
+        result[2] = " soil themselves.";
+        result[3] = " ineffectively slap at the enemy.";
+        result[4] = " are crying too hard to fight.";
+        result[5] = " attempt to reason with the enemy!";
+        result[6] = " have decided to become pacifists.";
+        sendChat(chatTarget, css.morale + peasantName + result[i] 
+            + css.spanEnd);
+        return false;
+    }
+}
+
+function isPeasantDefend(chatTarget, sheetId, defenderToken) {
+    if (!isPeasant(sheetId)) { return true; }
+    var defenderSheetId = getPropertyValue(defenderToken, "represents");
+    var defenderType = getDefendsAs(defenderSheetId);
+    var isDefenderPeasant = isPeasant(defenderSheetId);
+    var DC = getPeasantDefend(defenderType, isDefenderPeasant);
+    
+    var passFail = (rollTotal > DC) ? "PASS!" : "FAIL!";
+    var peasantName = getPropertyValue(peasantToken, "name");
+    sendChat(chatTarget, css.morale + peasantName 
+        + " is unsure if they should fight back. Roll: " 
+        + css.rollValue + rollTotal + css.endValue + " vs. " + DC + ": " 
+        + passFail + css.spanEnd);
+
+    if (rollTotal > DC) {
+        var result = [];
+        result[1] = " hold up their tools in defense.";
+        result[2] = " put up some sort of feeble resistance.";
+        result[3] = " strike back in fear!";
+        result[4] = " strike back!";
+        result[5] = " manage to stand up for themselves.";
+        result[6] = " double down.";
+        var i = randomInteger(6);
+        sendChat(chatTarget, css.morale + peasantName + result[i] 
+            + css.spanEnd);
+        return true;
+    }
+    else {
+        var result = [];
+        result[1] = " cry for their mothers.";
+        result[2] = " prepare for death.";
+        result[3] = " lie down in hopes all of this ends quickly.";
+        result[4] = " plead for their lives instead of fighting back.";
+        result[5] = " stare in shock at the bodies around them.";
+        result[6] = " aren't sure they're supposed to be here.";
+        sendChat(chatTarget, css.morale + peasantName + result[i] 
+            + css.spanEnd);
+        return false;
+    }
+}
+
+function getPeasantMoveDc() {
+    return 7;
+}
+
+function getPeasantAttackDc(defenderType, isDefenderPeasant) {
+    if (isDefenderPeasant) { return 4; }
+    if (defenderType === "Light Foot") { return 6; }
+    if (defenderType === "Heavy Foot") { return 8; }
+    if (defenderType === "Armored Foot") { return 9; }
+    if (defenderType === "Light Horse") { return 10; }
+    if (defenderType === "Medium Horse") { return 11; }
+    if (defenderType === "Heavy Horse") { return 12; }
+}
+
+function getPeasantDefendDc(attackerType, isAttackerPeasant) {
+    if (isAttackerPeasant) { return 5; }
+    if (attackerType === "Light Foot") { return 6; }
+    if (attackerType === "Heavy Foot") { return 7; }
+    if (attackerType === "Armored Foot") { return 8; }
+    if (attackerType === "Light Horse") { return 9; }
+    if (attackerType === "Medium Horse") { return 10; }
+    if (attackerType === "Heavy Horse") { return 11; }
+}
+
 
 

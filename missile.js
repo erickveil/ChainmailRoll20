@@ -120,17 +120,25 @@ function missileAttack(selectedId, targetId, msg, isIndirect) {
     var tokenType = "graphic";
     var archerToken = getObjectWithReport(tokenType, selectedId);
     var targetToken = getObjectWithReport(tokenType, targetId);
+    selectedObj = archerToken;
     pingObject(targetToken);
     tintRanged(archerToken);
 
-    if (isObjectWizard(targetToken)) {
-        sendChat(msg.who, css.warning + "Wizards are immune to missile attacks." + css.spanEnd);
+    if (isFantasyToken(selectedId) && isFantasyToken(targetId)) {
+        var IS_RANGED = true;
+        doFantasyBattle(msg.who, selectedObj, targetObj, IS_RANGED);
         return;
     }
 
-    selectedObj = getObjectWithReport("graphic", selectedId);
-    var selectedName = getPropertyValue(selectedObj, "name");
     var selectedSheetId = getPropertyValue(selectedObj, "represents");
+    var selectedName = getPropertyValue(selectedObj, "name");
+
+    var targetSheetId = getPropertyValue(targetToken, "represents");
+    var targetName = getPropertyValue(targetToken, "name");
+
+    if (isHasMissileImmunity(msg.who, selectedSheetId, targetSheetId, targetName)) {
+        return;
+    }
 
     // darkness effects
     if (isCombatAffectedByDarkness(selectedObj, targetToken)) {
@@ -142,7 +150,6 @@ function missileAttack(selectedId, targetId, msg, isIndirect) {
 
     clearLocalCasualties(archerToken, targetToken);
     var archerTroops = getTokenBarValue(archerToken, 1);
-    var targetSheetId = getPropertyValue(targetToken, "represents");
     var targetUnitType = getDefendsAs(targetSheetId);
     var targetArmor = getTargetMissileAC(targetUnitType);
 

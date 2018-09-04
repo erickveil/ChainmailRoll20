@@ -85,6 +85,20 @@ function getMagicSwordBonus(chatTarget, sheetId, attackerName) {
     return parseInt(getAttribute(sheetId, "Magic Sword"));
 }
 
+// ============ Magic Missile =================
+
+function isHasMagicMissile(sheetId) {
+    return isCharacterHasAbility(sheetId, "Magic Missiles");
+}
+
+function getMagicMissileBonus(chatTarget, sheetId, attackerName) {
+    if (!isHasMagicSword(sheetId)) { return 0; }
+    sendChat(chatTarget, css.magicItem + attackerName
+        + " gets an attack bonus from Magic Missiles!"
+        + css.spanEnd);
+    return parseInt(getAttribute(sheetId, "Magic Missiles"));
+}
+
 // ============ Nonmagic Melee Immunity =================
 
 function isHasMeleeImmunity(chatTarget, attackSheetId, defendSheetId, defendName) {
@@ -92,6 +106,18 @@ function isHasMeleeImmunity(chatTarget, attackSheetId, defendSheetId, defendName
         && !isHasMagicSword(attackSheetId)) {
             sendChat(chatTarget, css.warning + defendName 
                 + " is immune to nonmagical attacks!");
+            return true;
+    }
+    return false;
+}
+
+// ============ Nonmagic Missile Immunity =================
+
+function isHasMissileImmunity(chatTarget, attackSheetId, defendSheetId, defendName) {
+    if (isCharacterHasAbility(defendSheetId, "Missile Immunity")
+        && !isHasMagicMissile(attackSheetId)) {
+            sendChat(chatTarget, css.warning + defendName 
+                + " is immune to nonmagical missile attacks!");
             return true;
     }
     return false;

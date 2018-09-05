@@ -203,7 +203,7 @@ function isPeasant(sheetId) {
 
 function isPeasantMove(chatTarget, peasantToken) {
     var peasantSheetId = getPropertyValue(peasantToken, "represents");
-    if (!isPeasant(sheetId)) { return true; }
+    if (!isPeasant(peasantSheetId)) { return true; }
     var DC = getPeasantMoveDc();
 
     var roll1 = randomInteger(6);

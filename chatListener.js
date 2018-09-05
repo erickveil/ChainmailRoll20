@@ -43,6 +43,7 @@ on("chat:message", function(msg) {
         eventTallyArmy(msg);
         eventToggleTerrainToLayer(msg);
         eventNukeArmy(msg);
+        eventPeasantOrderedToMove(msg);
     }
     catch(err) {
         if (typeof err === "string") {
@@ -51,7 +52,7 @@ on("chat:message", function(msg) {
         else if (typeof err === "object"
             && typeof err.chatMsg !== "undefined"
             ) {
-            log("Exception: " + err);
+            log("Exception: " + JSON.stringify(err));
             sendChat(msg.who, css.error + err.chatMsg + css.spanEnd);
         }
         else if (typeof err === "undefined") {
@@ -76,6 +77,23 @@ function eventToggleTerrainToLayer(msg) {
         gIsTerrainOnMap = true;
         moveTerrainToMapLayer();
     }
+}
+
+function eventPeasantOrderedToMove(msg) {
+    if (!(msg.type === "api" 
+        && msg.content.indexOf("!peasantMove ") !== -1)) { return; }
+    var argStr = msg.content.replace("!peasantMove ", "");
+    var argList = argStr.split(",");
+    if (argList.length !== 1) {
+        var logMsg = "Not enough arguments in !peasantMove command: " 
+            + msg.content;
+        var chatMsg = css.error 
+            + "The !peasantMove macro is set up incorrectly." + css.spanEnd;
+        throw new roll20Exception(logMsg, chatMsg);
+    }
+    var selectedId = argList[0];
+    selectedObj = getObjectWithReport("graphic", selectedId);
+    isPeasantMove(msg.who, selectedObj);
 }
 
 function eventMoveTerrainToMapLayer(msg) {

@@ -56,6 +56,15 @@ function doFantasyBattle(chatTarget, attackerToken, defenderToken, isRanged)
     // end darkness effects
 
     var toHit = getFantasyAttackTargetValue(attackType, defendType);
+
+    // elves and fey with magic swords get special toHit
+    if (isFey(attackSheetId)
+        && isHasMagicSword(attackSheetId)
+        && isFeyFantasyTarget(defendSheetId)
+    ) {
+        toHit = getFeyFantasyToHit(defendType);
+    }
+
     var rollMod = 0;
     rollMod += getRangerBonus(attackSheetId);
     if (isRanged) {

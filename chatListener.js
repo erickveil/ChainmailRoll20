@@ -87,8 +87,7 @@ function eventPeasantOrderedToMove(msg) {
     if (argList.length !== 1) {
         var logMsg = "Not enough arguments in !peasantMove command: " 
             + msg.content;
-        var chatMsg = css.error 
-            + "The !peasantMove macro is set up incorrectly." + css.spanEnd;
+        var chatMsg = css.error + "The !peasantMove macro is set up incorrectly." + css.spanEnd;
         throw new roll20Exception(logMsg, chatMsg);
     }
     var selectedId = argList[0];

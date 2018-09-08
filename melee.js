@@ -289,6 +289,33 @@ function executeAttack(
     var numberOfDice = Math.ceil(attackerTroops * attackDiceFactor) 
         + pikeMod + magicSwordBonus;
 
+    // Elves with magic weapons vs certain creatures get more dice:
+    if (isFey(attackSheetId) 
+        && isHasMagicSword(attackSheetId)
+        && isOrc(defendSheetId)
+    ) {
+        sayFeyFantasyAttackLine(chatTarget, attackerName, 
+            defenderName, getMagicSwordName(attackSheetId));
+        numberOfDice += 2;
+    }
+    else if (isFey(attackSheetId) 
+        && isHasMagicSword(attackSheetId)
+        && isGoblin(defendSheetId)
+    ) {
+        sayFeyFantasyAttackLine(chatTarget, attackerName, 
+            defenderName, getMagicSwordName(attackSheetId));
+        numberOfDice += 3;
+    }
+    else if (isFey(attackSheetId)
+        && isHasMagicSword(attackSheetId)
+        && isFeyFantasyTarget(defendSheetId)
+    ) {
+        sayFeyFantasyAttackLine(chatTarget, attackerName, 
+            defenderName, getMagicSwordName(attackSheetId));
+        doFantasyBattle(chatTarget, attackerToken, defenderToken, false);
+        return;
+    }
+
     // do the roll
     sendChat(chatTarget,  "/r " + numberOfDice + "d6>" + targetNumber 
         + " " + attackerName);
@@ -301,6 +328,7 @@ function executeAttack(
     }
 }
 
+/*
 function isFantasyTarget(targetUnitType, sheetId) {
     if (
            targetUnitType === "Wizard"
@@ -311,6 +339,7 @@ function isFantasyTarget(targetUnitType, sheetId) {
     ) { return true; }
     return isAttrSetTrue(sheetId, "Fantasy");
 }
+*/
 
 function frontalAttack(selectedTroops, targetTroops, msg) {
     // from global value

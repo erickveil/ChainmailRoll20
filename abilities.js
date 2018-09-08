@@ -8,6 +8,7 @@
 
 
 // ============ Heroic =================
+// Heroic characters are only killed if you do full damage on a single attack.
 
 function isTokenHero(token) {
     var sheetId = getPropertyValue(token, "represents");
@@ -35,6 +36,7 @@ function handleHeroDefeat(chatMsg, heroToken) {
 
 
 // ============ Attacks/Defends/Fights As Unit Type =================
+// Priority is Attacks As/Defends As, then Fights As, then Unit Type
 
 function getFightsAs(sheetId) {
     if (isCharacterHasAbility(sheetId, "Fights As")) {
@@ -61,6 +63,7 @@ function getDefendsAs(sheetId) {
 }
 
 // ============ Ranger Bonus =================
+// Rangers get a +1 to their attack rolls
 
 function isGetsRangerBonus(sheetId) {
     return isCharacterHasAbility(sheetId, "Attack Bonus");
@@ -72,6 +75,7 @@ function getRangerBonus(sheetId) {
 }
 
 // ============ Magic Sword =================
+// Magic swords provide a bonus and 1 extra die on attacks
 
 function isHasMagicSword(sheetId) {
     return isCharacterHasAbility(sheetId, "Magic Sword");
@@ -86,6 +90,7 @@ function getMagicSwordBonus(chatTarget, sheetId, attackerName) {
 }
 
 // ============ Magic Missile =================
+// Magic missiles provide a bonus to missile attacks
 
 function isHasMagicMissile(sheetId) {
     return isCharacterHasAbility(sheetId, "Magic Missiles");
@@ -100,6 +105,7 @@ function getMagicMissileBonus(chatTarget, sheetId, attackerName) {
 }
 
 // ============ Nonmagic Melee Immunity =================
+// Can only be hit by magic swords
 
 function isHasMeleeImmunity(chatTarget, attackSheetId, defendSheetId, defendName) {
     if (isCharacterHasAbility(defendSheetId, "Normal Attack Immunity")
@@ -112,6 +118,7 @@ function isHasMeleeImmunity(chatTarget, attackSheetId, defendSheetId, defendName
 }
 
 // ============ Nonmagic Missile Immunity =================
+// Can only be hit by magic missiles
 
 function isHasMissileImmunity(chatTarget, attackSheetId, defendSheetId, defendName) {
     if (isCharacterHasAbility(defendSheetId, "Missile Immunity")
@@ -124,6 +131,7 @@ function isHasMissileImmunity(chatTarget, attackSheetId, defendSheetId, defendNa
 }
 
 // ============ Magic Armor =================
+// Provides a bonus to the target number when attacked
 
 function getMagicArmorBonus(chatTarget, defendSheetId, defendName) {
     if (isCharacterHasAbility(defendSheetId, "Magic Armor")) {
@@ -135,6 +143,7 @@ function getMagicArmorBonus(chatTarget, defendSheetId, defendName) {
 }
 
 // ============ Sun Sickness =================
+// Imposes a penalty to all dice rolls in bright light
 
 function isSunSicknessApplies(chatTarget, attackerToken) {
     var attackName = getPropertyValue(attackerToken, "name");
@@ -146,6 +155,8 @@ function isSunSicknessApplies(chatTarget, attackerToken) {
 }
 
 // ============ Waterborn =================
+// Waterborn attack as heavy horse if in water.
+// To be in water, give token the heart in chains icon
 
 function isWaterborn(sheetId) {
     return isCharacterHasAbility(sheetId, "Waterborn");
@@ -164,6 +175,7 @@ function getWaterbornToHit(chatTarget, attackerToken, defaultToHit, defendsAs) {
 }
 
 // ============ Airborn =================
+// Airborn creatures get a bonus to hit flying creatures
 
 function isAirborn(sheetId) {
     return isCharacterHasAbility(sheetId, "Airborn");
@@ -180,6 +192,7 @@ function getAirbornToHitMod(chatTarget, attackerToken, defenderToken) {
 }
 
 // ============ Earthborn =================
+// Earthborn creatures get a bonus to hit non-flying creatures
 
 function isEarthborn(sheetId) {
     return isCharacterHasAbility(sheetId, "Earthborn");
@@ -196,6 +209,7 @@ function getEarthbornToHitMod(chatTarget, attackerToken, defenderToken) {
 }
 
 // ============ Peasant =================
+// Peasants make a special morale check before fightng or moving.
 
 function isPeasant(sheetId) {
     return isCharacterHasAbility(sheetId, "Peasant");
@@ -365,6 +379,66 @@ function getPeasantDefendDc(attackerType, isAttackerPeasant) {
     if (attackerType === "Medium Horse") { return 10; }
     if (attackerType === "Heavy Horse") { return 11; }
     return 7;
+}
+
+// ============== Fey ================
+// Fey creatures get special attacks against certain creatures when
+// wielding a magic sword.
+
+function isFey(sheetId) {
+    return isCharacterHasAbility(sheetId, "Fey");
+}
+
+function isOrc(sheetId) {
+    var unitType = getAttributeWithError(sheetId, "Unit Type");
+    return unitType.toLowerCase() === "orc";
+}
+
+function isGoblin(sheetId) {
+    var unitType = getAttributeWithError(sheetId, "Unit Type");
+    return unitType.toLowerCase() === "goblin";
+}
+
+function isFeyFantasyTarget(defenderSheetId) {
+    var type = getFantasyType(defenderSheetId);
+    var type = type.toLowerCase();
+    return type === "hero"
+        || type === "super hero"
+        || type === "wizard"
+        || type === "wraith"
+        || type === "wight"
+        || type === "lycanthrope"
+        || type === "balrog"
+        || type === "troll"
+        || type === "giant";
+}
+
+function isGetsFeyFantasyAttack(attackerSheetId, defenderSheetId) {
+    if (!isFey(attackerSheetId)) { return false; }
+    if (!isHasMagicSword(attackerSheetId)) { return false; }
+    if (!isFeyFantasyTarget(defenderSheetId)) { return false; }
+    return true;
+}
+
+function getFeyFantasyToHit(defendType) {
+    var type = defendType.toLowerCase(); 
+    if (type === "hero") { return 9; }
+    if (type === "super hero") { return 11; }
+    if (type === "wizard") { return 10; }
+    if (type === "wraith") { return 8; }
+    if (type === "wight") { return 6; }
+    if (type === "lycanthrope") { return 9; }
+    if (type === "troll") { return 7; }
+    if (type === "balrog") { return 12; }
+    if (type === "giant") { return 10; }
+    return 7;
+}
+
+function sayFeyFantasyAttackLine(chatTarget, attackerName, defenderName, swordName) {
+    sendChat(chatTarget, css.magicItem + "The fey blade, "
+        + swordName + " of " + attackerName 
+        + ", flares with power as it strikes at " + defenderName
+        + css.spanEnd);
 }
 
 

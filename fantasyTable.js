@@ -61,8 +61,17 @@ function doFantasyBattle(chatTarget, attackerToken, defenderToken, isRanged)
     if (isFey(attackSheetId)
         && isHasMagicSword(attackSheetId)
         && isFeyFantasyTarget(defendSheetId)
+        && !isRanged
     ) {
         toHit = getFeyFantasyToHit(defendType);
+    }
+    // elves and fey with magic arrows attacks as heros
+    else if (isFey(attackSheetId)
+        && isHasMagicMissile(attackSheetId)
+        && isRanged
+    ) {
+        attackType = "Hero";
+        toHit = getFantasyAttackTargetValue(attackType, defendType);
     }
 
     var rollMod = 0;

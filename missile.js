@@ -124,17 +124,25 @@ function missileAttack(selectedId, targetId, msg, isIndirect) {
     pingObject(targetToken);
     tintRanged(archerToken);
 
-    if (isFantasyToken(selectedId) && isFantasyToken(targetId)) {
-        var IS_RANGED = true;
-        doFantasyBattle(msg.who, selectedObj, targetObj, IS_RANGED);
-        return;
-    }
-
     var selectedSheetId = getPropertyValue(selectedObj, "represents");
     var selectedName = getPropertyValue(selectedObj, "name");
 
     var targetSheetId = getPropertyValue(targetToken, "represents");
     var targetName = getPropertyValue(targetToken, "name");
+
+    // TODO: The fantasy tables are not being rolled on, but instead acting as if it were a magical attack on normal ranged attack resistance
+    var IS_RANGED = true;
+    if (isFantasyToken(selectedId) && isFantasyToken(targetId)) {
+        doFantasyBattle(msg.who, selectedObj, targetObj, IS_RANGED);
+        return;
+    }
+    else if (isFey(selectedSheetId) 
+        && isHasMagicMissile(selectedSheetId)
+        && isFantasyToken(targetId)
+    ) {
+        doFantasyBattle(msg.who, selectedObj, targetObj, IS_RANGED);
+        return;
+    }
 
     if (isHasMissileImmunity(msg.who, selectedSheetId, targetSheetId, targetName)) {
         return;

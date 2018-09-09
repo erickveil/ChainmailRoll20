@@ -7,7 +7,7 @@
  */
 
 function isFantasyToken(sheetId) {
-    var isHasType = isHasAttribute(sheetId, "Fantasy Type");
+    var isHasType = isCharacterHasAbility(sheetId, "Fantasy Type");
     if(!isHasType) { return false; }
     var type = getAttribute(sheetId, "Fantasy Type");
     return isValidFantasyType(type);
@@ -189,6 +189,7 @@ function doFantasyBattle(chatTarget, attackerToken, defenderToken, isRanged)
             + result[i] + css.spanEnd);
         defenderToken.set("status_dead", true);
     }
+
 }
 
 function lightSensitivityEffect(chatTarget, affectedName) {

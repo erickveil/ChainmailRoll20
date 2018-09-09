@@ -124,23 +124,23 @@ function missileAttack(selectedId, targetId, msg, isIndirect) {
     pingObject(targetToken);
     tintRanged(archerToken);
 
-    var selectedSheetId = getPropertyValue(selectedObj, "represents");
-    var selectedName = getPropertyValue(selectedObj, "name");
+    var selectedSheetId = getPropertyValue(archerToken, "represents");
+    var selectedName = getPropertyValue(archerToken, "name");
 
     var targetSheetId = getPropertyValue(targetToken, "represents");
     var targetName = getPropertyValue(targetToken, "name");
 
     // TODO: The fantasy tables are not being rolled on, but instead acting as if it were a magical attack on normal ranged attack resistance
     var IS_RANGED = true;
-    if (isFantasyToken(selectedId) && isFantasyToken(targetId)) {
-        doFantasyBattle(msg.who, selectedObj, targetObj, IS_RANGED);
+    if (isFantasyToken(selectedSheetId) && isFantasyToken(targetSheetId)) {
+        doFantasyBattle(msg.who, archerToken, targetToken, IS_RANGED);
         return;
     }
     else if (isFey(selectedSheetId) 
         && isHasMagicMissile(selectedSheetId)
-        && isFantasyToken(targetId)
+        && isFantasyToken(targetSheetId)
     ) {
-        doFantasyBattle(msg.who, selectedObj, targetObj, IS_RANGED);
+        doFantasyBattle(msg.who, archerToken, targetToken, IS_RANGED);
         return;
     }
 
@@ -149,11 +149,11 @@ function missileAttack(selectedId, targetId, msg, isIndirect) {
     }
 
     // darkness effects
-    if (isCombatAffectedByDarkness(selectedObj, targetToken)) {
-        doDarknessEffect(msg.who, selectedObj, targetToken);
+    if (isCombatAffectedByDarkness(archerToken, targetToken)) {
+        doDarknessEffect(msg.who, archerToken, targetToken);
         return;
     }
-    doDarknessEffect(msg.who, selectedObj, targetToken);
+    doDarknessEffect(msg.who, archerToken, targetToken);
     // end darkness effects
 
     clearLocalCasualties(archerToken, targetToken);

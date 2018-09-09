@@ -1,6 +1,7 @@
 # Ignore minified version of script
 # minify using `cat file1 file2 fiel3 | uglifyjs -o ouputfile.min.js
 *.min.js
+*.comp.js
 
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion,
 # Android Studio and WebStorm

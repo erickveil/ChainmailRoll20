@@ -65,18 +65,8 @@ function eventMagicMissileAttack(msg) {
         return;
     }
 
-    // all fantasy creatures go here
-    var isFantasyTarget = false;
 
-    if (!isFantasyTarget) {
-        missileAttack(selectedId, targetId, msg, true);
-        return;
-    }
-
-    // NOTE: Enchanted arrows get special attacks against fantasy creatures, but normal
-    // attacks against normal creatures.
-    // Wizards are still immune to *all* missiles.
-    // TODO: Define what happens when attacking fantasy foes with enchanted arrows here.
+    missileAttack(selectedId, targetId, msg, true);
 }
 
 function eventIndirectMissileAttack(msg) {
@@ -130,7 +120,6 @@ function missileAttack(selectedId, targetId, msg, isIndirect) {
     var targetSheetId = getPropertyValue(targetToken, "represents");
     var targetName = getPropertyValue(targetToken, "name");
 
-    // TODO: The fantasy tables are not being rolled on, but instead acting as if it were a magical attack on normal ranged attack resistance
     var IS_RANGED = true;
     if (isFantasyToken(selectedSheetId) && isFantasyToken(targetSheetId)) {
         doFantasyBattle(msg.who, archerToken, targetToken, IS_RANGED);
@@ -144,7 +133,9 @@ function missileAttack(selectedId, targetId, msg, isIndirect) {
         return;
     }
 
-    if (isHasMissileImmunity(msg.who, selectedSheetId, targetSheetId, targetName)) {
+    if (isHasMissileImmunity(msg.who, selectedSheetId, targetSheetId, 
+        targetName)
+        && !isHasMagicMissile(selectedSheetId)) {
         return;
     }
 

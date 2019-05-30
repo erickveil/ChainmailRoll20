@@ -109,14 +109,14 @@ function eventToggleMiscRange(msg) {
     var color = argList[2];
 
     var selectedToken = getTokenById(tokenId);
-    var currentRadius = getPropertyValue(selectedToken, "aura1_radius");
+    var currentRadius = getPropertyValue(selectedToken, "aura2_radius");
     if (currentRadius !== "") {
-        selectedToken.set("aura1_radius", "");
+        selectedToken.set("aura2_radius", "");
         return;
     }
-    selectedToken.set("aura1_square", false);
-    selectedToken.set("aura1_color", color);
-    selectedToken.set("aura1_radius", range);
+    selectedToken.set("aura2_square", false);
+    selectedToken.set("aura2_color", color);
+    selectedToken.set("aura2_radius", range);
 
 }
 

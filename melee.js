@@ -815,6 +815,14 @@ function removeAllTints() {
     var objList = findObjs({type: 'graphic'});
     for (var i = 0; i < objList.length; ++i) {
         objList[i].set('tint_color', "transparent");
+
+        // Set to tint color if Tint attribute is set:
+        var sheetId = getTokenSheetId(objList[i]);
+        if (sheetId === "") { continue; }
+        if (!isHasAttribute(sheetId, "Tint")) { continue; }
+        var tintAttr = getAttribute(sheetId, "Tint");
+        if (tintAttr === "") { continue; } 
+        objList[i].set('tint_color', tintAttr);
     }
 }
 

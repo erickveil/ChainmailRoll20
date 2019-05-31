@@ -316,6 +316,9 @@ function executeAttack(
         return;
     }
 
+    if (targetNumber > 6) { targetNumber = 6; }
+    if (targetNumber < 1) { targetNumber = 1; }
+
     // do the roll
     sendChat(chatTarget,  "/r " + numberOfDice + "d6>" + targetNumber 
         + " " + attackerName);
